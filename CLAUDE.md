@@ -108,3 +108,12 @@
 
 ## Next.js 버전 안내
 @AGENTS.md
+
+## 배포·운영 (2026-10-10 첫 배포)
+- 사이트 주소: **https://english-schedule-5mgw.vercel.app** (Vercel 프로젝트 `english-schedule-5mgw`)
+- 코드: GitHub `qmfflcldlclr-blip/english-schedule` (비공개). **main 에 push 하면 Vercel 이 자동 배포.**
+- Vercel 환경 변수: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (값은 `.env.local` 과 동일)
+- 데이터베이스 변경은 `supabase/migrations/` 에 번호 순서대로 SQL 파일을 만들고, 사용자가 Supabase SQL Editor 에서 **한 번씩** 실행. **0008 까지 실행 완료.**
+- 취소 규칙 테스트: `supabase/tests/lesson_status_test.sql` ("TEST OK" 오류 메시지가 성공)
+- 로그인 계정: `lee`(매니저, 한국어, Asia/Seoul), `michelle`(선생님, 영어, Asia/Manila). 아이디는 내부적으로 `아이디@example.com` 이메일로 변환됨.
+- 폰에서 개발 서버 확인: `npm run dev:phone` → 같은 Wi-Fi 에서 `http://PC의IP:3000`
