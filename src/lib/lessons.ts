@@ -11,11 +11,12 @@ export type Lesson = {
   status: LessonStatus;
   series_id: string | null;
   memo: string | null;
+  cancelled_at: string | null; // 있으면 취소(무료·차감), 결석인데 없으면 노쇼
   studentName: string;
 };
 
 const COLUMNS =
-  "id, student_id, starts_at, duration_minutes, status, series_id, memo, student:students(name)";
+  "id, student_id, starts_at, duration_minutes, status, series_id, memo, cancelled_at, student:students(name)";
 
 type Row = Omit<Lesson, "studentName"> & {
   student: { name: string } | { name: string }[] | null;
@@ -58,4 +59,15 @@ export async function getOtherTimeZone(myId: string, myTimeZone: string) {
     .neq("id", myId)
     .in("role", ["manager", "teacher"]);
   return data?.map((p) => p.timezone as string).find((tz) => tz !== myTimeZone) ?? null;
+}
+
+// 학생의 남은 횟수
+export async function getRemaining(studentId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("student_balances")
+    .select("remaining")
+    .eq("student_id", studentId)
+    .maybeSingle();
+  return (data?.remaining as number | undefined) ?? 0;
 }

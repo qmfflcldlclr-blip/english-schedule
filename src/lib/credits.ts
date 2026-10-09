@@ -7,6 +7,7 @@ import {
 } from "@/lib/credit-math";
 
 export type EntryKind =
+  | "revert"
   | "plan"
   | "lesson_completed"
   | "absent"
@@ -25,7 +26,7 @@ export async function getStudentCredits(studentId: string, today: string) {
     supabase
       .from("credit_entries")
       .select(
-        "id, delta, kind, plan_id, reason, created_at, creator:profiles(display_name)",
+        "id, delta, kind, plan_id, reason, detail, created_at, creator:profiles(display_name), lesson:lessons(starts_at)",
       )
       .eq("student_id", studentId)
       .order("created_at"),
@@ -39,6 +40,8 @@ export async function getStudentCredits(studentId: string, today: string) {
     kind: e.kind as EntryKind,
     plan_id: e.plan_id as string | null,
     reason: e.reason as string | null,
+    detail: e.detail as string | null, // 취소 규칙 사유 또는 되돌리기 전 상태
+    lessonStartsAt: (firstOf(e.lesson) as { starts_at: string } | undefined)?.starts_at ?? null,
     created_at: e.created_at as string,
     creatorName: firstOf(e.creator)?.display_name ?? "",
   }));

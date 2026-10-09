@@ -10,6 +10,7 @@ type Props = {
   credits: Awaited<ReturnType<typeof getStudentCredits>>;
   locale: string;
   timeZone: string;
+  hoursBefore: number; // 무료 취소 기준 시간 (설정 값)
 };
 
 // "YYYY-MM-DD" 날짜는 시간대 변환 없이 그대로 표시
@@ -35,7 +36,23 @@ export default function CreditSection({
   credits,
   locale,
   timeZone,
+  hoursBefore,
 }: Props) {
+  // 기록 한 줄의 부가 설명: 어느 수업인지 + 취소 사유 / 무엇을 되돌렸는지 / 수동 조정 사유
+  const describe = (e: (typeof entries)[number]) => {
+    const parts: string[] = [];
+    if (e.lessonStartsAt) {
+      parts.push(format(t.lessonOn, { date: formatDate(e.lessonStartsAt, locale, timeZone) }));
+    }
+    if (e.kind === "revert" && e.detail) {
+      const undone = e.detail === "completed" ? "lesson_completed" : e.detail;
+      if (undone in t.kinds) parts.push(format(t.revertOf, { status: t.kinds[undone as keyof typeof t.kinds] }));
+    } else if (e.detail && e.detail in t.reasons) {
+      parts.push(format(t.reasons[e.detail as keyof typeof t.reasons], { hours: hoursBefore }));
+    }
+    if (e.reason) parts.push(e.reason);
+    return parts.join(" · ");
+  };
   const { remaining, used, purchased, firstStart, plans, entries } = credits;
 
   return (
@@ -166,8 +183,8 @@ export default function CreditSection({
                     <p className="text-xs text-gray-500">
                       {formatDate(e.created_at, locale, timeZone)} · {e.creatorName}
                     </p>
-                    {e.reason && (
-                      <p className="mt-0.5 break-words text-sm text-gray-600">{e.reason}</p>
+                    {describe(e) && (
+                      <p className="mt-0.5 break-words text-sm text-gray-600">{describe(e)}</p>
                     )}
                   </div>
                   <div className="shrink-0 text-right tabular-nums">
@@ -201,7 +218,7 @@ export default function CreditSection({
                     </td>
                     <td className="py-2.5 pr-4">
                       {t.kinds[e.kind]}
-                      {e.reason && <span className="block text-gray-500">{e.reason}</span>}
+                      {describe(e) && <span className="block text-gray-500">{describe(e)}</span>}
                     </td>
                     <td className={`py-2.5 pr-4 text-right font-semibold tabular-nums ${e.delta > 0 ? "text-emerald-700" : e.delta < 0 ? "text-red-600" : "text-gray-500"}`}>
                       {signed(e.delta)}

@@ -103,7 +103,8 @@
       "absent": "Absent",
       "late_cancel": "Late cancel",
       "free_cancel": "Free cancel",
-      "adjust": "Manual adjustment"
+      "adjust": "Manual adjustment",
+      "revert": "Reverted"
     },
     "newPlanTitle": "Add plan",
     "editPlanTitle": "Edit plan",
@@ -127,6 +128,13 @@
       "amount": "Credits must be between 1 and {max}.",
       "reason": "Please enter a reason.",
       "save": "Could not save. Please try again."
+    },
+    "revertOf": "Reverted {status}",
+    "lessonOn": "Class on {date}",
+    "reasons": {
+      "early_first": "{hours}+ hours before, first cancel this month",
+      "within_hour": "Cancelled within {hours} hour(s) of class",
+      "monthly_limit": "Already cancelled this month"
     }
   },
   "calendar": {
@@ -211,6 +219,40 @@
     "repeatErrors": {
       "weekdays": "Choose at least one day.",
       "weeks": "Choose between 1 and {max} weeks."
+    },
+    "actions": {
+      "complete": "Completed",
+      "cancel": "Cancel",
+      "absent": "Absent",
+      "revert": "Revert"
+    },
+    "processing": "Processing…",
+    "confirmComplete": "Mark this class as completed? 1 credit will be used.",
+    "confirmCompleteNoCredits": "This student has {n} credits left. Complete anyway? The balance will go negative.",
+    "confirmAbsent": "Mark as absent (no-show)? 1 credit will be used.",
+    "confirmRevert": "Revert to \"Scheduled\"? Any credit change from this class will be undone.",
+    "cancelTitle": "Cancel class",
+    "cancelledAt": "When the cancellation was received",
+    "cancelledAtHint": "Defaults to now. If you were told earlier, change it to that time.",
+    "cancelPreviewFree": "Free cancellation — no credit used.",
+    "cancelPreviewCharged": "1 credit will be used.",
+    "checking": "Checking…",
+    "confirmCancel": "Cancel class",
+    "back": "Back",
+    "remainingNow": "{n} credits left",
+    "cancelledAtLabel": "Cancelled at",
+    "noShow": "Absent (no-show)",
+    "lateCancel": "Late cancel",
+    "reasons": {
+      "early_first": "{hours}+ hours before, first cancel this month",
+      "within_hour": "Cancelled within {hours} hour(s) of class",
+      "monthly_limit": "Already cancelled {n} time(s) this month"
+    },
+    "statusErrors": {
+      "already_processed": "This class was already processed. Please refresh.",
+      "cancel_time_in_future": "Cancellation time cannot be in the future.",
+      "not_processed": "This class has not been processed yet.",
+      "unknown": "Could not process. Please try again."
     }
   }
 }

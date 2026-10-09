@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "@/i18n/server";
 import { format } from "@/i18n/format";
 import { getCurrentProfile } from "@/lib/supabase/server";
-import { getLesson, getOtherTimeZone } from "@/lib/lessons";
+import { getLesson, getOtherTimeZone, getRemaining } from "@/lib/lessons";
+import { getSettings } from "@/lib/settings";
+import LessonStatusPanel from "@/components/calendar/LessonStatusPanel";
 import { listStudents } from "@/lib/students";
 import { formatDay, toZoned } from "@/lib/time";
 import { zoneName } from "@/config/timezones";
@@ -26,6 +28,14 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
   const timeZone = (profile?.timezone as string) ?? "UTC";
   const local = toZoned(lesson.starts_at, timeZone);
   const editable = lesson.status === "scheduled";
+  const [remaining, settings, otherTimeZone] = await Promise.all([
+    getRemaining(lesson.student_id),
+    getSettings(),
+    getOtherTimeZone(profile?.id ?? "", timeZone),
+  ]);
+  const now = toZoned(new Date(), timeZone);
+  // 결석 중 취소 시각이 있으면 "차감 취소", 없으면 "노쇼"
+  const absentLabel = lesson.cancelled_at ? t.lateCancel : t.noShow;
 
   // 보관된 학생의 수업이어도 선택 목록에 그 학생이 보이도록
   const options = students.some((s) => s.id === lesson.student_id)
@@ -40,25 +50,35 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
 
       <div className="mt-2 mb-6 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{editable ? t.editTitle : t.viewTitle}</h1>
+          <h1 className="text-2xl font-bold">{t.viewTitle}</h1>
           <p className="mt-1 text-gray-600">
             {formatDay(local.date, locale, { month: "long", day: "numeric", weekday: "short" })}{" "}
             <LessonTime
               startsAt={lesson.starts_at}
               timeZone={timeZone}
-              otherTimeZone={await getOtherTimeZone(profile?.id ?? "", timeZone)}
+              otherTimeZone={otherTimeZone}
               locale={locale}
               otherLabel={t.otherTime}
             />
           </p>
         </div>
         <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusBadge[lesson.status]}`}>
-          {t.status[lesson.status]}
+          {lesson.status === "absent" ? absentLabel : t.status[lesson.status]}
         </span>
       </div>
 
+      <LessonStatusPanel
+        t={t}
+        lessonId={lesson.id}
+        status={lesson.status}
+        remaining={remaining}
+        hoursBefore={settings.freeCancelHoursBefore}
+        now={{ date: now.date, time: now.time }}
+      />
+
       {editable ? (
         <>
+          <h2 className="mt-8 mb-4 border-t border-gray-100 pt-6 text-lg font-semibold">{t.editTitle}</h2>
           <LessonForm
             t={t}
             students={options}
@@ -89,7 +109,7 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
         </>
       ) : (
         <>
-          <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-xl border border-gray-200 p-4">
+          <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-xl border border-gray-200 p-4">
             <dt className="text-gray-500">{t.student}</dt>
             <dd>
               <Link href={`/students/${lesson.student_id}`} className="underline underline-offset-4">
@@ -98,11 +118,20 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
             </dd>
             <dt className="text-gray-500">{t.duration}</dt>
             <dd>{format(t.minutesUnit, { n: lesson.duration_minutes })}</dd>
+            {lesson.cancelled_at && (
+              <>
+                <dt className="text-gray-500">{t.cancelledAtLabel}</dt>
+                <dd>
+                  {formatDay(toZoned(lesson.cancelled_at, timeZone).date, locale)}{" "}
+                  {toZoned(lesson.cancelled_at, timeZone).time}
+                </dd>
+              </>
+            )}
             <dt className="text-gray-500">{t.memo}</dt>
             <dd className="break-words">{lesson.memo || "—"}</dd>
           </dl>
           <p className="mt-4 text-sm text-gray-500">
-            {format(t.lockedNotice, { status: t.status[lesson.status] })}
+            {format(t.lockedNotice, { status: lesson.status === "absent" ? absentLabel : t.status[lesson.status] })}
           </p>
         </>
       )}

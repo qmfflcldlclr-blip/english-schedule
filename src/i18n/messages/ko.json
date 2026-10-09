@@ -103,7 +103,8 @@
       "absent": "결석",
       "late_cancel": "차감 취소",
       "free_cancel": "무료 취소",
-      "adjust": "수동 조정"
+      "adjust": "수동 조정",
+      "revert": "되돌림"
     },
     "newPlanTitle": "플랜 등록",
     "editPlanTitle": "플랜 수정",
@@ -127,6 +128,13 @@
       "amount": "횟수는 1~{max} 사이로 입력하세요.",
       "reason": "사유를 입력하세요.",
       "save": "저장하지 못했습니다. 다시 시도해 주세요."
+    },
+    "revertOf": "{status} 되돌림",
+    "lessonOn": "{date} 수업",
+    "reasons": {
+      "early_first": "{hours}시간 이상 전 + 이번 달 첫 취소",
+      "within_hour": "수업 {hours}시간 이내 취소",
+      "monthly_limit": "이번 달 이미 취소한 적 있음"
     }
   },
   "calendar": {
@@ -211,6 +219,40 @@
     "repeatErrors": {
       "weekdays": "요일을 하나 이상 고르세요.",
       "weeks": "기간은 1~{max}주 사이로 입력하세요."
+    },
+    "actions": {
+      "complete": "완료",
+      "cancel": "취소",
+      "absent": "결석",
+      "revert": "되돌리기"
+    },
+    "processing": "처리 중…",
+    "confirmComplete": "이 수업을 완료 처리할까요? 1회 차감됩니다.",
+    "confirmCompleteNoCredits": "남은 횟수가 {n}회입니다. 그래도 완료 처리할까요? 남은 횟수가 마이너스가 됩니다.",
+    "confirmAbsent": "결석(노쇼)으로 처리할까요? 1회 차감됩니다.",
+    "confirmRevert": "\"예정\"으로 되돌릴까요? 이 수업으로 바뀐 횟수가 원래대로 돌아옵니다.",
+    "cancelTitle": "수업 취소",
+    "cancelledAt": "취소 연락 받은 시각",
+    "cancelledAtHint": "기본값은 지금입니다. 미리 연락받았다면 그 시각으로 바꾸세요.",
+    "cancelPreviewFree": "무료 취소 가능 — 차감되지 않습니다.",
+    "cancelPreviewCharged": "1회 차감됩니다.",
+    "checking": "확인 중…",
+    "confirmCancel": "취소 처리",
+    "back": "돌아가기",
+    "remainingNow": "남은 횟수 {n}회",
+    "cancelledAtLabel": "취소 시각",
+    "noShow": "결석 (노쇼)",
+    "lateCancel": "차감 취소",
+    "reasons": {
+      "early_first": "{hours}시간 이상 전 + 이번 달 첫 취소",
+      "within_hour": "수업 {hours}시간 이내 취소",
+      "monthly_limit": "이번 달 이미 취소 {n}회"
+    },
+    "statusErrors": {
+      "already_processed": "이미 처리된 수업입니다. 화면을 새로고침하세요.",
+      "cancel_time_in_future": "취소 시각은 지금보다 늦을 수 없습니다.",
+      "not_processed": "아직 처리되지 않은 수업입니다.",
+      "unknown": "처리하지 못했습니다. 다시 시도해 주세요."
     }
   }
 }

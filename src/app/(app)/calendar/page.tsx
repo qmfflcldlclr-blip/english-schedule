@@ -125,7 +125,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                   <div className="flex shrink-0 flex-col items-end gap-1 text-sm">
                     <span className="text-gray-500">{format(t.minutesUnit, { n: l.duration_minutes })}</span>
                     {l.status !== "scheduled" && (
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium no-underline ${statusBadge[l.status]}`}>{t.status[l.status]}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium no-underline ${statusBadge[l.status]}`}>{l.status === "absent" ? (l.cancelled_at ? t.lateCancel : t.noShow) : t.status[l.status]}</span>
                     )}
                   </div>
                 </Link>

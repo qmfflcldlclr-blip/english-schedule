@@ -5,6 +5,7 @@ import { format, formatDate } from "@/i18n/format";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getStudent } from "@/lib/students";
 import { getStudentCredits } from "@/lib/credits";
+import { getSettings } from "@/lib/settings";
 import { todayIn } from "@/lib/credit-math";
 import ArchiveButton from "@/components/ArchiveButton";
 import CreditSection from "@/components/CreditSection";
@@ -21,7 +22,10 @@ export default async function StudentDetailPage({
   if (!student) notFound();
   const t = all.students;
   const timeZone = profile?.timezone ?? "UTC";
-  const credits = await getStudentCredits(student.id, todayIn(timeZone));
+  const [credits, settings] = await Promise.all([
+    getStudentCredits(student.id, todayIn(timeZone)),
+    getSettings(),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
@@ -67,6 +71,7 @@ export default async function StudentDetailPage({
         credits={credits}
         locale={locale}
         timeZone={timeZone}
+        hoursBefore={settings.freeCancelHoursBefore}
       />
 
       <div className="mt-8 flex justify-end">
