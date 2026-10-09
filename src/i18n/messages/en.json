@@ -11,7 +11,8 @@
   "nav": {
     "label": "Menu",
     "home": "Home",
-    "students": "Students"
+    "students": "Students",
+    "calendar": "Calendar"
   },
   "auth": {
     "loginTitle": "Log in",
@@ -126,6 +127,53 @@
       "amount": "Credits must be between 1 and {max}.",
       "reason": "Please enter a reason.",
       "save": "Could not save. Please try again."
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "add": "Add class",
+    "noLessons": "No classes on this day.",
+    "noLessonsWeek": "No classes this week.",
+    "otherTime": "{zone} {time}",
+    "minutesUnit": "{n} min",
+    "status": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "free_cancel": "Free cancel",
+      "absent": "Absent"
+    },
+    "newTitle": "Add class",
+    "editTitle": "Edit class",
+    "viewTitle": "Class details",
+    "student": "Student",
+    "chooseStudent": "Choose a student",
+    "date": "Date",
+    "time": "Start time",
+    "duration": "Length",
+    "memo": "Notes",
+    "memoPlaceholder": "e.g. Book unit 3",
+    "timeZoneHint": "Times are in {zone} time.",
+    "noStudents": "Add a student first.",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "deleteConfirm": "Delete this class?",
+    "lockedNotice": "This class is already {status} and can no longer be edited or deleted.",
+    "overlapTitle": "This overlaps another class",
+    "overlapItem": "{time} {name} ({n} min)",
+    "saveAnyway": "Save anyway",
+    "errors": {
+      "student": "Please choose a student.",
+      "date": "Please enter a date.",
+      "time": "Please enter a start time.",
+      "duration": "Length must be between {min} and {max} minutes.",
+      "save": "Could not save. Please try again.",
+      "delete": "Could not delete. The class may already be processed."
     }
   }
 }

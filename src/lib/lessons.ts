@@ -1,0 +1,61 @@
+import "server-only";
+import { createClient } from "@/lib/supabase/server";
+
+export type LessonStatus = "scheduled" | "completed" | "free_cancel" | "absent";
+
+export type Lesson = {
+  id: string;
+  student_id: string;
+  starts_at: string;
+  duration_minutes: number;
+  status: LessonStatus;
+  series_id: string | null;
+  memo: string | null;
+  studentName: string;
+};
+
+const COLUMNS =
+  "id, student_id, starts_at, duration_minutes, status, series_id, memo, student:students(name)";
+
+type Row = Omit<Lesson, "studentName"> & {
+  student: { name: string } | { name: string }[] | null;
+};
+
+function toLesson({ student, ...row }: Row): Lesson {
+  const s = Array.isArray(student) ? student[0] : student;
+  return { ...row, studentName: s?.name ?? "" };
+}
+
+// from 이상 to 미만에 시작하는 수업 (시간순)
+export async function listLessons(from: Date, to: Date): Promise<Lesson[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("lessons")
+    .select(COLUMNS)
+    .gte("starts_at", from.toISOString())
+    .lt("starts_at", to.toISOString())
+    .order("starts_at");
+  if (error) throw error;
+  return (data as Row[]).map(toLesson);
+}
+
+export async function getLesson(id: string): Promise<Lesson | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("lessons")
+    .select(COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
+  return data ? toLesson(data as Row) : null;
+}
+
+// 상대방(나와 다른 시간대의 매니저·선생님) 시간대. 없으면 null
+export async function getOtherTimeZone(myId: string, myTimeZone: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("timezone")
+    .neq("id", myId)
+    .in("role", ["manager", "teacher"]);
+  return data?.map((p) => p.timezone as string).find((tz) => tz !== myTimeZone) ?? null;
+}

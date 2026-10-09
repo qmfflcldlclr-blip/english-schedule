@@ -17,6 +17,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
 
   const items = [
     { href: "/", label: t.nav.home, icon: "home" as const },
+    { href: "/calendar", label: t.nav.calendar, icon: "calendar" as const },
     { href: "/students", label: t.nav.students, icon: "students" as const },
   ];
 
