@@ -26,7 +26,7 @@ async function Home() {
           <form action={logout}>
             <button
               type="submit"
-              className="rounded-full px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+              className="min-h-11 rounded-full px-3 text-sm text-gray-600 hover:bg-gray-100"
             >
               {t.auth.logout}
             </button>

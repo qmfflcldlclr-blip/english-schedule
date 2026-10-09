@@ -4,6 +4,9 @@ export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = "ko";
 
+// 폰 화면처럼 좁은 곳에서 쓰는 짧은 언어 이름
+export const localeShortNames: Record<Locale, string> = { ko: "한", en: "EN" };
+
 // 선택한 언어를 저장하는 쿠키 이름
 export const LOCALE_COOKIE = "locale";
 

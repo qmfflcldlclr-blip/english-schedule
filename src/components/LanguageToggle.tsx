@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { setLocale } from "@/i18n/actions";
-import { locales, type Locale } from "@/i18n/config";
+import { localeShortNames, locales, type Locale } from "@/i18n/config";
 
 type Props = {
   current: Locale;
@@ -28,13 +28,16 @@ export default function LanguageToggle({ current, labels, ariaLabel }: Props) {
             aria-pressed={active}
             disabled={pending || active}
             onClick={() => startTransition(() => setLocale(locale))}
-            className={`rounded-full px-3 py-1.5 transition-colors ${
+            aria-label={labels[locale]}
+            className={`min-h-10 min-w-10 rounded-full px-3 transition-colors ${
               active
                 ? "bg-gray-900 text-white"
                 : "text-gray-600 hover:bg-gray-100"
             } disabled:cursor-default`}
           >
-            {labels[locale]}
+            {/* 폰에서는 짧게(한/EN), 넓은 화면에서는 전체 이름 */}
+            <span className="sm:hidden">{localeShortNames[locale]}</span>
+            <span className="hidden sm:inline">{labels[locale]}</span>
           </button>
         );
       })}

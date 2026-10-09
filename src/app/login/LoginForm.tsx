@@ -11,7 +11,7 @@ export default function LoginForm({ t }: { t: Messages["auth"] }) {
   );
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-base focus:border-gray-900 focus:outline-none";
+    "mt-1 min-h-12 w-full rounded-lg border border-gray-300 px-3 text-base focus:border-gray-900 focus:outline-none";
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -46,7 +46,7 @@ export default function LoginForm({ t }: { t: Messages["auth"] }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 rounded-lg bg-gray-900 py-2.5 font-medium text-white disabled:opacity-60"
+        className="mt-2 min-h-12 rounded-lg bg-gray-900 font-medium text-white disabled:opacity-60"
       >
         {pending ? t.submitting : t.submit}
       </button>
