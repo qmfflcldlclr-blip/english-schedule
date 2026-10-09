@@ -5,3 +5,7 @@
 export const DEFAULT_LESSON_MINUTES = 30;
 export const LESSON_MINUTES_MIN = 10;
 export const LESSON_MINUTES_MAX = 180;
+
+// 플랜 1개에 등록할 수 있는 최대 횟수, 수동 조정 1번에 바꿀 수 있는 최대 횟수 (입력 실수 방지용)
+export const PLAN_CREDITS_MAX = 200;
+export const ADJUST_MAX = 50;

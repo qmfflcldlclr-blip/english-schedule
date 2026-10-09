@@ -4,7 +4,10 @@ import { getDictionary } from "@/i18n/server";
 import { format, formatDate } from "@/i18n/format";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getStudent } from "@/lib/students";
+import { getStudentCredits } from "@/lib/credits";
+import { todayIn } from "@/lib/credit-math";
 import ArchiveButton from "@/components/ArchiveButton";
+import CreditSection from "@/components/CreditSection";
 
 export default async function StudentDetailPage({
   params,
@@ -17,6 +20,8 @@ export default async function StudentDetailPage({
   ]);
   if (!student) notFound();
   const t = all.students;
+  const timeZone = profile?.timezone ?? "UTC";
+  const credits = await getStudentCredits(student.id, todayIn(timeZone));
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
@@ -49,15 +54,20 @@ export default async function StudentDetailPage({
         <dd>{format(t.minutesUnit, { n: student.lesson_minutes })}</dd>
         <dt className="text-gray-500">{t.createdAt}</dt>
         <dd>
-          {formatDate(student.created_at, locale, profile?.timezone ?? "UTC")}
+          {formatDate(student.created_at, locale, timeZone)}
         </dd>
         <dt className="text-gray-500">{t.memo}</dt>
         <dd className="whitespace-pre-wrap break-words">{student.memo || "—"}</dd>
       </dl>
 
-      <p className="mt-6 rounded-xl bg-gray-50 p-4 text-sm text-gray-500">
-        {t.plansComingSoon}
-      </p>
+      <CreditSection
+        t={all.credits}
+        studentId={student.id}
+        archived={student.archived}
+        credits={credits}
+        locale={locale}
+        timeZone={timeZone}
+      />
 
       <div className="mt-8 flex justify-end">
         <ArchiveButton
