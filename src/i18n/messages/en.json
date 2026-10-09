@@ -12,7 +12,8 @@
     "label": "Menu",
     "home": "Home",
     "students": "Students",
-    "calendar": "Calendar"
+    "calendar": "Calendar",
+    "settings": "Settings"
   },
   "auth": {
     "loginTitle": "Log in",
@@ -253,6 +254,29 @@
       "cancel_time_in_future": "Cancellation time cannot be in the future.",
       "not_processed": "This class has not been processed yet.",
       "unknown": "Could not process. Please try again."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "zoomTitle": "Zoom link",
+    "zoomHint": "The fixed Zoom link used for every class.",
+    "zoomPlaceholder": "https://us02web.zoom.us/j/...",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved.",
+    "openZoom": "Open Zoom",
+    "noZoom": "No Zoom link yet.",
+    "setZoom": "Add in Settings",
+    "rulesTitle": "Cancellation rules",
+    "rulesHint": "Rule values can be changed in the database settings.",
+    "ruleHours": "Free cancellation",
+    "ruleHoursValue": "Up to {n} hour(s) before class",
+    "rulePerMonth": "Free cancels per month",
+    "rulePerMonthValue": "{n} (all cancellations count)",
+    "ruleZone": "Month boundary time zone",
+    "errors": {
+      "url": "Please enter a valid address starting with https://",
+      "save": "Could not save. Please try again."
     }
   }
 }

@@ -6,6 +6,7 @@ import { getCurrentProfile } from "@/lib/supabase/server";
 import { getLesson, getOtherTimeZone, getRemaining } from "@/lib/lessons";
 import { getSettings } from "@/lib/settings";
 import LessonStatusPanel from "@/components/calendar/LessonStatusPanel";
+import ZoomButton from "@/components/ZoomButton";
 import { listStudents } from "@/lib/students";
 import { formatDay, toZoned } from "@/lib/time";
 import { zoneName } from "@/config/timezones";
@@ -66,6 +67,12 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
           {lesson.status === "absent" ? absentLabel : t.status[lesson.status]}
         </span>
       </div>
+
+      {editable && (
+        <div className="mb-2">
+          <ZoomButton url={settings.zoomUrl} t={all.settings} size="large" />
+        </div>
+      )}
 
       <LessonStatusPanel
         t={t}

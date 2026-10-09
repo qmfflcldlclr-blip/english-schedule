@@ -14,6 +14,8 @@ import {
   weekStart,
 } from "@/lib/time";
 import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
+import ZoomButton from "@/components/ZoomButton";
+import { getSettings } from "@/lib/settings";
 
 // PC 시간표: 기본으로 보여줄 시간 범위 (수업이 범위 밖이면 자동으로 넓어짐)
 const GRID_DEFAULT_FROM = 9;
@@ -33,9 +35,10 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   const monday = weekStart(selected);
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
 
-  const [lessons, otherTimeZone] = await Promise.all([
+  const [lessons, otherTimeZone, settings] = await Promise.all([
     listLessons(fromZoned(monday, "00:00", timeZone), fromZoned(addDays(monday, 7), "00:00", timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
+    getSettings(),
   ]);
 
   // 날짜별로 묶기 (내 시간대 기준)
@@ -77,8 +80,9 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
         </Link>
       </div>
 
-      {/* 지난주 복사 · 반복 생성 */}
-      <div className="mt-2 flex justify-center gap-2 md:justify-end">
+      {/* Zoom · 지난주 복사 · 반복 생성 */}
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 md:justify-end">
+        <ZoomButton url={settings.zoomUrl} t={all.settings} />
         <Link href={`/calendar/copy?date=${monday}`} className="flex min-h-11 items-center rounded-full border border-gray-300 px-4 text-sm">
           {t.copyWeek}
         </Link>

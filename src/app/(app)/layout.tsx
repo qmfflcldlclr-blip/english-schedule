@@ -19,6 +19,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
     { href: "/", label: t.nav.home, icon: "home" as const },
     { href: "/calendar", label: t.nav.calendar, icon: "calendar" as const },
     { href: "/students", label: t.nav.students, icon: "students" as const },
+    { href: "/settings", label: t.nav.settings, icon: "settings" as const },
   ];
 
   return (
