@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies, headers } from "next/headers";
+import { cache } from "react";
 import { defaultLocale, isLocale, LOCALE_COOKIE, type Locale } from "./config";
 import ko from "./messages/ko.json";
 import en from "./messages/en.json";
@@ -19,7 +20,7 @@ export async function getLocale(): Promise<Locale> {
   return first === "ko" ? "ko" : "en";
 }
 
-export async function getDictionary() {
+export const getDictionary = cache(async () => {
   const locale = await getLocale();
   return { locale, t: dictionaries[locale] };
-}
+});

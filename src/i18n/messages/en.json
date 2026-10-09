@@ -8,6 +8,11 @@
     "ko": "한국어",
     "en": "English"
   },
+  "nav": {
+    "label": "Menu",
+    "home": "Home",
+    "students": "Students"
+  },
   "auth": {
     "loginTitle": "Log in",
     "username": "Username",
@@ -20,6 +25,40 @@
   },
   "home": {
     "greeting": "Hello, {name}!",
-    "comingSoon": "Student management and the calendar are coming soon."
+    "comingSoon": "Class plans and the calendar are coming soon."
+  },
+  "students": {
+    "title": "Students",
+    "add": "Add student",
+    "count": "{n} students",
+    "empty": "No students yet.",
+    "emptyArchived": "No archived students.",
+    "showArchived": "Show archived",
+    "showActive": "Show current",
+    "archivedBadge": "Archived",
+    "name": "Name",
+    "lessonMinutes": "Class length",
+    "minutesUnit": "{n} min",
+    "minutes": "min",
+    "memo": "Notes",
+    "memoPlaceholder": "e.g. Grade 3, working on phonics",
+    "createdAt": "Added",
+    "backToList": "Students",
+    "newTitle": "New student",
+    "editTitle": "Edit student",
+    "edit": "Edit",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "archiveConfirm": "Archive this student? They will be hidden from the list, but their records are kept.",
+    "notFound": "Student not found.",
+    "plansComingSoon": "Class plans and credit history will be added in the next step.",
+    "errors": {
+      "name": "Please enter a name.",
+      "minutes": "Class length must be between {min} and {max} minutes.",
+      "save": "Could not save. Please try again."
+    }
   }
 }

@@ -8,6 +8,11 @@
     "ko": "한국어",
     "en": "English"
   },
+  "nav": {
+    "label": "메뉴",
+    "home": "홈",
+    "students": "학생"
+  },
   "auth": {
     "loginTitle": "로그인",
     "username": "아이디",
@@ -20,6 +25,40 @@
   },
   "home": {
     "greeting": "안녕하세요, {name}님!",
-    "comingSoon": "곧 학생 관리와 달력 기능이 추가됩니다."
+    "comingSoon": "곧 수강 플랜과 달력 기능이 추가됩니다."
+  },
+  "students": {
+    "title": "학생",
+    "add": "학생 추가",
+    "count": "{n}명",
+    "empty": "등록된 학생이 없습니다.",
+    "emptyArchived": "보관된 학생이 없습니다.",
+    "showArchived": "보관된 학생 보기",
+    "showActive": "현재 학생 보기",
+    "archivedBadge": "보관됨",
+    "name": "이름",
+    "lessonMinutes": "수업 길이",
+    "minutesUnit": "{n}분",
+    "minutes": "분",
+    "memo": "메모",
+    "memoPlaceholder": "예: 초등 3학년, 파닉스 진행 중",
+    "createdAt": "등록일",
+    "backToList": "학생 목록",
+    "newTitle": "새 학생",
+    "editTitle": "학생 정보 수정",
+    "edit": "수정",
+    "save": "저장",
+    "saving": "저장 중…",
+    "cancel": "취소",
+    "archive": "보관하기",
+    "unarchive": "보관 해제",
+    "archiveConfirm": "이 학생을 보관할까요? 목록에서 숨겨지며 기록은 그대로 남습니다.",
+    "notFound": "학생을 찾을 수 없습니다.",
+    "plansComingSoon": "수강 플랜과 횟수 기록은 다음 단계에서 추가됩니다.",
+    "errors": {
+      "name": "이름을 입력하세요.",
+      "minutes": "수업 길이는 {min}~{max}분 사이로 입력하세요.",
+      "save": "저장하지 못했습니다. 다시 시도해 주세요."
+    }
   }
 }
