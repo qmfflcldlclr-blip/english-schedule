@@ -8,8 +8,18 @@
     "ko": "한국어",
     "en": "English"
   },
+  "auth": {
+    "loginTitle": "Log in",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Log in",
+    "submitting": "Logging in…",
+    "invalid": "Incorrect username or password.",
+    "noProfile": "This account has no profile yet. Please contact the manager.",
+    "logout": "Log out"
+  },
   "home": {
-    "welcome": "Welcome!",
-    "comingSoon": "Login, student management, and calendar are coming soon."
+    "greeting": "Hello, {name}!",
+    "comingSoon": "Student management and the calendar are coming soon."
   }
 }

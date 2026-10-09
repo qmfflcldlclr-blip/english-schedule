@@ -8,8 +8,18 @@
     "ko": "한국어",
     "en": "English"
   },
+  "auth": {
+    "loginTitle": "로그인",
+    "username": "아이디",
+    "password": "비밀번호",
+    "submit": "로그인",
+    "submitting": "로그인 중…",
+    "invalid": "아이디 또는 비밀번호가 올바르지 않습니다.",
+    "noProfile": "계정 정보가 등록되지 않았습니다. 관리자에게 문의하세요.",
+    "logout": "로그아웃"
+  },
   "home": {
-    "welcome": "환영합니다!",
-    "comingSoon": "곧 로그인, 학생 관리, 달력 기능이 추가됩니다."
+    "greeting": "안녕하세요, {name}님!",
+    "comingSoon": "곧 학생 관리와 달력 기능이 추가됩니다."
   }
 }
