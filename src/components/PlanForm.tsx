@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionForm } from "@/lib/use-action-form";
 import { savePlan, type PlanFormState } from "@/lib/credit-actions";
 import { PLAN_CREDITS_MAX } from "@/config/rules";
 import { format } from "@/i18n/format";
@@ -51,14 +51,14 @@ export function FormButtons({
 }
 
 export default function PlanForm({ t, studentId, today, plan }: Props) {
-  const [state, formAction, pending] = useActionState<PlanFormState, FormData>(
+  const [state, onSubmit, pending] = useActionForm<PlanFormState>(
     savePlan,
     {},
   );
   const errors = state.errors ?? {};
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex flex-col gap-5">
       <input type="hidden" name="student_id" value={studentId} />
       {plan && <input type="hidden" name="plan_id" value={plan.id} />}
 

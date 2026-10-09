@@ -9,6 +9,8 @@ import { formatDay, toZoned } from "@/lib/time";
 import { zoneName } from "@/config/timezones";
 import LessonForm from "@/components/calendar/LessonForm";
 import DeleteLessonButton from "@/components/calendar/DeleteLessonButton";
+import { deleteLesson } from "@/lib/lesson-actions";
+import { deleteSeriesFrom } from "@/lib/schedule-actions";
 import LessonTime, { statusBadge } from "@/components/calendar/LessonTime";
 
 export default async function LessonPage({ params }: PageProps<"/calendar/lessons/[id]">) {
@@ -71,10 +73,16 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
               memo: lesson.memo ?? "",
             }}
           />
-          <div className="mt-8 flex justify-end border-t border-gray-100 pt-4">
+          <div className="mt-8 flex flex-wrap justify-end gap-2 border-t border-gray-100 pt-4">
+            {lesson.series_id && (
+              <DeleteLessonButton
+                subtle
+                action={deleteSeriesFrom.bind(null, lesson.id)}
+                t={{ delete: t.deleteSeries, deleting: t.deleting, deleteConfirm: t.deleteSeriesConfirm, error: t.errors.delete }}
+              />
+            )}
             <DeleteLessonButton
-              lessonId={lesson.id}
-              date={local.date}
+              action={deleteLesson.bind(null, lesson.id, local.date)}
               t={{ delete: t.delete, deleting: t.deleting, deleteConfirm: t.deleteConfirm, error: t.errors.delete }}
             />
           </div>

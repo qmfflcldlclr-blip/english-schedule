@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionForm } from "@/lib/use-action-form";
 import { adjustCredits, type AdjustFormState } from "@/lib/credit-actions";
 import { ADJUST_MAX } from "@/config/rules";
 import { format } from "@/i18n/format";
@@ -10,17 +10,14 @@ import { ErrorText, FormButtons, fieldClass } from "./PlanForm";
 type Props = { t: Messages["credits"]; studentId: string };
 
 export default function AdjustForm({ t, studentId }: Props) {
-  const [state, formAction, pending] = useActionState<
-    AdjustFormState,
-    FormData
-  >(adjustCredits, {});
+  const [state, onSubmit, pending] = useActionForm<AdjustFormState>(adjustCredits, {});
   const errors = state.errors ?? {};
 
   const choice =
     "flex min-h-12 flex-1 cursor-pointer items-center justify-center rounded-lg border border-gray-300 font-medium has-[:checked]:border-gray-900 has-[:checked]:bg-gray-900 has-[:checked]:text-white";
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex flex-col gap-5">
       <input type="hidden" name="student_id" value={studentId} />
 
       <fieldset>

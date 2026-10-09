@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionForm } from "@/lib/use-action-form";
 import { saveStudent, type StudentFormState } from "@/lib/student-actions";
 import {
   DEFAULT_LESSON_MINUTES,
@@ -19,17 +19,14 @@ type Props = {
 };
 
 export default function StudentForm({ t, student, cancelHref }: Props) {
-  const [state, formAction, pending] = useActionState<
-    StudentFormState,
-    FormData
-  >(saveStudent, {});
+  const [state, onSubmit, pending] = useActionForm<StudentFormState>(saveStudent, {});
   const errors = state.errors ?? {};
 
   const inputClass =
     "mt-1 w-full rounded-lg border border-gray-300 px-3 text-base focus:border-gray-900 focus:outline-none aria-invalid:border-red-500";
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex flex-col gap-5">
       {student && <input type="hidden" name="id" value={student.id} />}
 
       <label className="block text-sm font-medium">

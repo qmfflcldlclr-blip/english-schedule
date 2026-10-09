@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { deleteLesson } from "@/lib/lesson-actions";
 
 type Props = {
-  lessonId: string;
-  date: string;
+  // 실제 삭제를 하는 서버 함수 (수업 1개 삭제 / 이후 반복 모두 삭제)
+  action: () => Promise<{ error?: boolean } | void>;
   t: { delete: string; deleting: string; deleteConfirm: string; error: string };
+  subtle?: boolean;
 };
 
-export default function DeleteLessonButton({ lessonId, date, t }: Props) {
+export default function DeleteLessonButton({ action, t, subtle }: Props) {
   const [pending, startTransition] = useTransition();
   const [failed, setFailed] = useState(false);
 
@@ -21,11 +21,11 @@ export default function DeleteLessonButton({ lessonId, date, t }: Props) {
         onClick={() => {
           if (!window.confirm(t.deleteConfirm)) return;
           startTransition(async () => {
-            const result = await deleteLesson(lessonId, date);
+            const result = await action();
             if (result?.error) setFailed(true);
           });
         }}
-        className="min-h-11 rounded-lg px-4 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
+        className={`min-h-11 rounded-lg px-4 text-sm font-medium hover:bg-red-50 disabled:opacity-60 ${subtle ? "text-red-500" : "text-red-600"}`}
       >
         {pending ? t.deleting : t.delete}
       </button>

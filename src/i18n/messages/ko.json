@@ -174,6 +174,43 @@
       "duration": "수업 길이는 {min}~{max}분 사이로 입력하세요.",
       "save": "저장하지 못했습니다. 다시 시도해 주세요.",
       "delete": "삭제하지 못했습니다. 이미 처리된 수업일 수 있습니다."
+    },
+    "copyWeek": "지난주 복사",
+    "repeat": "반복 생성",
+    "copyTitle": "지난주 수업 복사",
+    "copyDesc": "{from} 수업을 {to}로 같은 요일·시간에 복사합니다.",
+    "copyNone": "복사할 지난주 수업이 없습니다.",
+    "copyConfirm": "{n}개 복사",
+    "copying": "복사 중…",
+    "copySkipNote": "이미 같은 시간에 있는 수업은 건너뜁니다. 보관된 학생, 무료 취소된 수업, 메모는 복사하지 않습니다.",
+    "alreadyExists": "이미 있음",
+    "repeatTitle": "반복 일정 생성",
+    "weekdays": "요일",
+    "startDate": "시작일",
+    "weeks": "기간",
+    "weeksUnit": "주",
+    "preview": "미리보기",
+    "previewing": "확인 중…",
+    "previewTitle": "생성될 수업 {n}개",
+    "createN": "{n}개 생성",
+    "creating": "생성 중…",
+    "overlapsOther": "다른 수업과 겹침",
+    "nothingToCreate": "새로 만들 수업이 없습니다.",
+    "repeatHint": "만든 뒤에는 수업을 하나씩 따로 수정할 수 있습니다.",
+    "deleteSeries": "이후 반복 수업 모두 삭제",
+    "deleteSeriesConfirm": "이 수업과 이후의 같은 반복 예정 수업을 모두 삭제할까요?",
+    "weekdayNames": [
+      "월",
+      "화",
+      "수",
+      "목",
+      "금",
+      "토",
+      "일"
+    ],
+    "repeatErrors": {
+      "weekdays": "요일을 하나 이상 고르세요.",
+      "weeks": "기간은 1~{max}주 사이로 입력하세요."
     }
   }
 }

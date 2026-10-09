@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionForm } from "@/lib/use-action-form";
 import { login, type LoginState } from "@/lib/auth-actions";
 import type { Messages } from "@/i18n/server";
 
 export default function LoginForm({ t }: { t: Messages["auth"] }) {
-  const [state, formAction, pending] = useActionState<LoginState, FormData>(
+  const [state, onSubmit, pending] = useActionForm<LoginState>(
     login,
     {},
   );
@@ -14,7 +14,7 @@ export default function LoginForm({ t }: { t: Messages["auth"] }) {
     "mt-1 min-h-12 w-full rounded-lg border border-gray-300 px-3 text-base focus:border-gray-900 focus:outline-none";
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <label className="block text-sm font-medium">
         {t.username}
         <input

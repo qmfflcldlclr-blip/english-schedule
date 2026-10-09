@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
+import { useActionForm } from "@/lib/use-action-form";
 import { saveLesson, type LessonFormState } from "@/lib/lesson-actions";
 import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
 import { format } from "@/i18n/format";
@@ -25,7 +26,7 @@ type Props = {
 };
 
 export default function LessonForm({ t, students, zoneLabel, cancelHref, initial }: Props) {
-  const [state, formAction, pending] = useActionState<LessonFormState, FormData>(saveLesson, {});
+  const [state, onSubmit, pending] = useActionForm<LessonFormState>(saveLesson, {});
   // 값을 직접 들고 있어서, 경고·오류가 나도 입력한 내용이 사라지지 않음
   const [values, setValues] = useState(initial);
   const set = (key: keyof typeof values) => (e: { target: { value: string } }) =>
@@ -39,7 +40,7 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, initial
   };
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex flex-col gap-5">
       {values.lessonId && <input type="hidden" name="lesson_id" value={values.lessonId} />}
 
       <label className="block text-sm font-medium">

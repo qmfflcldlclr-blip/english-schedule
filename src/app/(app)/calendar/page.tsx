@@ -77,6 +77,16 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
         </Link>
       </div>
 
+      {/* 지난주 복사 · 반복 생성 */}
+      <div className="mt-2 flex justify-center gap-2 md:justify-end">
+        <Link href={`/calendar/copy?date=${monday}`} className="flex min-h-11 items-center rounded-full border border-gray-300 px-4 text-sm">
+          {t.copyWeek}
+        </Link>
+        <Link href={`/calendar/repeat?date=${selected}`} className="flex min-h-11 items-center rounded-full border border-gray-300 px-4 text-sm">
+          {t.repeat}
+        </Link>
+      </div>
+
       {/* ───── 폰: 날짜 줄 + 그날 목록 ───── */}
       <div className="md:hidden">
         <nav className="mt-3 grid grid-cols-7 gap-1">
