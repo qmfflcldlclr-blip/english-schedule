@@ -1,0 +1,15 @@
+{
+  "app": {
+    "title": "영어 수업 스케줄",
+    "description": "1:1 영어 화상수업 일정·횟수 관리"
+  },
+  "language": {
+    "label": "언어",
+    "ko": "한국어",
+    "en": "English"
+  },
+  "home": {
+    "welcome": "환영합니다!",
+    "comingSoon": "곧 로그인, 학생 관리, 달력 기능이 추가됩니다."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "app": {
+    "title": "English Class Schedule",
+    "description": "1:1 online English class schedule & credit management"
+  },
+  "language": {
+    "label": "Language",
+    "ko": "한국어",
+    "en": "English"
+  },
+  "home": {
+    "welcome": "Welcome!",
+    "comingSoon": "Login, student management, and calendar are coming soon."
+  }
+}
