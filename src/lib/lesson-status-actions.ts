@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { getLesson, getRemaining } from "@/lib/lessons";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { fromZoned, isDate, isTime } from "@/lib/time";
 
@@ -55,4 +57,30 @@ export async function changeLessonStatus(
     return { error: known.find((code) => error.message.includes(code)) ?? "unknown" };
   }
   redirect(`/calendar/lessons/${lessonId}`);
+}
+
+export type QuickResult = { ok: true } | { error: string } | { confirmRemaining: number };
+
+// 달력에서 바로 완료·결석 (화면 이동 없이 달력만 새로 그림)
+// 완료인데 남은 횟수가 0회 이하면 먼저 한 번 더 확인받음 (force=true 로 다시 호출)
+export async function quickLessonStatus(
+  lessonId: string,
+  action: "complete" | "absent",
+  force = false,
+): Promise<QuickResult> {
+  if (action === "complete" && !force) {
+    const lesson = await getLesson(lessonId);
+    if (!lesson) return { error: "unknown" };
+    const remaining = await getRemaining(lesson.student_id);
+    if (remaining <= 0) return { confirmRemaining: remaining };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_lesson_status", { p_lesson_id: lessonId, p_action: action });
+  if (error) {
+    const known = ["already_processed", "not_processed"];
+    return { error: known.find((code) => error.message.includes(code)) ?? "unknown" };
+  }
+  revalidatePath("/calendar");
+  revalidatePath("/");
+  return { ok: true };
 }

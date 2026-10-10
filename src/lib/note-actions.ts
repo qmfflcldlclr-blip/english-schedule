@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { NOTE_MAX } from "@/config/rules";
+import { isMissingTable } from "@/lib/db-errors";
 
-export type NoteFormState = { saved?: boolean; error?: "tooLong" | "save" };
+export type NoteFormState = { saved?: boolean; error?: "tooLong" | "save" | "setup" };
 
 // 내 메모 저장 (상대방 메모는 데이터베이스 보안 규칙이 막음)
 export async function saveNote(_prev: NoteFormState, formData: FormData): Promise<NoteFormState> {
@@ -20,6 +21,7 @@ export async function saveNote(_prev: NoteFormState, formData: FormData): Promis
     .from("staff_notes")
     .update({ content }, { count: "exact" })
     .eq("owner_id", me);
+  if (isMissingTable(error)) return { error: "setup" };
   if (error) return { error: "save" };
   if (!count) {
     // 메모 칸이 아직 없으면(새 직원) 새로 만듦

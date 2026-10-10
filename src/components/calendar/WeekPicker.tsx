@@ -4,7 +4,17 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 
 // 주 제목을 누르면 날짜 선택기가 떠서, 고른 날짜가 있는 주로 이동
-export default function WeekPicker({ label, value, ariaLabel }: { label: string; value: string; ariaLabel: string }) {
+export default function WeekPicker({
+  label,
+  value,
+  ariaLabel,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  ariaLabel: string;
+  className?: string;
+}) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   return (
@@ -21,11 +31,11 @@ export default function WeekPicker({ label, value, ariaLabel }: { label: string;
             el.focus(); // 선택기를 직접 못 여는 브라우저
           }
         }}
-        className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-lg font-semibold hover:bg-brand-50"
+        className={`flex min-h-11 items-center gap-1.5 rounded-full px-3 text-lg font-bold ${className}`}
       >
         <span aria-hidden>📅</span>
         {label}
-        <span aria-hidden className="text-sm text-gray-400">▾</span>
+        <span aria-hidden className="text-sm opacity-70">▾</span>
       </button>
       <input
         ref={input}

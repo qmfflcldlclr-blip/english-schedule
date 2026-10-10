@@ -8,6 +8,8 @@ import { formatDay, toScheduleDay, toZoned } from "@/lib/time";
 import { CALENDAR_END_HOUR, CALENDAR_START_HOUR, DAY_CUTOFF_HOUR, HOUR_PX } from "@/config/schedule";
 import LessonTime, { statusStyle } from "@/components/calendar/LessonTime";
 import DaySlots from "@/components/calendar/DaySlots";
+import LessonQuick from "@/components/calendar/LessonQuick";
+import { quickLabels, statusText } from "@/components/calendar/quick-labels";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
 
 // 이보다 낮은 수업 칸은 "시간 이름" 한 줄로 (15·20분 수업)
@@ -28,6 +30,7 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
   const lessons = days.flatMap((d) => byDay[d] ?? []);
   const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.otherTime };
   const tone = (d: string) => toneText[dayTone(d, Boolean(holidays[d]))];
+  const labels = quickLabels(t);
   const holidayText = (d: string) => (holidays[d] ?? []).map((h) => `${flag[h.country]} ${h.name}`).join(" · ");
 
   // 시간 범위 (기본 15시 ~ 다음 날 1시, 범위 밖 수업이 있으면 넓힘)
@@ -82,11 +85,16 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
               const height = Math.max((l.duration_minutes / 60) * HOUR_PX - 2, 24);
               const oneLine = height < ONE_LINE_BELOW_PX;
               const time = toZoned(l.starts_at, timeZone).time;
+              const minutes = format(t.minutesUnit, { n: l.duration_minutes });
               return (
-                <Link
+                <LessonQuick
                   key={l.id}
-                  href={`/calendar/lessons/${l.id}`}
-                  title={`${time} ${l.studentName} · ${format(t.minutesUnit, { n: l.duration_minutes })}`}
+                  lessonId={l.id}
+                  scheduled={l.status === "scheduled"}
+                  heading={`${time} · ${l.studentName}`}
+                  sub={`${minutes} · ${statusText(l, t)}`}
+                  labels={labels}
+                  title={`${time} ${l.studentName} · ${minutes}`}
                   className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]}`}
                   style={{ top: ((start - fromHour * 60) / 60) * HOUR_PX, height }}
                 >
@@ -94,14 +102,16 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
                     <>
                       <span className="shrink-0 font-semibold tabular-nums">{time}</span>
                       <span className="min-w-0 truncate font-medium">{l.studentName}</span>
+                      <span className="ml-auto shrink-0 pl-1 text-[11px] opacity-70">{minutes}</span>
                     </>
                   ) : (
                     <>
+                      <span className="absolute top-1 right-1.5 text-[11px] opacity-70">{minutes}</span>
                       <LessonTime startsAt={l.starts_at} {...timeProps} compact />
                       <span className="block truncate font-medium">{l.studentName}</span>
                     </>
                   )}
-                </Link>
+                </LessonQuick>
               );
             })}
           </div>

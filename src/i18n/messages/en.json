@@ -271,7 +271,9 @@
     "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length.",
     "pickWeek": "Choose a week",
     "searchStudent": "Search by name",
-    "noMatch": "No matching student."
+    "noMatch": "No matching student.",
+    "details": "Details",
+    "close": "Close"
   },
   "settings": {
     "title": "Settings",
@@ -335,7 +337,8 @@
     "updated": "Updated {time}",
     "errors": {
       "tooLong": "Notes can be up to 2000 characters.",
-      "save": "Could not save. Please try again."
+      "save": "Could not save. Please try again.",
+      "setup": "The database needs setup: run migration 0009 (notes) in the Supabase SQL Editor."
     }
   },
   "feedback": {
@@ -373,7 +376,8 @@
       "student": "Choose a student.",
       "kind": "Choose a type.",
       "content": "Enter 1–2000 characters.",
-      "save": "Could not save. Please try again."
+      "save": "Could not save. Please try again.",
+      "setup": "The database needs setup: run migration 0010 (feedback) in the Supabase SQL Editor."
     }
   }
 }

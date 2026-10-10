@@ -11,7 +11,7 @@ type Props = {
   updatedLabel: string | null; // "마지막 수정 10/10 16:20"
   editable: boolean; // 내 메모 칸이면 true
   accent: "brand" | "sunny";
-  t: { placeholder: string; empty: string; save: string; saving: string; saved: string; edit: string; cancel: string; errors: { tooLong: string; save: string } };
+  t: { placeholder: string; empty: string; save: string; saving: string; saved: string; edit: string; cancel: string; errors: { tooLong: string; save: string; setup: string } };
 };
 
 // 홈 메모 한 칸: 내 칸은 고치기, 상대 칸은 읽기만

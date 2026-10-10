@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FEEDBACK_MAX } from "@/config/rules";
 import { safeInternalPath } from "@/lib/safe-path";
+import { isMissingTable } from "@/lib/db-errors";
 
-export type FeedbackFormState = { errors?: { student?: boolean; kind?: boolean; content?: boolean; save?: boolean } };
+export type FeedbackFormState = { errors?: { student?: boolean; kind?: boolean; content?: boolean; save?: boolean; setup?: boolean } };
 
 const KINDS = ["good", "improve", "note"];
 
@@ -28,9 +29,11 @@ export async function saveFeedback(_prev: FeedbackFormState, formData: FormData)
       .from("student_feedback")
       .update({ kind, content }, { count: "exact" })
       .eq("id", id);
+    if (isMissingTable(error)) return { errors: { setup: true } };
     if (error || !count) return { errors: { save: true } };
   } else {
     const { error } = await supabase.from("student_feedback").insert({ student_id: studentId, kind, content });
+    if (isMissingTable(error)) return { errors: { setup: true } };
     if (error) return { errors: { save: true } };
   }
   redirect(safeInternalPath(formData.get("back"), "/feedback"));

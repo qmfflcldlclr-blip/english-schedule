@@ -6,18 +6,19 @@ import { getOtherTimeZone, listLessons, type Lesson } from "@/lib/lessons";
 import {
   addDays,
   formatDay,
-  formatDayRange,
   isDate,
   scheduleDayStart,
   scheduleToday,
   toScheduleDay,
+  toZoned,
   weekStart,
 } from "@/lib/time";
 import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
-import ZoomButton from "@/components/ZoomButton";
 import WeekGrid from "@/components/calendar/WeekGrid";
 import { EmptyLessonsArt } from "@/components/Illustrations";
-import WeekPicker from "@/components/calendar/WeekPicker";
+import CalendarHeader from "@/components/calendar/CalendarHeader";
+import LessonQuick from "@/components/calendar/LessonQuick";
+import { quickLabels, statusText } from "@/components/calendar/quick-labels";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
 import { getSettings } from "@/lib/settings";
 import { flag, getHolidays } from "@/lib/holidays";
@@ -56,39 +57,17 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4">
-      {/* 주 이동 */}
-      <div className="flex items-center justify-between gap-2">
-        <Link href={link(addDays(selected, -7))} aria-label={t.prevWeek} className="flex size-11 items-center justify-center rounded-full text-xl hover:bg-gray-100">
-          ‹
-        </Link>
-        <div className="flex flex-col items-center">
-          <h1>
-            <WeekPicker label={formatDayRange(monday, days[6], locale)} value={selected} ariaLabel={t.pickWeek} />
-          </h1>
-          {!days.includes(today) && (
-            <Link href={link(today)} className="text-sm text-brand-700 underline underline-offset-4">
-              {t.today}
-            </Link>
-          )}
-        </div>
-        <Link href={link(addDays(selected, 7))} aria-label={t.nextWeek} className="flex size-11 items-center justify-center rounded-full text-xl hover:bg-gray-100">
-          ›
-        </Link>
-      </div>
-
-      {/* Zoom · 지난주 복사 · 반복 생성 */}
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 md:justify-end">
-        <ZoomButton url={settings.zoomUrl} t={all.settings} />
-        <Link href={`/calendar/copy?date=${monday}`} className="flex min-h-11 items-center rounded-full border border-gray-300 bg-white px-4 text-sm">
-          {t.copyWeek}
-        </Link>
-        <Link href={`/calendar/repeat?date=${selected}`} className="flex min-h-11 items-center rounded-full border border-gray-300 bg-white px-4 text-sm">
-          {t.repeat}
-        </Link>
-        <Link href={`/calendar/print?month=${selected.slice(0, 7)}`} className="flex min-h-11 items-center rounded-full border border-gray-300 bg-white px-4 text-sm">
-          🖨️ {t.print}
-        </Link>
-      </div>
+      <CalendarHeader
+        monday={monday}
+        sunday={days[6]}
+        selected={selected}
+        showToday={!days.includes(today)}
+        today={today}
+        locale={locale}
+        zoomUrl={settings.zoomUrl}
+        t={t}
+        settingsT={all.settings}
+      />
 
       {/* ───── 폰: 날짜 줄 + 그날 목록 ───── */}
       <div className="md:hidden">
@@ -126,7 +105,14 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
           <ul className="mt-2 flex flex-col gap-2">
             {dayLessons.map((l) => (
               <li key={l.id}>
-                <Link href={`/calendar/lessons/${l.id}`} className={`flex min-h-16 items-center justify-between gap-3 rounded-xl border px-4 py-3 ${statusStyle[l.status]}`}>
+                <LessonQuick
+                  lessonId={l.id}
+                  scheduled={l.status === "scheduled"}
+                  heading={`${toZoned(l.starts_at, timeZone).time} · ${l.studentName}`}
+                  sub={`${format(t.minutesUnit, { n: l.duration_minutes })} · ${statusText(l, t)}`}
+                  labels={quickLabels(t)}
+                  className={`flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 ${statusStyle[l.status]}`}
+                >
                   <div className="min-w-0">
                     <LessonTime startsAt={l.starts_at} {...timeProps} />
                     <p className="truncate font-medium">{l.studentName}</p>
@@ -134,10 +120,10 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                   <div className="flex shrink-0 flex-col items-end gap-1 text-sm">
                     <span className="text-gray-500">{format(t.minutesUnit, { n: l.duration_minutes })}</span>
                     {l.status !== "scheduled" && (
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium no-underline ${statusBadge[l.status]}`}>{l.status === "absent" ? (l.cancelled_at ? t.lateCancel : t.noShow) : t.status[l.status]}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium no-underline ${statusBadge[l.status]}`}>{statusText(l, t)}</span>
                     )}
                   </div>
-                </Link>
+                </LessonQuick>
               </li>
             ))}
           </ul>
@@ -154,11 +140,6 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
 
       {/* ───── PC: 주간 시간표 ───── */}
       <div className="mt-4 hidden md:block">
-        <div className="mb-3 flex justify-end">
-          <Link href={`/calendar/new?date=${selected}`} className="flex min-h-11 items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white">
-            + {t.add}
-          </Link>
-        </div>
         <WeekGrid
           days={days}
           today={today}

@@ -90,6 +90,7 @@ export default function FeedbackForm({ t, students, searchLabels, back, initial 
       </label>
 
       {errors.save && <ErrorText>{t.errors.save}</ErrorText>}
+      {errors.setup && <ErrorText>{t.errors.setup}</ErrorText>}
       <FormButtons cancelHref={back} pending={pending} t={t} />
     </form>
   );

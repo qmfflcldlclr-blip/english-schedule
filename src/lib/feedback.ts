@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { isMissingTable } from "@/lib/db-errors";
 
 export const FEEDBACK_KINDS = ["good", "improve", "note"] as const;
 export type FeedbackKind = (typeof FEEDBACK_KINDS)[number];
@@ -57,7 +58,7 @@ export async function listFeedback(filter: { studentId?: string; kind?: Feedback
   if (filter.kind) q = q.eq("kind", filter.kind);
   const { data, error } = await q.limit(filter.limit ?? 200);
   // 피드백 표가 아직 없으면(SQL 0010 실행 전) 빈 목록 — 학생 화면이 멈추지 않게
-  if (error && (error.code === "PGRST205" || error.code === "42P01")) return [];
+  if (isMissingTable(error)) return [];
   if (error) throw error;
   return (data as Row[]).map(toFeedback);
 }
