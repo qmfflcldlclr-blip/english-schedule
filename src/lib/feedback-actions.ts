@@ -3,16 +3,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FEEDBACK_MAX } from "@/config/rules";
+import { safeInternalPath } from "@/lib/safe-path";
 
 export type FeedbackFormState = { errors?: { student?: boolean; kind?: boolean; content?: boolean; save?: boolean } };
 
 const KINDS = ["good", "improve", "note"];
-
-// 돌아갈 곳: 내부 주소만 허용 (외부 사이트로 보내는 링크 방지)
-const safeBack = (v: FormDataEntryValue | null) => {
-  const s = String(v ?? "");
-  return s.startsWith("/") && !s.startsWith("//") ? s : "/feedback";
-};
 
 // 피드백 쓰기·고치기. 폼에 id 가 있으면 고치기 (작성자만 — 데이터베이스가 확인)
 export async function saveFeedback(_prev: FeedbackFormState, formData: FormData): Promise<FeedbackFormState> {
@@ -38,11 +33,11 @@ export async function saveFeedback(_prev: FeedbackFormState, formData: FormData)
     const { error } = await supabase.from("student_feedback").insert({ student_id: studentId, kind, content });
     if (error) return { errors: { save: true } };
   }
-  redirect(safeBack(formData.get("back")));
+  redirect(safeInternalPath(formData.get("back"), "/feedback"));
 }
 
 export async function deleteFeedback(id: string, back: string) {
   const supabase = await createClient();
   await supabase.from("student_feedback").delete().eq("id", id);
-  redirect(back.startsWith("/") && !back.startsWith("//") ? back : "/feedback");
+  redirect(safeInternalPath(back, "/feedback"));
 }
