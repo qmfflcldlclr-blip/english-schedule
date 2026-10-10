@@ -8,6 +8,7 @@ import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import { formatDay, toZoned } from "@/lib/time";
 import { ErrorText, fieldClass } from "@/components/PlanForm";
+import StudentCombobox from "@/components/StudentCombobox";
 
 type Props = {
   t: Messages["calendar"];
@@ -50,26 +51,19 @@ export default function RepeatForm({ t, students, zoneLabel, timeZone, locale, i
       }} className="flex flex-col gap-5">
       <label className="block text-sm font-medium">
         {t.student}
-        <select
+        <StudentCombobox
           name="student_id"
-          required
+          students={students}
           value={studentId}
-          onChange={(e) => {
-            changed(setStudentId)(e.target.value);
-            const s = students.find((x) => x.id === e.target.value);
+          onChange={(id) => {
+            changed(setStudentId)(id);
+            const s = students.find((x) => x.id === id);
             if (s) changed(setDuration)(s.lesson_minutes);
           }}
-          className={fieldClass}
-        >
-          <option value="" disabled>
-            {t.chooseStudent}
-          </option>
-          {students.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+          placeholder={t.searchStudent}
+          noMatch={t.noMatch}
+          invalid={errors.student}
+        />
         {errors.student && <ErrorText>{t.errors.student}</ErrorText>}
       </label>
 

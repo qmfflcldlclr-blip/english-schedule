@@ -7,6 +7,7 @@ import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import { ErrorText, FormButtons, fieldClass } from "@/components/PlanForm";
+import StudentCombobox from "@/components/StudentCombobox";
 
 type StudentOption = { id: string; name: string; lesson_minutes: number };
 
@@ -50,23 +51,15 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDur
 
       <label className="block text-sm font-medium">
         {t.student}
-        <select
+        <StudentCombobox
           name="student_id"
-          required
+          students={students}
           value={values.studentId}
-          onChange={(e) => chooseStudent(e.target.value)}
-          aria-invalid={errors.student || undefined}
-          className={fieldClass}
-        >
-          <option value="" disabled>
-            {t.chooseStudent}
-          </option>
-          {students.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+          onChange={chooseStudent}
+          placeholder={t.searchStudent}
+          noMatch={t.noMatch}
+          invalid={errors.student}
+        />
         {errors.student && <ErrorText>{t.errors.student}</ErrorText>}
       </label>
 

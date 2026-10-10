@@ -70,7 +70,9 @@
       "minutes": "Class length must be between {min} and {max} minutes.",
       "save": "Could not save. Please try again."
     },
-    "remaining": "Remaining"
+    "remaining": "Remaining",
+    "search": "Search name or memo",
+    "noMatch": "No results."
   },
   "credits": {
     "title": "Class credits",
@@ -266,7 +268,9 @@
     },
     "print": "Print",
     "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length.",
-    "pickWeek": "Choose a week"
+    "pickWeek": "Choose a week",
+    "searchStudent": "Search by name",
+    "noMatch": "No matching student."
   },
   "settings": {
     "title": "Settings",
