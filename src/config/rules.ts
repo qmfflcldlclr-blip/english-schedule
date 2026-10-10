@@ -15,3 +15,6 @@ export const REPEAT_MAX_WEEKS = 26;
 
 // 홈 메모 최대 글자 수 (데이터베이스 0009 의 검사와 같은 값)
 export const NOTE_MAX = 2000;
+
+// 피드백 1건 최대 글자 수 (데이터베이스 0010 의 검사와 같은 값)
+export const FEEDBACK_MAX = 2000;

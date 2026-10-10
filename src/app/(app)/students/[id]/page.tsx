@@ -9,6 +9,11 @@ import { getSettings } from "@/lib/settings";
 import { todayIn } from "@/lib/credit-math";
 import ArchiveButton from "@/components/ArchiveButton";
 import CreditSection from "@/components/CreditSection";
+import FeedbackList from "@/components/feedback/FeedbackList";
+import { listFeedback } from "@/lib/feedback";
+
+// 학생 상세에서 보여 줄 최근 피드백 개수
+const RECENT_FEEDBACK = 3;
 
 export default async function StudentDetailPage({
   params,
@@ -22,10 +27,13 @@ export default async function StudentDetailPage({
   if (!student) notFound();
   const t = all.students;
   const timeZone = profile?.timezone ?? "UTC";
-  const [credits, settings] = await Promise.all([
+  const [credits, settings, feedback] = await Promise.all([
     getStudentCredits(student.id, todayIn(timeZone)),
     getSettings(),
+    listFeedback({ studentId: student.id }),
   ]);
+  const fb = all.feedback;
+  const here = `/students/${student.id}`;
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
@@ -63,6 +71,33 @@ export default async function StudentDetailPage({
         <dt className="text-gray-500">{t.memo}</dt>
         <dd className="whitespace-pre-wrap break-words">{student.memo || "—"}</dd>
       </dl>
+
+      {/* 피드백 (최근 몇 개 + 모두 보기) */}
+      <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg font-bold">{fb.sectionTitle}</h2>
+          {!student.archived && (
+            <Link
+              href={`/feedback/new?student=${student.id}&back=${encodeURIComponent(here)}`}
+              className="flex min-h-11 items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white"
+            >
+              + {fb.add}
+            </Link>
+          )}
+        </div>
+        {feedback.length === 0 ? (
+          <p className="mt-3 text-sm text-gray-500">{fb.empty}</p>
+        ) : (
+          <div className="mt-3">
+            <FeedbackList items={feedback.slice(0, RECENT_FEEDBACK)} t={fb} me={profile?.id ?? ""} timeZone={timeZone} back={here} />
+            {feedback.length > RECENT_FEEDBACK && (
+              <Link href={`/feedback?student=${student.id}`} className="mt-2 flex min-h-11 items-center justify-center text-sm font-medium text-brand-700">
+                {format(fb.seeAll, { n: feedback.length })} ›
+              </Link>
+            )}
+          </div>
+        )}
+      </section>
 
       <CreditSection
         t={all.credits}

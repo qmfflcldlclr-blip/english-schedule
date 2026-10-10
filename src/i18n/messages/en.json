@@ -12,6 +12,7 @@
     "label": "Menu",
     "home": "Home",
     "students": "Students",
+    "feedback": "Feedback",
     "calendar": "Calendar",
     "settings": "Settings"
   },
@@ -334,6 +335,44 @@
     "updated": "Updated {time}",
     "errors": {
       "tooLong": "Notes can be up to 2000 characters.",
+      "save": "Could not save. Please try again."
+    }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "sectionTitle": "Feedback",
+    "add": "Write feedback",
+    "newTitle": "Write feedback",
+    "editTitle": "Edit feedback",
+    "kinds": {
+      "good": "Did well",
+      "improve": "To improve",
+      "note": "Note"
+    },
+    "kindLabel": "Type",
+    "student": "Student",
+    "content": "Feedback",
+    "contentPlaceholder": {
+      "good": "e.g. Pronunciation improved a lot, especially the th sound!",
+      "improve": "e.g. Often forgets past tense -ed. Review next class.",
+      "note": "e.g. Starting book 2 next month."
+    },
+    "all": "All",
+    "allStudents": "All students",
+    "empty": "No feedback yet.",
+    "emptyHint": "After class, leave what went well or what to work on.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this feedback? This cannot be undone.",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "edited": "edited",
+    "seeAll": "See all ({n})",
+    "errors": {
+      "student": "Choose a student.",
+      "kind": "Choose a type.",
+      "content": "Enter 1–2000 characters.",
       "save": "Could not save. Please try again."
     }
   }

@@ -12,6 +12,7 @@
     "label": "메뉴",
     "home": "홈",
     "students": "학생",
+    "feedback": "피드백",
     "calendar": "달력",
     "settings": "설정"
   },
@@ -334,6 +335,44 @@
     "updated": "마지막 수정 {time}",
     "errors": {
       "tooLong": "메모는 2000자까지 쓸 수 있어요.",
+      "save": "저장하지 못했습니다. 다시 시도해 주세요."
+    }
+  },
+  "feedback": {
+    "title": "피드백",
+    "sectionTitle": "피드백",
+    "add": "피드백 쓰기",
+    "newTitle": "피드백 쓰기",
+    "editTitle": "피드백 고치기",
+    "kinds": {
+      "good": "잘한 점",
+      "improve": "고칠 점",
+      "note": "메모"
+    },
+    "kindLabel": "종류",
+    "student": "학생",
+    "content": "내용",
+    "contentPlaceholder": {
+      "good": "예: 발음이 많이 좋아졌어요. 특히 th 소리!",
+      "improve": "예: 과거형 -ed 를 자주 빠뜨려요. 다음 시간에 복습",
+      "note": "예: 다음 달부터 교재 2권 시작"
+    },
+    "all": "전체",
+    "allStudents": "전체 학생",
+    "empty": "아직 피드백이 없어요.",
+    "emptyHint": "수업 후에 잘한 점이나 고칠 점을 남겨 보세요.",
+    "edit": "고치기",
+    "delete": "지우기",
+    "deleteConfirm": "이 피드백을 지울까요? 되돌릴 수 없습니다.",
+    "save": "저장",
+    "saving": "저장 중…",
+    "cancel": "취소",
+    "edited": "수정됨",
+    "seeAll": "모두 보기 ({n})",
+    "errors": {
+      "student": "학생을 고르세요.",
+      "kind": "종류를 고르세요.",
+      "content": "내용을 1~2000자로 입력하세요.",
       "save": "저장하지 못했습니다. 다시 시도해 주세요."
     }
   }
