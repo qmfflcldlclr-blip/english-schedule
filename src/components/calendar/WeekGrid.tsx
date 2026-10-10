@@ -1,0 +1,114 @@
+// PC 주간 시간표 (월~일 × 시간). 빈 시간 더블클릭·드래그로 추가, 수업 칸 누르면 수업 정보
+import Link from "next/link";
+import { format } from "@/i18n/format";
+import type { Messages } from "@/i18n/server";
+import type { Lesson } from "@/lib/lessons";
+import { flag, type Holiday } from "@/lib/holidays";
+import { formatDay, toScheduleDay, toZoned } from "@/lib/time";
+import { CALENDAR_END_HOUR, CALENDAR_START_HOUR, DAY_CUTOFF_HOUR, HOUR_PX } from "@/config/schedule";
+import LessonTime, { statusStyle } from "@/components/calendar/LessonTime";
+import DaySlots from "@/components/calendar/DaySlots";
+import { dayTone, toneText } from "@/components/calendar/day-tone";
+
+// 이보다 낮은 수업 칸은 "시간 이름" 한 줄로 (15·20분 수업)
+const ONE_LINE_BELOW_PX = 44;
+
+type Props = {
+  days: string[]; // 월~일
+  today: string;
+  byDay: Record<string, Lesson[]>; // 수업일별 수업
+  holidays: Record<string, Holiday[]>;
+  timeZone: string;
+  otherTimeZone: string | null;
+  locale: string;
+  t: Messages["calendar"];
+};
+
+export default function WeekGrid({ days, today, byDay, holidays, timeZone, otherTimeZone, locale, t }: Props) {
+  const lessons = days.flatMap((d) => byDay[d] ?? []);
+  const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.otherTime };
+  const tone = (d: string) => toneText[dayTone(d, Boolean(holidays[d]))];
+  const holidayText = (d: string) => (holidays[d] ?? []).map((h) => `${flag[h.country]} ${h.name}`).join(" · ");
+
+  // 시간 범위 (기본 15시 ~ 다음 날 1시, 범위 밖 수업이 있으면 넓힘)
+  let fromHour = CALENDAR_START_HOUR;
+  let toHour = CALENDAR_END_HOUR;
+  for (const l of lessons) {
+    const start = toScheduleDay(l.starts_at, timeZone).minutes;
+    fromHour = Math.min(fromHour, Math.floor(start / 60));
+    toHour = Math.max(toHour, Math.min(24 + DAY_CUTOFF_HOUR, Math.ceil((start + l.duration_minutes) / 60)));
+  }
+  const hours = Array.from({ length: toHour - fromHour }, (_, i) => fromHour + i);
+
+  return (
+    <>
+      <div className="grid grid-cols-[3.5rem_repeat(7,minmax(0,1fr))] rounded-2xl border border-gray-200 bg-white shadow-sm">
+        {/* 요일 머리글 (공휴일·일요일 빨강, 토요일 파랑) */}
+        <div className="border-b border-gray-200" />
+        {days.map((d) => (
+          <Link
+            key={d}
+            href={`/calendar/new?date=${d}`}
+            title={t.add}
+            className={`flex min-w-0 flex-col items-center justify-center border-b border-l border-gray-200 px-1 py-1.5 text-center text-sm hover:bg-gray-50 ${d === today ? "bg-brand-50 font-bold" : ""} ${tone(d) || "text-gray-700"}`}
+          >
+            {formatDay(d, locale, { weekday: "short", day: "numeric" })}
+            {holidays[d] && (
+              <span title={holidayText(d)} className="block w-full truncate text-[11px] font-medium">
+                {holidayText(d)}
+              </span>
+            )}
+          </Link>
+        ))}
+
+        {/* 시간 눈금 (24시 넘으면 01:00 처럼) */}
+        <div className="relative" style={{ height: hours.length * HOUR_PX }}>
+          {hours.map((h, i) => (
+            <span key={h} className="absolute right-2 -translate-y-1/2 text-xs text-gray-400 tabular-nums" style={{ top: i * HOUR_PX }}>
+              {i === 0 ? "" : `${String(h % 24).padStart(2, "0")}:00`}
+            </span>
+          ))}
+        </div>
+
+        {/* 날짜별 칸 */}
+        {days.map((d) => (
+          <div key={d} className={`relative border-l border-gray-200 ${d === today ? "bg-brand-50/40" : ""}`} style={{ height: hours.length * HOUR_PX }}>
+            {hours.map((h, i) => (
+              <div key={h} className={`absolute inset-x-0 border-t ${h === 24 ? "border-gray-300 border-dashed" : "border-gray-100"}`} style={{ top: i * HOUR_PX }} />
+            ))}
+            <DaySlots date={d} fromHour={fromHour} toHour={toHour} hourPx={HOUR_PX} hint={t.slotHint} minutesUnit={t.minutesUnit} />
+            {(byDay[d] ?? []).map((l) => {
+              const start = toScheduleDay(l.starts_at, timeZone).minutes;
+              const height = Math.max((l.duration_minutes / 60) * HOUR_PX - 2, 24);
+              const oneLine = height < ONE_LINE_BELOW_PX;
+              const time = toZoned(l.starts_at, timeZone).time;
+              return (
+                <Link
+                  key={l.id}
+                  href={`/calendar/lessons/${l.id}`}
+                  title={`${time} ${l.studentName} · ${format(t.minutesUnit, { n: l.duration_minutes })}`}
+                  className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]}`}
+                  style={{ top: ((start - fromHour * 60) / 60) * HOUR_PX, height }}
+                >
+                  {oneLine ? (
+                    <>
+                      <span className="shrink-0 font-semibold tabular-nums">{time}</span>
+                      <span className="min-w-0 truncate font-medium">{l.studentName}</span>
+                    </>
+                  ) : (
+                    <>
+                      <LessonTime startsAt={l.starts_at} {...timeProps} compact />
+                      <span className="block truncate font-medium">{l.studentName}</span>
+                    </>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      {lessons.length === 0 && <p className="mt-4 text-center text-gray-500">{t.noLessonsWeek}</p>}
+      <p className="mt-2 text-center text-sm text-gray-500">💡 {t.slotHint}</p>
+    </>
+  );
+}

@@ -3,26 +3,24 @@ import { getDictionary } from "@/i18n/server";
 import { format } from "@/i18n/format";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getOtherTimeZone, listLessons, type Lesson } from "@/lib/lessons";
-import { todayIn } from "@/lib/credit-math";
 import {
   addDays,
   formatDay,
   formatDayRange,
-  fromZoned,
   isDate,
-  toZoned,
+  scheduleDayStart,
+  scheduleToday,
+  toScheduleDay,
   weekStart,
 } from "@/lib/time";
 import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
 import ZoomButton from "@/components/ZoomButton";
-import DaySlots from "@/components/calendar/DaySlots";
+import WeekGrid from "@/components/calendar/WeekGrid";
 import { EmptyLessonsArt } from "@/components/Illustrations";
+import WeekPicker from "@/components/calendar/WeekPicker";
+import { dayTone, toneText } from "@/components/calendar/day-tone";
 import { getSettings } from "@/lib/settings";
-
-// PC 시간표: 기본으로 보여줄 시간 범위 (수업이 범위 밖이면 자동으로 넓어짐)
-const GRID_DEFAULT_FROM = 9;
-const GRID_DEFAULT_TO = 22;
-const HOUR_PX = 64;
+import { flag, getHolidays } from "@/lib/holidays";
 
 export default async function CalendarPage({ searchParams }: PageProps<"/calendar">) {
   const [{ locale, t: all }, profile, sp] = await Promise.all([
@@ -32,33 +30,27 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   ]);
   const t = all.calendar;
   const timeZone = (profile?.timezone as string) ?? "UTC";
-  const today = todayIn(timeZone);
+  const today = scheduleToday(timeZone); // 새벽 1시라면 아직 "어제"
   const selected = isDate(sp.date) ? sp.date : today;
   const monday = weekStart(selected);
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
 
-  const [lessons, otherTimeZone, settings] = await Promise.all([
-    listLessons(fromZoned(monday, "00:00", timeZone), fromZoned(addDays(monday, 7), "00:00", timeZone)),
+  const [lessons, otherTimeZone, settings, holidays] = await Promise.all([
+    // 수업일 기준 한 주 (월요일 새벽 5시 ~ 다음 월요일 새벽 5시)
+    listLessons(scheduleDayStart(monday, timeZone), scheduleDayStart(addDays(monday, 7), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
     getSettings(),
+    getHolidays(monday, days[6]),
   ]);
 
-  // 날짜별로 묶기 (내 시간대 기준)
+  // 수업일별로 묶기 (내 시간대 기준, 새벽 수업은 전날)
   const byDay = new Map<string, Lesson[]>(days.map((d) => [d, []]));
-  for (const l of lessons) byDay.get(toZoned(l.starts_at, timeZone).date)?.push(l);
+  for (const l of lessons) byDay.get(toScheduleDay(l.starts_at, timeZone).date)?.push(l);
+  const tone = (d: string) => toneText[dayTone(d, Boolean(holidays[d]))];
+  const holidayText = (d: string) => (holidays[d] ?? []).map((h) => `${flag[h.country]} ${h.name}`).join(" · ");
 
   const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.otherTime };
   const link = (date: string) => `/calendar?date=${date}`;
-
-  // PC 시간표 범위
-  let fromHour = GRID_DEFAULT_FROM;
-  let toHour = GRID_DEFAULT_TO;
-  for (const l of lessons) {
-    const start = toZoned(l.starts_at, timeZone).minutes;
-    fromHour = Math.min(fromHour, Math.floor(start / 60));
-    toHour = Math.max(toHour, Math.min(24, Math.ceil((start + l.duration_minutes) / 60)));
-  }
-  const hours = Array.from({ length: toHour - fromHour }, (_, i) => fromHour + i);
 
   const dayLessons = byDay.get(selected) ?? [];
 
@@ -70,7 +62,9 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
           ‹
         </Link>
         <div className="flex flex-col items-center">
-          <h1 className="text-lg font-semibold">{formatDayRange(monday, days[6], locale)}</h1>
+          <h1>
+            <WeekPicker label={formatDayRange(monday, days[6], locale)} value={selected} ariaLabel={t.pickWeek} />
+          </h1>
           {!days.includes(today) && (
             <Link href={link(today)} className="text-sm text-brand-700 underline underline-offset-4">
               {t.today}
@@ -108,7 +102,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                 href={link(d)}
                 aria-current={isSel ? "date" : undefined}
                 className={`flex min-h-14 flex-col items-center justify-center rounded-xl text-sm ${
-                  isSel ? "bg-brand-600 text-white" : d === today ? "bg-brand-50 text-brand-700" : "text-gray-700"
+                  isSel ? "bg-brand-600 text-white" : `${d === today ? "bg-brand-50 ring-1 ring-brand-200" : ""} ${tone(d) || "text-gray-700"}`
                 }`}
               >
                 <span className="text-xs opacity-80">{formatDay(d, locale, { weekday: "narrow" })}</span>
@@ -119,7 +113,10 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
           })}
         </nav>
 
-        <h2 className="mt-5 text-sm font-medium text-gray-500">{formatDay(selected, locale, { month: "long", day: "numeric", weekday: "long" })}</h2>
+        <h2 className={`mt-5 text-sm font-medium ${tone(selected) || "text-gray-500"}`}>
+          {formatDay(selected, locale, { month: "long", day: "numeric", weekday: "long" })}
+          {holidays[selected] && <span className="ml-2">{holidayText(selected)}</span>}
+        </h2>
         {dayLessons.length === 0 ? (
           <div className="mt-4 flex flex-col items-center py-4 text-center">
             <EmptyLessonsArt className="h-24" />
@@ -162,58 +159,16 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
             + {t.add}
           </Link>
         </div>
-        <div className="grid grid-cols-[3.5rem_repeat(7,minmax(0,1fr))] rounded-2xl border border-gray-200 bg-white shadow-sm">
-          {/* 요일 머리글 */}
-          <div className="border-b border-gray-200" />
-          {days.map((d) => (
-            <Link
-              key={d}
-              href={`/calendar/new?date=${d}`}
-              title={t.add}
-              className={`border-b border-l border-gray-200 py-2 text-center text-sm hover:bg-gray-50 ${d === today ? "font-semibold text-brand-700" : "text-gray-700"}`}
-            >
-              {formatDay(d, locale, { weekday: "short", day: "numeric" })}
-            </Link>
-          ))}
-
-          {/* 시간 눈금 */}
-          <div className="relative" style={{ height: hours.length * HOUR_PX }}>
-            {hours.map((h, i) => (
-              <span key={h} className="absolute right-2 -translate-y-1/2 text-xs text-gray-400 tabular-nums" style={{ top: i * HOUR_PX }}>
-                {i === 0 ? "" : `${String(h).padStart(2, "0")}:00`}
-              </span>
-            ))}
-          </div>
-
-          {/* 날짜별 칸 */}
-          {days.map((d) => (
-            <div key={d} className={`relative border-l border-gray-200 ${d === today ? "bg-brand-50/40" : ""}`} style={{ height: hours.length * HOUR_PX }}>
-              {hours.map((h, i) => (
-                <div key={h} className="absolute inset-x-0 border-t border-gray-100" style={{ top: i * HOUR_PX }} />
-              ))}
-              <DaySlots date={d} fromHour={fromHour} toHour={toHour} hourPx={HOUR_PX} hint={t.slotHint} minutesUnit={t.minutesUnit} />
-              {(byDay.get(d) ?? []).map((l) => {
-                const start = toZoned(l.starts_at, timeZone).minutes;
-                return (
-                  <Link
-                    key={l.id}
-                    href={`/calendar/lessons/${l.id}`}
-                    className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 py-1 text-xs hover:z-10 hover:shadow-md ${statusStyle[l.status]}`}
-                    style={{
-                      top: ((start - fromHour * 60) / 60) * HOUR_PX,
-                      height: Math.max((l.duration_minutes / 60) * HOUR_PX - 2, 28),
-                    }}
-                  >
-                    <LessonTime startsAt={l.starts_at} {...timeProps} compact />
-                    <span className="block truncate font-medium">{l.studentName}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-        {lessons.length === 0 && <p className="mt-4 text-center text-gray-500">{t.noLessonsWeek}</p>}
-        <p className="mt-2 text-center text-sm text-gray-500">💡 {t.slotHint}</p>
+        <WeekGrid
+          days={days}
+          today={today}
+          byDay={Object.fromEntries(byDay)}
+          holidays={holidays}
+          timeZone={timeZone}
+          otherTimeZone={otherTimeZone}
+          locale={locale}
+          t={t}
+        />
       </div>
     </main>
   );

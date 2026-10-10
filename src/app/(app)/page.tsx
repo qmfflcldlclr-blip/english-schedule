@@ -3,8 +3,7 @@ import { getDictionary } from "@/i18n/server";
 import { format } from "@/i18n/format";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getOtherTimeZone, listLessons } from "@/lib/lessons";
-import { todayIn } from "@/lib/credit-math";
-import { addDays, formatDay, fromZoned, toZoned } from "@/lib/time";
+import { addDays, formatDay, scheduleDayStart, scheduleToday, toZoned } from "@/lib/time";
 import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
 import { EmptyLessonsArt, GreetingArt, type DayPart } from "@/components/Illustrations";
 
@@ -16,11 +15,11 @@ function dayPart(minutes: number): DayPart {
 export default async function Home() {
   const [{ locale, t }, profile] = await Promise.all([getDictionary(), getCurrentProfile()]);
   const timeZone = (profile?.timezone as string) ?? "UTC";
-  const today = todayIn(timeZone);
+  const today = scheduleToday(timeZone); // 새벽 수업은 전날에 포함
   const now = new Date();
 
   const [lessons, otherTimeZone] = await Promise.all([
-    listLessons(fromZoned(today, "00:00", timeZone), fromZoned(addDays(today, 1), "00:00", timeZone)),
+    listLessons(scheduleDayStart(today, timeZone), scheduleDayStart(addDays(today, 1), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
   ]);
   const active = lessons.filter((l) => l.status === "scheduled" || l.status === "completed");

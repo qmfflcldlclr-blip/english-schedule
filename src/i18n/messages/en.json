@@ -265,7 +265,8 @@
       "unknown": "Could not process. Please try again."
     },
     "print": "Print",
-    "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length."
+    "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length.",
+    "pickWeek": "Choose a week"
   },
   "settings": {
     "title": "Settings",

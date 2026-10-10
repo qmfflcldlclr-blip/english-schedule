@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280">
+  <!-- Andy English 배경 무늬 (아주 연하게, 반복 타일) -->
+  <g fill="none" stroke="#e6f0fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 말풍선 -->
+    <path d="M28 30h40a10 10 0 0 1 10 10v14a10 10 0 0 1-10 10H46l-10 8v-8h-8a10 10 0 0 1-10-10V40a10 10 0 0 1 10-10Z"/>
+    <!-- 펼친 책 -->
+    <path d="M168 150c10-4 20-4 28 1v30c-8-5-18-5-28-1ZM224 150c-10-4-20-4-28 1v30c8-5 18-5 28-1Z"/>
+    <!-- 연필 -->
+    <path d="M44 214l40-40 10 10-40 40-14 4Z M78 180l10 10"/>
+    <!-- 지구본 -->
+    <circle cx="214" cy="56" r="18"/>
+    <path d="M196 56h36M214 38c-8 10-8 26 0 36M214 38c8 10 8 26 0 36"/>
+  </g>
+  <g fill="#e6f0fc" font-family="Arial, sans-serif" font-weight="800">
+    <text x="120" y="70" font-size="26">A</text>
+    <text x="104" y="250" font-size="22">B</text>
+    <text x="250" y="232" font-size="24">C</text>
+    <text x="16" y="140" font-size="18">abc</text>
+  </g>
+  <g fill="#fff1c4">
+    <path d="M150 112l3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+    <path d="M262 120l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>
+    <path d="M90 104l2 4 4 2-4 2-2 4-2-4-4-2 4-2Z"/>
+    <circle cx="190" cy="250" r="3"/>
+  </g>
+</svg>

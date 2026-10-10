@@ -1,6 +1,8 @@
 // 시간대 변환 도우미 (서버·브라우저 공용, 외부 라이브러리 없음)
 // 날짜는 "YYYY-MM-DD", 시각은 "HH:mm" 문자열로 다룸
 
+import { DAY_CUTOFF_HOUR } from "@/config/schedule";
+
 const pad = (n: number) => String(n).padStart(2, "0");
 
 // 특정 순간을 그 시간대의 달력 날짜·시각으로
@@ -77,4 +79,31 @@ export function formatDayRange(from: string, to: string, locale: string) {
     day: "numeric",
     timeZone: "UTC",
   }).formatRange(new Date(`${from}T00:00:00Z`), new Date(`${to}T00:00:00Z`));
+}
+
+// ─── 화면용 "수업일" (새벽 수업은 전날 칸에 이어서) ───
+// 순간 → 수업일 날짜와, 그 날 0시부터 센 분 (예: 다음 날 00:30 → 24:30 = 1470분)
+export function toScheduleDay(instant: Date | string, timeZone: string) {
+  const z = toZoned(instant, timeZone);
+  if (z.minutes < DAY_CUTOFF_HOUR * 60) {
+    return { date: addDays(z.date, -1), minutes: z.minutes + 24 * 60, time: z.time };
+  }
+  return z;
+}
+
+// 수업일이 시작되는 순간 (그 날짜의 DAY_CUTOFF_HOUR 시)
+export function scheduleDayStart(date: string, timeZone: string) {
+  return fromZoned(date, `${pad(DAY_CUTOFF_HOUR)}:00`, timeZone);
+}
+
+// 지금이 속한 수업일 (새벽 1시라면 어제)
+export function scheduleToday(timeZone: string) {
+  return toScheduleDay(new Date(), timeZone).date;
+}
+
+// 수업일 + 그 날 0시부터 센 분 → 실제 날짜·시각 (1470분 → 다음 날 "00:30")
+export function scheduleToActual(date: string, minutes: number) {
+  const dayShift = Math.floor(minutes / (24 * 60));
+  const m = minutes - dayShift * 24 * 60;
+  return { date: addDays(date, dayShift), time: `${pad(Math.floor(m / 60))}:${pad(m % 60)}` };
 }

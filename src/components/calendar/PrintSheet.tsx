@@ -3,6 +3,7 @@ import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import { fitCalendar, fitSummary, monthWeeks, PAGE } from "@/lib/print-layout";
 import { LogoMark } from "@/components/Illustrations";
+import { dayTone, toneText } from "@/components/calendar/day-tone";
 
 export type PrintEntry = { id: string; time: string; name: string; note: string; strike: boolean };
 export type PrintRow = {
@@ -20,6 +21,7 @@ type Props = {
   heading: string; // "2026년 10월 · 전체 학생"
   meta: string; // "한국 시간 기준 · 출력 2026-10-10"
   days: Record<string, PrintEntry[]>; // 날짜별 수업 (시간순)
+  holidays?: Record<string, string>; // 날짜별 공휴일 이름
   summary: PrintRow[];
   t: Messages["print"];
   weekdayNames: string[];
@@ -59,7 +61,7 @@ function Title({ heading, meta, sub }: { heading: string; meta: string; sub?: st
   );
 }
 
-export default function PrintSheet({ month, heading, meta, days, summary, t, weekdayNames, timesUnit }: Props) {
+export default function PrintSheet({ month, heading, meta, days, holidays = {}, summary, t, weekdayNames, timesUnit }: Props) {
   const weeks = monthWeeks(month);
   const fit = fitCalendar(weeks.map((w) => Math.max(...w.map((d) => days[d]?.length ?? 0))));
   const sf = fitSummary(summary.length);
@@ -86,8 +88,8 @@ export default function PrintSheet({ month, heading, meta, days, summary, t, wee
           <table className="w-full table-fixed border-collapse">
             <thead>
               <tr style={{ height: "5mm" }}>
-                {weekdayNames.map((w) => (
-                  <th key={w} className={`${cell} bg-gray-100 text-[8pt] font-bold`}>
+                {weekdayNames.map((w, i) => (
+                  <th key={w} className={`${cell} bg-gray-100 text-[8pt] font-bold ${i === 5 ? "text-blue-600" : i === 6 ? "text-red-600" : ""}`}>
                     {w}
                   </th>
                 ))}
@@ -100,8 +102,11 @@ export default function PrintSheet({ month, heading, meta, days, summary, t, wee
                     const items = days[d] ?? [];
                     return (
                       <td key={d} className={`${cell} overflow-hidden px-[1mm] pt-[0.4mm] align-top`}>
-                        <div className={`text-[7.5pt] leading-[3.2mm] font-bold ${d.startsWith(month) ? "" : "text-gray-300"}`}>
+                        <div
+                          className={`truncate text-[7.5pt] leading-[3.2mm] font-bold ${d.startsWith(month) ? toneText[dayTone(d, Boolean(holidays[d]))] : "text-gray-300"}`}
+                        >
                           {Number(d.slice(8))}
+                          {holidays[d] && d.startsWith(month) && <span className="ml-[1mm] text-[6.5pt] font-medium">{holidays[d]}</span>}
                         </div>
                         {items.length > 0 && (
                           <ul

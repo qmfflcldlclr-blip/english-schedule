@@ -6,9 +6,10 @@ import { listLessons, type Lesson } from "@/lib/lessons";
 import { listStudents } from "@/lib/students";
 import { getCreditOverview } from "@/lib/credits";
 import { todayIn } from "@/lib/credit-math";
-import { fromZoned, toZoned } from "@/lib/time";
+import { scheduleDayStart, toScheduleDay, toZoned } from "@/lib/time";
 import { zoneName } from "@/config/timezones";
-import { addMonths, isMonth, PAGE } from "@/lib/print-layout";
+import { addMonths, isMonth, monthWeeks, PAGE } from "@/lib/print-layout";
+import { getHolidays } from "@/lib/holidays";
 import { PrintButton, StudentPicker } from "@/components/calendar/PrintControls";
 import PrintSheet, { type PrintEntry, type PrintRow } from "@/components/calendar/PrintSheet";
 
@@ -24,12 +25,12 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
   const today = todayIn(timeZone);
   const month = isMonth(sp.month) ? sp.month : today.slice(0, 7);
 
-  const [allLessons, students] = await Promise.all([
-    listLessons(
-      fromZoned(`${month}-01`, "00:00", timeZone),
-      fromZoned(`${addMonths(month, 1)}-01`, "00:00", timeZone),
-    ),
+  const weeks = monthWeeks(month);
+  const [allLessons, students, holidays] = await Promise.all([
+    // 수업일 기준 한 달 (새벽 수업은 전날에 포함)
+    listLessons(scheduleDayStart(`${month}-01`, timeZone), scheduleDayStart(`${addMonths(month, 1)}-01`, timeZone)),
     listStudents(false),
+    getHolidays(weeks[0][0], weeks.at(-1)![6]),
   ]);
   const student = students.find((s) => s.id === sp.student) ?? null;
   const lessons = student ? allLessons.filter((l) => l.student_id === student.id) : allLessons;
@@ -43,7 +44,7 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
       return l.cancelled_at ? { ...base, note: t.lateShort, strike: true } : { ...base, note: t.absentShort, strike: false };
     return { ...base, note: "", strike: false };
   };
-  for (const l of lessons) (days[toZoned(l.starts_at, timeZone).date] ??= []).push(entry(l));
+  for (const l of lessons) (days[toScheduleDay(l.starts_at, timeZone).date] ??= []).push(entry(l));
 
   // 학생별 이번 달 횟수 (학생을 골랐으면 그 학생만, 아니면 이번 달 수업이 있는 학생)
   const rows = new Map<string, Omit<PrintRow, "id" | "remaining">>();
@@ -107,6 +108,7 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
           heading={`${monthTitle} · ${student ? student.name : t.allStudents}`}
           meta={`${format(t.timeZoneNote, { zone: zoneName(timeZone, locale) })} · ${format(t.printedAt, { date: today })}`}
           days={days}
+          holidays={Object.fromEntries(Object.entries(holidays).map(([d, hs]) => [d, hs.map((h) => h.name).join(", ")]))}
           summary={summary}
           t={t}
           weekdayNames={all.calendar.weekdayNames}
