@@ -15,7 +15,7 @@ export default async function NewFeedbackPage({ searchParams }: PageProps<"/feed
       <h1 className="mb-6 text-2xl font-bold">{all.feedback.newTitle}</h1>
       <FeedbackForm
         t={all.feedback}
-        students={students.map((s) => ({ id: s.id, name: s.name }))}
+        students={students.map((s) => ({ id: s.id, name: s.label }))}
         searchLabels={{ placeholder: all.calendar.searchStudent, noMatch: all.calendar.noMatch }}
         back={back}
         initial={{ studentId: preset?.id ?? "", kind: isFeedbackKind(sp.kind) ? sp.kind : "good", content: "" }}

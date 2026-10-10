@@ -30,7 +30,7 @@ export default async function RepeatPage({ searchParams }: PageProps<"/calendar/
       ) : (
         <RepeatForm
           t={t.calendar}
-          students={students}
+          students={students.map((s) => ({ ...s, name: s.label }))}
           zoneLabel={zoneName(timeZone, locale)}
           timeZone={timeZone}
           locale={locale}

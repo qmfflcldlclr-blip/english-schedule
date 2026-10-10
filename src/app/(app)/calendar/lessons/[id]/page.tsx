@@ -38,10 +38,12 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
   // 결석 중 취소 시각이 있으면 "차감 취소", 없으면 "노쇼"
   const absentLabel = lesson.cancelled_at ? t.lateCancel : t.noShow;
 
+  // 고르는 칸에는 동명이인 번호가 붙은 이름으로
+  const named = students.map((s) => ({ ...s, name: s.label }));
   // 보관된 학생의 수업이어도 선택 목록에 그 학생이 보이도록
-  const options = students.some((s) => s.id === lesson.student_id)
-    ? students
-    : [...students, { id: lesson.student_id, name: lesson.studentName, lesson_minutes: lesson.duration_minutes }];
+  const options = named.some((s) => s.id === lesson.student_id)
+    ? named
+    : [...named, { id: lesson.student_id, name: lesson.studentName, lesson_minutes: lesson.duration_minutes }];
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 px-4 py-6">

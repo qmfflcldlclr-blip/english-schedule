@@ -108,6 +108,13 @@
 ## 홈 메모 (2026-10-10 결정)
 - 홈에 **매니저 메모 · 선생님 메모** 2칸. **각자 자기 칸만 수정**(데이터베이스 보안 규칙), 상대 칸은 읽기만. 마지막 수정 시각 표시.
 
+## 학생 목록 관리 (2026-10-10 결정)
+- 기본 수업 길이 **15분** (`DEFAULT_LESSON_MINUTES`).
+- 체크박스로 여러 명 선택 → **보관** 또는 **완전 삭제**(학생과 수업·횟수 기록·피드백 모두 영구 삭제, "삭제" 입력 확인, DB 함수 `delete_students_permanently`). 평소 기록 보호(삭제 금지)는 유지.
+- 남은 횟수 **0회 학생은 목록 맨 아래 묶음**. **0회인 채로 30일 + 예정 수업 없음 → 자동 보관** (학생 목록 열 때 실행, 마이너스 학생·기록 없는 새 학생 제외).
+- **동명이인**: 등록 순서대로 "김민준 #1", "김민준 #2" 자동 표시 (보관된 학생도 셈, 화면에서 계산).
+- 달력: 수업 칸을 누르면 작은 창에서 바로 **완료·결석** 처리 (취소는 '자세히'에서).
+
 ## 학생 피드백 (2026-10-10 결정)
 - 메뉴 **"피드백"** (폰 하단 탭 5칸) + **학생 상세 화면**에 최근 3개와 쓰기 버튼.
 - 형식: **종류(👍 잘한 점 / ✏️ 고칠 점 / 📌 메모) + 자유 글**. 매니저·선생님 모두 쓰고 볼 수 있음, **고치기·지우기는 쓴 사람만**.
@@ -125,7 +132,7 @@
 - 사이트 주소: **https://english-schedule-5mgw.vercel.app** (Vercel 프로젝트 `english-schedule-5mgw`)
 - 코드: GitHub `qmfflcldlclr-blip/english-schedule` (비공개). **main 에 push 하면 Vercel 이 자동 배포.**
 - Vercel 환경 변수: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (값은 `.env.local` 과 동일)
-- 데이터베이스 변경은 `supabase/migrations/` 에 번호 순서대로 SQL 파일을 만들고, 사용자가 Supabase SQL Editor 에서 **한 번씩** 실행. **0008 까지 실행 완료.** (0009 홈 메모, 0010 피드백 — 실행 필요)
+- 데이터베이스 변경은 `supabase/migrations/` 에 번호 순서대로 SQL 파일을 만들고, 사용자가 Supabase SQL Editor 에서 **한 번씩** 실행. **0008 까지 실행 완료.** (0009 홈 메모, 0010 피드백, 0011 학생 정리 — 순서대로 실행 필요)
 - 취소 규칙 테스트: `supabase/tests/lesson_status_test.sql` ("TEST OK" 오류 메시지가 성공)
 - 로그인 계정: `lee`(매니저, 한국어, Asia/Seoul), `michelle`(선생님, 영어, Asia/Manila). 아이디는 내부적으로 `아이디@example.com` 이메일로 변환됨.
 - 폰에서 개발 서버 확인: `npm run dev:phone` → 같은 Wi-Fi 에서 `http://PC의IP:3000`

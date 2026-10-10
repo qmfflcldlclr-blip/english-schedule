@@ -49,7 +49,7 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
   // 학생별 이번 달 횟수 (학생을 골랐으면 그 학생만, 아니면 이번 달 수업이 있는 학생)
   const rows = new Map<string, Omit<PrintRow, "id" | "remaining">>();
   const empty = (name: string) => ({ name, completed: 0, scheduled: 0, free: 0, absent: 0 });
-  if (student) rows.set(student.id, empty(student.name));
+  if (student) rows.set(student.id, empty(student.label));
   for (const l of lessons) {
     const r = rows.get(l.student_id) ?? empty(l.studentName);
     r[l.status === "free_cancel" ? "free" : l.status]++;
@@ -92,7 +92,7 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
           <StudentPicker
             month={month}
             selected={student?.id ?? ""}
-            students={students.map((s) => ({ id: s.id, name: s.name }))}
+            students={students.map((s) => ({ id: s.id, name: s.label }))}
             label={t.student}
             allLabel={t.allStudents}
           />
@@ -105,7 +105,7 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
       <div className="mt-4 overflow-x-auto pb-2 print:mt-0 print:overflow-visible print:p-0">
         <PrintSheet
           month={month}
-          heading={`${monthTitle} · ${student ? student.name : t.allStudents}`}
+          heading={`${monthTitle} · ${student ? student.label : t.allStudents}`}
           meta={`${format(t.timeZoneNote, { zone: zoneName(timeZone, locale) })} · ${format(t.printedAt, { date: today })}`}
           days={days}
           holidays={Object.fromEntries(Object.entries(holidays).map(([d, hs]) => [d, hs.map((h) => h.name).join(", ")]))}

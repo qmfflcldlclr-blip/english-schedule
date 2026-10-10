@@ -73,7 +73,26 @@
     },
     "remaining": "Remaining",
     "search": "Search name or memo",
-    "noMatch": "No results."
+    "noMatch": "No results.",
+    "selectAll": "Select all",
+    "selectStudent": "Select {name}",
+    "selectedCount": "{n} selected",
+    "archiveSelected": "Archive",
+    "unarchiveSelected": "Unarchive",
+    "deleteSelected": "Delete permanently",
+    "clearSelection": "Clear",
+    "deleteWord": "DELETE",
+    "deletePrompt": "This permanently deletes {n} student(s) and all their records (classes, credit history, feedback). This cannot be undone.\n\n{names}\n\nType \"{word}\" to continue.",
+    "deleteMismatch": "Text did not match, nothing was deleted.",
+    "zeroTitle": "0 classes left",
+    "zeroHint": "Students left at 0 for {days} days with no upcoming classes are archived automatically.",
+    "autoArchived": "Archived {n} student(s) who stayed at 0 classes for {days} days.",
+    "bulkDone": "Done for {n} student(s).",
+    "bulkErrors": {
+      "invalid": "Could not read the selected students.",
+      "save": "Could not complete. Please try again.",
+      "setup": "To delete permanently, first run migration 0011 in the Supabase SQL Editor."
+    }
   },
   "credits": {
     "title": "Class credits",

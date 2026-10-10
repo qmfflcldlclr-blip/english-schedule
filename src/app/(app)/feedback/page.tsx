@@ -35,7 +35,7 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/feedbac
 
       <div className="mt-4">
         <FeedbackFilters
-          students={students.map((s) => ({ id: s.id, name: s.name }))}
+          students={students.map((s) => ({ id: s.id, name: s.label }))}
           studentId={studentId}
           kind={kind}
           labels={{ all: t.all, allStudents: t.allStudents, placeholder: all.calendar.searchStudent, noMatch: all.calendar.noMatch, kinds: t.kinds }}

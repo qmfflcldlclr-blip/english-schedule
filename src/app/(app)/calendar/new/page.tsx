@@ -36,7 +36,7 @@ export default async function NewLessonPage({ searchParams }: PageProps<"/calend
       ) : (
         <LessonForm
           t={t.calendar}
-          students={students}
+          students={students.map((s) => ({ ...s, name: s.label }))}
           zoneLabel={zoneName(timeZone, locale)}
           cancelHref={`/calendar?date=${date}`}
           keepDuration={draggedOk}

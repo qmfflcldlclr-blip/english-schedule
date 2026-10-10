@@ -7,11 +7,21 @@ import { getCreditOverview } from "@/lib/credits";
 import { todayIn } from "@/lib/credit-math";
 import { EmptyStudentsArt } from "@/components/Illustrations";
 import StudentList from "@/components/StudentList";
+import { createClient } from "@/lib/supabase/server";
+import { AUTO_ARCHIVE_DAYS } from "@/config/rules";
+
+// 남은 횟수 0회인 채로 오래된 학생 자동 보관 (SQL 0011 실행 전이면 아무 일도 안 함)
+async function autoArchive() {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("auto_archive_students", { p_days: AUTO_ARCHIVE_DAYS });
+  return typeof data === "number" ? data : 0;
+}
 
 export default async function StudentsPage({
   searchParams,
 }: PageProps<"/students">) {
   const showArchived = (await searchParams).show === "archived";
+  const archivedNow = showArchived ? 0 : await autoArchive(); // 목록을 읽기 전에 먼저 정리
   const [{ t: all }, profile, students] = await Promise.all([
     getDictionary(),
     getCurrentProfile(),
@@ -51,6 +61,12 @@ export default async function StudentsPage({
         {showArchived ? t.showActive : t.showArchived}
       </Link>
 
+      {archivedNow > 0 && (
+        <p role="status" className="mt-2 rounded-xl bg-brand-50 p-3 text-sm text-brand-800">
+          📦 {format(t.autoArchived, { n: archivedNow, days: AUTO_ARCHIVE_DAYS })}
+        </p>
+      )}
+
       {students.length === 0 ? (
         <div className="mt-8 flex flex-col items-center text-center">
           <EmptyStudentsArt className="h-28" />
@@ -59,17 +75,9 @@ export default async function StudentsPage({
       ) : (
         <StudentList
           students={students.map((st) => ({ ...st, ...creditsOf(st.id) }))}
-          t={{
-            search: t.search,
-            noMatch: t.noMatch,
-            name: t.name,
-            remaining: t.remaining,
-            lessonMinutes: t.lessonMinutes,
-            memo: t.memo,
-            minutesUnit: t.minutesUnit,
-            timesUnit: all.credits.timesUnit,
-            expired: all.credits.expired,
-          }}
+          archivedView={showArchived}
+          autoArchiveDays={AUTO_ARCHIVE_DAYS}
+          t={{ ...t, timesUnit: all.credits.timesUnit, expired: all.credits.expired }}
         />
       )}
     </main>

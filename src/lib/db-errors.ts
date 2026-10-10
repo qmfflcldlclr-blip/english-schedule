@@ -3,3 +3,8 @@
 export function isMissingTable(error: { code?: string } | null | undefined) {
   return error?.code === "PGRST205" || error?.code === "42P01";
 }
+
+// 함수가 아직 없음 = 해당 SQL 파일을 아직 실행하지 않음
+export function isMissingFunction(error: { code?: string } | null | undefined) {
+  return error?.code === "PGRST202" || error?.code === "42883";
+}

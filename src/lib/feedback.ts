@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { isMissingTable } from "@/lib/db-errors";
+import { getStudentLabels } from "@/lib/student-labels";
 
 export const FEEDBACK_KINDS = ["good", "improve", "note"] as const;
 export type FeedbackKind = (typeof FEEDBACK_KINDS)[number];
@@ -35,11 +36,11 @@ type Row = {
 
 const first = <T,>(v: T | T[] | null) => (Array.isArray(v) ? v[0] : v) ?? undefined;
 
-function toFeedback(r: Row): Feedback {
+function toFeedback(r: Row, labels: Map<string, string>): Feedback {
   return {
     id: r.id,
     studentId: r.student_id,
-    studentName: first(r.student)?.name ?? "",
+    studentName: labels.get(r.student_id) ?? first(r.student)?.name ?? "",
     kind: r.kind,
     content: r.content,
     createdBy: r.created_by,
@@ -60,11 +61,12 @@ export async function listFeedback(filter: { studentId?: string; kind?: Feedback
   // 피드백 표가 아직 없으면(SQL 0010 실행 전) 빈 목록 — 학생 화면이 멈추지 않게
   if (isMissingTable(error)) return [];
   if (error) throw error;
-  return (data as Row[]).map(toFeedback);
+  const labels = await getStudentLabels();
+  return (data as Row[]).map((r) => toFeedback(r, labels));
 }
 
 export async function getFeedback(id: string) {
   const supabase = await createClient();
   const { data } = await supabase.from("student_feedback").select(COLUMNS).eq("id", id).maybeSingle();
-  return data ? toFeedback(data as Row) : null;
+  return data ? toFeedback(data as Row, await getStudentLabels()) : null;
 }

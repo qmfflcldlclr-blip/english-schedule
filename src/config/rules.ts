@@ -18,3 +18,6 @@ export const NOTE_MAX = 2000;
 
 // 피드백 1건 최대 글자 수 (데이터베이스 0010 의 검사와 같은 값)
 export const FEEDBACK_MAX = 2000;
+
+// 남은 횟수 0회인 채로 이 일수가 지나고 예정 수업이 없으면 자동 보관
+export const AUTO_ARCHIVE_DAYS = 30;

@@ -46,7 +46,7 @@ export default async function StudentDetailPage({
 
       <div className="mt-2 flex items-start justify-between gap-3">
         <h1 className="min-w-0 break-words text-2xl font-bold">
-          {student.name}
+          {student.label}
           {student.archived && (
             <span className="ml-2 rounded-full bg-gray-100 px-2 py-0.5 align-middle text-xs font-medium text-gray-600">
               {t.archivedBadge}
