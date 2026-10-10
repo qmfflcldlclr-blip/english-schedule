@@ -43,7 +43,7 @@ export function BottomNav({ items, label }: { items: Item[]; label: string }) {
   return (
     <nav
       aria-label={label}
-      className="fixed inset-x-0 bottom-0 z-10 flex border-t border-brand-100 bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-10 flex print:hidden border-t border-brand-100 bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       {items.map((item) => (
         <Link

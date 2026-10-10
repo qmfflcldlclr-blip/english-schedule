@@ -90,6 +90,9 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
         <Link href={`/calendar/repeat?date=${selected}`} className="flex min-h-11 items-center rounded-full border border-gray-300 bg-white px-4 text-sm">
           {t.repeat}
         </Link>
+        <Link href={`/calendar/print?month=${selected.slice(0, 7)}`} className="flex min-h-11 items-center rounded-full border border-gray-300 bg-white px-4 text-sm">
+          🖨️ {t.print}
+        </Link>
       </div>
 
       {/* ───── 폰: 날짜 줄 + 그날 목록 ───── */}

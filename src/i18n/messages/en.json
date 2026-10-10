@@ -263,7 +263,8 @@
       "cancel_time_in_future": "Cancellation time cannot be in the future.",
       "not_processed": "This class has not been processed yet.",
       "unknown": "Could not process. Please try again."
-    }
+    },
+    "print": "Print"
   },
   "settings": {
     "title": "Settings",
@@ -287,5 +288,30 @@
       "url": "Please enter a valid address starting with https://",
       "save": "Could not save. Please try again."
     }
+  },
+  "print": {
+    "title": "Print schedule",
+    "back": "Back to calendar",
+    "student": "Student",
+    "allStudents": "All students",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "printNow": "Print",
+    "hint": "Prints on one A4 landscape page. On a phone you can also save it as a PDF from the print screen.",
+    "summaryTitle": "This month",
+    "colStudent": "Student",
+    "colMonth": "Classes",
+    "colCompleted": "Done",
+    "colScheduled": "Scheduled",
+    "colFree": "Free cancel",
+    "colAbsent": "Absent/charged",
+    "colRemaining": "Remaining",
+    "total": "Total",
+    "noLessons": "No classes this month.",
+    "printedAt": "Printed {date}",
+    "freeShort": "cancel",
+    "lateShort": "charged",
+    "absentShort": "absent",
+    "timeZoneNote": "{zone} time"
   }
 }

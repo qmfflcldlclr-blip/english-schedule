@@ -41,6 +41,13 @@ body {
   overflow-wrap: break-word;
 }
 
+/* 인쇄할 때는 흰 종이 그대로 */
+@media print {
+  body {
+    background: white;
+  }
+}
+
 @layer base {
   /* 입력칸은 배경색 위에서도 잘 보이게 흰 바탕 */
   input,
