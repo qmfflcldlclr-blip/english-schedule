@@ -6,6 +6,8 @@ import { getOtherTimeZone, listLessons } from "@/lib/lessons";
 import { addDays, formatDay, scheduleDayStart, scheduleToday, toZoned } from "@/lib/time";
 import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
 import { EmptyLessonsArt, GreetingArt, type DayPart } from "@/components/Illustrations";
+import NoteCard from "@/components/NoteCard";
+import { getStaffNotes } from "@/lib/notes";
 
 // 내 시간대 기준: 12시 전 아침, 18시 전 오후, 그 뒤 저녁
 function dayPart(minutes: number): DayPart {
@@ -18,10 +20,16 @@ export default async function Home() {
   const today = scheduleToday(timeZone); // 새벽 수업은 전날에 포함
   const now = new Date();
 
-  const [lessons, otherTimeZone] = await Promise.all([
+  const [lessons, otherTimeZone, notes] = await Promise.all([
     listLessons(scheduleDayStart(today, timeZone), scheduleDayStart(addDays(today, 1), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
+    getStaffNotes(),
   ]);
+  // 메모 수정 시각 "10/10 16:20" (내 시간대)
+  const stamp = (iso: string) => {
+    const z = toZoned(iso, timeZone);
+    return `${Number(z.date.slice(5, 7))}/${Number(z.date.slice(8))} ${z.time}`;
+  };
   const active = lessons.filter((l) => l.status === "scheduled" || l.status === "completed");
   // 다음 수업: 아직 끝나지 않은 예정 수업 중 가장 빠른 것
   const next = lessons.find(
@@ -77,6 +85,21 @@ export default async function Home() {
           )
         )}
       </section>
+
+      {/* 서로 남기는 메모 (매니저 · 선생님 각자 한 칸) */}
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {notes.map((n) => (
+          <NoteCard
+            key={n.ownerId}
+            title={`${n.role === "manager" ? t.notes.manager : t.notes.teacher} · ${n.name}`}
+            content={n.content}
+            updatedLabel={n.updatedAt ? format(t.notes.updated, { time: stamp(n.updatedAt) }) : null}
+            editable={n.ownerId === profile?.id}
+            accent={n.role === "manager" ? "brand" : "sunny"}
+            t={t.notes}
+          />
+        ))}
+      </div>
 
       {/* 오늘 수업 목록 */}
       <div className="mt-6 flex items-center justify-between gap-2">

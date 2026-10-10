@@ -12,3 +12,6 @@ export const ADJUST_MAX = 50;
 
 // 반복 일정을 한 번에 만들 수 있는 최대 기간(주)
 export const REPEAT_MAX_WEEKS = 26;
+
+// 홈 메모 최대 글자 수 (데이터베이스 0009 의 검사와 같은 값)
+export const NOTE_MAX = 2000;

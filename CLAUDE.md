@@ -105,6 +105,9 @@
 5. 수업 상태 변경 (완료/취소/결석) 및 규칙에 따른 횟수 자동 차감
 6. Zoom 링크 표시
 
+## 홈 메모 (2026-10-10 결정)
+- 홈에 **매니저 메모 · 선생님 메모** 2칸. **각자 자기 칸만 수정**(데이터베이스 보안 규칙), 상대 칸은 읽기만. 마지막 수정 시각 표시.
+
 ## 2차 이후
 - 텔레그램 알림
 - 기존 엑셀 데이터 가져오기 (엑셀 파일 받은 후)
@@ -118,7 +121,7 @@
 - 사이트 주소: **https://english-schedule-5mgw.vercel.app** (Vercel 프로젝트 `english-schedule-5mgw`)
 - 코드: GitHub `qmfflcldlclr-blip/english-schedule` (비공개). **main 에 push 하면 Vercel 이 자동 배포.**
 - Vercel 환경 변수: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (값은 `.env.local` 과 동일)
-- 데이터베이스 변경은 `supabase/migrations/` 에 번호 순서대로 SQL 파일을 만들고, 사용자가 Supabase SQL Editor 에서 **한 번씩** 실행. **0008 까지 실행 완료.**
+- 데이터베이스 변경은 `supabase/migrations/` 에 번호 순서대로 SQL 파일을 만들고, 사용자가 Supabase SQL Editor 에서 **한 번씩** 실행. **0008 까지 실행 완료.** (0009 홈 메모 — 실행 필요)
 - 취소 규칙 테스트: `supabase/tests/lesson_status_test.sql` ("TEST OK" 오류 메시지가 성공)
 - 로그인 계정: `lee`(매니저, 한국어, Asia/Seoul), `michelle`(선생님, 영어, Asia/Manila). 아이디는 내부적으로 `아이디@example.com` 이메일로 변환됨.
 - 폰에서 개발 서버 확인: `npm run dev:phone` → 같은 Wi-Fi 에서 `http://PC의IP:3000`

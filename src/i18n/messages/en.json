@@ -319,5 +319,22 @@
     "lateShort": "charged",
     "absentShort": "absent",
     "timeZoneNote": "{zone} time"
+  },
+  "notes": {
+    "title": "Notes",
+    "manager": "Manager’s note",
+    "teacher": "Teacher’s note",
+    "placeholder": "Write anything the other person should know.",
+    "empty": "No note yet.",
+    "edit": "Write",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "updated": "Updated {time}",
+    "errors": {
+      "tooLong": "Notes can be up to 2000 characters.",
+      "save": "Could not save. Please try again."
+    }
   }
 }

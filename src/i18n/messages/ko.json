@@ -319,5 +319,22 @@
     "lateShort": "차감",
     "absentShort": "결석",
     "timeZoneNote": "{zone} 시간 기준"
+  },
+  "notes": {
+    "title": "메모",
+    "manager": "매니저 메모",
+    "teacher": "선생님 메모",
+    "placeholder": "상대방이 참고했으면 하는 내용을 적어 주세요.",
+    "empty": "아직 메모가 없어요.",
+    "edit": "쓰기",
+    "save": "저장",
+    "saving": "저장 중…",
+    "saved": "저장했어요",
+    "cancel": "취소",
+    "updated": "마지막 수정 {time}",
+    "errors": {
+      "tooLong": "메모는 2000자까지 쓸 수 있어요.",
+      "save": "저장하지 못했습니다. 다시 시도해 주세요."
+    }
   }
 }
