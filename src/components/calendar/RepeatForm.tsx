@@ -79,7 +79,7 @@ export default function RepeatForm({ t, students, zoneLabel, timeZone, locale, i
           {t.weekdayNames.map((name, d) => (
             <label
               key={d}
-              className="flex min-h-12 cursor-pointer items-center justify-center rounded-lg border border-gray-300 text-sm font-medium has-[:checked]:border-gray-900 has-[:checked]:bg-gray-900 has-[:checked]:text-white"
+              className="flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-gray-300 bg-white text-sm font-medium has-[:checked]:border-brand-600 has-[:checked]:bg-brand-600 has-[:checked]:text-white"
             >
               <input type="checkbox" name="weekday" value={d} checked={weekdays.includes(d)} onChange={() => changed(toggleDay)(d)} className="sr-only" />
               {name}
@@ -146,13 +146,13 @@ export default function RepeatForm({ t, students, zoneLabel, timeZone, locale, i
         name="mode"
         value="preview"
         disabled={pending}
-        className="min-h-12 rounded-lg border border-gray-300 font-medium disabled:opacity-60"
+        className="min-h-12 rounded-xl border border-gray-300 bg-white font-medium disabled:opacity-60"
       >
         {pending ? t.previewing : t.preview}
       </button>
 
       {preview && (
-        <section className="rounded-xl border border-gray-200 p-4">
+        <section className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
           <h2 className="font-semibold">{format(t.previewTitle, { n: toCreate })}</h2>
           <ul className="mt-2 max-h-80 divide-y divide-gray-100 overflow-y-auto">
             {preview.map((p) => (
@@ -178,7 +178,7 @@ export default function RepeatForm({ t, students, zoneLabel, timeZone, locale, i
               name="mode"
               value="create"
               disabled={pending}
-              className="mt-3 min-h-12 w-full rounded-lg bg-gray-900 font-medium text-white disabled:opacity-60"
+              className="mt-3 min-h-12 w-full rounded-xl bg-brand-600 font-medium text-white disabled:opacity-60"
             >
               {pending ? t.creating : format(t.createN, { n: toCreate })}
             </button>

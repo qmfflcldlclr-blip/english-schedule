@@ -23,7 +23,7 @@ export default function StudentForm({ t, student, cancelHref }: Props) {
   const errors = state.errors ?? {};
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-gray-300 px-3 text-base focus:border-gray-900 focus:outline-none aria-invalid:border-red-500";
+    "mt-1 w-full rounded-xl border border-gray-300 px-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none aria-invalid:border-red-500";
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
@@ -91,14 +91,14 @@ export default function StudentForm({ t, student, cancelHref }: Props) {
       <div className="flex gap-3">
         <Link
           href={cancelHref}
-          className="flex min-h-12 flex-1 items-center justify-center rounded-lg border border-gray-300 font-medium"
+          className="flex min-h-12 flex-1 items-center justify-center rounded-xl border border-gray-300 bg-white font-medium"
         >
           {t.cancel}
         </Link>
         <button
           type="submit"
           disabled={pending}
-          className="min-h-12 flex-1 rounded-lg bg-gray-900 font-medium text-white disabled:opacity-60"
+          className="min-h-12 flex-1 rounded-xl bg-brand-600 font-medium text-white disabled:opacity-60"
         >
           {pending ? t.saving : t.save}
         </button>

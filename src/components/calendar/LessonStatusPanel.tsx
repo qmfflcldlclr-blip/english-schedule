@@ -64,7 +64,7 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
           type="button"
           disabled={pending}
           onClick={() => run("revert", t.confirmRevert)}
-          className="min-h-11 w-full rounded-lg border border-gray-300 font-medium disabled:opacity-60"
+          className="min-h-11 w-full rounded-xl border border-gray-300 bg-white font-medium disabled:opacity-60"
         >
           {pending ? t.processing : `↩ ${t.actions.revert}`}
         </button>
@@ -77,7 +77,7 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
   if (cancelOpen) {
     const p = preview && !("error" in preview) ? preview : null;
     return (
-      <section className="mt-6 rounded-xl border border-gray-200 p-4">
+      <section className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
         <h2 className="font-semibold">{t.cancelTitle}</h2>
         <p className="mt-3 text-sm font-medium">{t.cancelledAt}</p>
         <div className="grid grid-cols-2 gap-3">
@@ -88,7 +88,7 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
 
         <div
           aria-live="polite"
-          className={`mt-4 rounded-lg p-3 text-sm ${
+          className={`mt-4 rounded-xl p-3 text-sm ${
             !p ? "bg-gray-50 text-gray-500" : p.free ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-900"
           }`}
         >
@@ -105,14 +105,14 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
         {errorText && <p className="mt-2 text-sm text-red-600">{errorText}</p>}
 
         <div className="mt-4 flex gap-3">
-          <button type="button" onClick={() => setCancelOpen(false)} className="min-h-12 flex-1 rounded-lg border border-gray-300 font-medium">
+          <button type="button" onClick={() => setCancelOpen(false)} className="min-h-12 flex-1 rounded-xl border border-gray-300 bg-white font-medium">
             {t.back}
           </button>
           <button
             type="button"
             disabled={pending || !p}
             onClick={() => run("cancel")}
-            className="min-h-12 flex-1 rounded-lg bg-gray-900 font-medium text-white disabled:opacity-60"
+            className="min-h-12 flex-1 rounded-xl bg-brand-600 font-medium text-white disabled:opacity-60"
           >
             {pending ? t.processing : t.confirmCancel}
           </button>
@@ -134,11 +134,11 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
           onClick={() =>
             run("complete", remaining <= 0 ? format(t.confirmCompleteNoCredits, { n: remaining }) : t.confirmComplete)
           }
-          className={`${big} bg-gray-900 text-white`}
+          className={`${big} bg-brand-600 text-white`}
         >
           {t.actions.complete}
         </button>
-        <button type="button" disabled={pending} onClick={() => setCancelOpen(true)} className={`${big} border border-gray-300`}>
+        <button type="button" disabled={pending} onClick={() => setCancelOpen(true)} className={`${big} border border-gray-300 bg-white`}>
           {t.actions.cancel}
         </button>
         <button

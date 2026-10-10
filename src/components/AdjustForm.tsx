@@ -14,7 +14,7 @@ export default function AdjustForm({ t, studentId }: Props) {
   const errors = state.errors ?? {};
 
   const choice =
-    "flex min-h-12 flex-1 cursor-pointer items-center justify-center rounded-lg border border-gray-300 font-medium has-[:checked]:border-gray-900 has-[:checked]:bg-gray-900 has-[:checked]:text-white";
+    "flex min-h-12 flex-1 cursor-pointer items-center justify-center rounded-xl border border-gray-300 font-medium has-[:checked]:border-brand-600 has-[:checked]:bg-brand-600 has-[:checked]:text-white";
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
@@ -64,7 +64,7 @@ export default function AdjustForm({ t, studentId }: Props) {
         {errors.reason && <ErrorText>{t.errors.reason}</ErrorText>}
       </label>
 
-      <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{t.adjustHint}</p>
+      <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t.adjustHint}</p>
 
       {errors.save && (
         <p role="alert" className="text-sm text-red-600">

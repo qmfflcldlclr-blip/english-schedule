@@ -29,7 +29,7 @@ export default function ZoomForm({ t, initial }: { t: Messages["settings"]; init
       <button
         type="submit"
         disabled={pending}
-        className="min-h-12 rounded-lg bg-gray-900 font-medium text-white disabled:opacity-60"
+        className="min-h-12 rounded-xl bg-brand-600 font-medium text-white disabled:opacity-60"
       >
         {pending ? t.saving : t.save}
       </button>

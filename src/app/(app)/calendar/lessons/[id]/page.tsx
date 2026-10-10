@@ -116,7 +116,7 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
         </>
       ) : (
         <>
-          <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-xl border border-gray-200 p-4">
+          <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
             <dt className="text-gray-500">{t.student}</dt>
             <dd>
               <Link href={`/students/${lesson.student_id}`} className="underline underline-offset-4">

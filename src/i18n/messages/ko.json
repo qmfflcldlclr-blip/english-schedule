@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "영어 수업 스케줄",
+    "title": "Andy English",
     "description": "1:1 영어 화상수업 일정·횟수 관리"
   },
   "language": {
@@ -26,8 +26,17 @@
     "logout": "로그아웃"
   },
   "home": {
-    "greeting": "안녕하세요, {name}님!",
-    "comingSoon": "곧 수강 플랜과 달력 기능이 추가됩니다."
+    "morning": "좋은 아침이에요, {name}님!",
+    "afternoon": "좋은 오후예요, {name}님!",
+    "evening": "좋은 저녁이에요, {name}님!",
+    "todayCount": "오늘 수업 {n}개",
+    "todayCountOne": "오늘 수업 1개",
+    "nextLesson": "다음 수업",
+    "allDone": "오늘 수업을 모두 마쳤어요. 수고하셨어요!",
+    "noLessons": "오늘은 수업이 없어요.",
+    "noLessonsHint": "달력에서 수업을 추가할 수 있어요.",
+    "todayTitle": "오늘 수업",
+    "openCalendar": "달력 보기"
   },
   "students": {
     "title": "학생",

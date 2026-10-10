@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getDictionary } from "@/i18n/server";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { logout } from "@/lib/auth-actions";
+import { Logo } from "@/components/Illustrations";
 import LanguageToggle from "@/components/LanguageToggle";
 import { BottomNav, TopNav } from "@/components/NavLinks";
 
@@ -24,10 +25,10 @@ async function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-2">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-brand-100 bg-white/90 px-4 py-2 backdrop-blur">
         <div className="flex min-w-0 items-center gap-4">
-          <Link href="/" className="truncate text-lg font-semibold">
-            {t.app.title}
+          <Link href="/" aria-label={t.app.title} className="flex min-h-11 shrink-0 items-center">
+            <Logo />
           </Link>
           <TopNav items={items} />
         </div>
@@ -40,7 +41,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
           <form action={logout}>
             <button
               type="submit"
-              className="min-h-11 rounded-full px-3 text-sm text-gray-600 hover:bg-gray-100"
+              className="min-h-11 rounded-full px-3 text-sm whitespace-nowrap text-gray-600 hover:bg-gray-100"
             >
               {t.auth.logout}
             </button>

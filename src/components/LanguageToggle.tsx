@@ -17,7 +17,7 @@ export default function LanguageToggle({ current, labels, ariaLabel }: Props) {
     <div
       role="group"
       aria-label={ariaLabel}
-      className="inline-flex rounded-full border border-gray-300 p-0.5 text-sm"
+      className="inline-flex rounded-full border border-gray-300 bg-white p-0.5 text-sm"
     >
       {locales.map((locale) => {
         const active = locale === current;
@@ -31,7 +31,7 @@ export default function LanguageToggle({ current, labels, ariaLabel }: Props) {
             aria-label={labels[locale]}
             className={`min-h-10 min-w-10 rounded-full px-3 transition-colors ${
               active
-                ? "bg-gray-900 text-white"
+                ? "bg-brand-600 text-white"
                 : "text-gray-600 hover:bg-gray-100"
             } disabled:cursor-default`}
           >

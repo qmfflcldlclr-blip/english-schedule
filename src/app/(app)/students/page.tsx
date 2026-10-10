@@ -5,6 +5,7 @@ import { listStudents } from "@/lib/students";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getCreditOverview } from "@/lib/credits";
 import { todayIn } from "@/lib/credit-math";
+import { EmptyStudentsArt } from "@/components/Illustrations";
 
 export default async function StudentsPage({
   searchParams,
@@ -52,7 +53,7 @@ export default async function StudentsPage({
         {!showArchived && (
           <Link
             href="/students/new"
-            className="flex min-h-11 items-center rounded-lg bg-gray-900 px-4 text-sm font-medium text-white"
+            className="flex min-h-11 items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white"
           >
             + {t.add}
           </Link>
@@ -67,9 +68,10 @@ export default async function StudentsPage({
       </Link>
 
       {students.length === 0 ? (
-        <p className="mt-10 text-center text-gray-500">
-          {showArchived ? t.emptyArchived : t.empty}
-        </p>
+        <div className="mt-8 flex flex-col items-center text-center">
+          <EmptyStudentsArt className="h-28" />
+          <p className="mt-3 text-gray-500">{showArchived ? t.emptyArchived : t.empty}</p>
+        </div>
       ) : (
         <>
           {/* 폰: 카드형 목록 */}
@@ -78,7 +80,7 @@ export default async function StudentsPage({
               <li key={s.id}>
                 <Link
                   href={`/students/${s.id}`}
-                  className="flex min-h-16 items-center justify-between gap-3 rounded-xl border border-gray-200 px-4 py-3 active:bg-gray-50"
+                  className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white shadow-sm px-4 py-3 active:bg-gray-50"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-semibold">{s.name}</p>

@@ -56,8 +56,8 @@ function redirectKeepingCookies(
 }
 
 export const config = {
-  // 이미지·스크립트 같은 정적 파일은 검사하지 않음
+  // 이미지·스크립트 같은 정적 파일과 앱 아이콘·앱 정보는 검사하지 않음 (폰이 로그인 없이 가져감)
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|apple-icon|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

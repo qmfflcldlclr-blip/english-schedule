@@ -25,7 +25,7 @@ function signed(n: number) {
 const statusStyle = {
   done: "bg-gray-100 text-gray-500",
   active: "bg-emerald-50 text-emerald-700",
-  waiting: "bg-sky-50 text-sky-700",
+  waiting: "bg-brand-50 text-brand-700",
 };
 
 // 학생 상세 화면의 수강 횟수 영역: 요약 → 플랜별 진행 → 기록
@@ -58,7 +58,7 @@ export default function CreditSection({
   return (
     <>
       {/* 요약 */}
-      <section className="mt-6 rounded-xl border border-gray-200 p-4">
+      <section className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
         <h2 className="text-sm font-medium text-gray-500">{t.remaining}</h2>
         <p
           className={`mt-1 text-4xl font-bold tabular-nums ${remaining <= 0 ? "text-red-600" : ""}`}
@@ -79,13 +79,13 @@ export default function CreditSection({
           <div className="mt-4 flex gap-3">
             <Link
               href={`/students/${studentId}/plans/new`}
-              className="flex min-h-11 flex-1 items-center justify-center rounded-lg bg-gray-900 text-sm font-medium text-white"
+              className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-brand-600 text-sm font-medium text-white"
             >
               + {t.addPlan}
             </Link>
             <Link
               href={`/students/${studentId}/adjust`}
-              className="flex min-h-11 flex-1 items-center justify-center rounded-lg border border-gray-300 text-sm font-medium"
+              className="flex min-h-11 flex-1 items-center justify-center rounded-xl border border-gray-300 bg-white text-sm font-medium"
             >
               ± {t.adjust}
             </Link>
@@ -101,7 +101,7 @@ export default function CreditSection({
         ) : (
           <ul className="mt-3 flex flex-col gap-3">
             {plans.map((p) => (
-              <li key={p.id} className="rounded-xl border border-gray-200 p-4">
+              <li key={p.id} className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-semibold">
@@ -124,7 +124,7 @@ export default function CreditSection({
                   {!archived && (
                     <Link
                       href={`/students/${studentId}/plans/${p.id}/edit`}
-                      className="flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm text-gray-600 hover:bg-gray-100"
+                      className="flex min-h-11 shrink-0 items-center rounded-xl px-3 text-sm text-gray-600 hover:bg-gray-100"
                     >
                       {t.editPlan}
                     </Link>
@@ -140,7 +140,7 @@ export default function CreditSection({
                   aria-valuenow={p.used}
                 >
                   <div
-                    className="h-full rounded-full bg-gray-900"
+                    className="h-full rounded-full bg-brand-600"
                     style={{ width: `${(p.used / p.credits) * 100}%` }}
                   />
                 </div>
@@ -175,7 +175,7 @@ export default function CreditSection({
         ) : (
           <>
             {/* 폰: 줄 목록 */}
-            <ul className="mt-3 divide-y divide-gray-100 rounded-xl border border-gray-200 md:hidden">
+            <ul className="mt-3 divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm md:hidden">
               {entries.map((e) => (
                 <li key={e.id} className="flex items-center justify-between gap-3 px-4 py-3">
                   <div className="min-w-0">

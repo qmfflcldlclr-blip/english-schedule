@@ -23,7 +23,7 @@ export default function ZoomButton({ url, t, size = "small" }: Props) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center justify-center gap-2 rounded-lg bg-[#0B5CFF] font-medium text-white hover:bg-[#0A4FDB] ${
+      className={`inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B5CFF] font-medium text-white hover:bg-[#0A4FDB] ${
         size === "large" ? "min-h-14 w-full text-base" : "min-h-11 px-4 text-sm"
       }`}
     >

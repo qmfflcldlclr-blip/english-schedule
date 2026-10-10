@@ -107,7 +107,7 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, initial
       </label>
 
       {state.overlaps && (
-        <div role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+        <div role="alert" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
           <p className="font-semibold">{t.overlapTitle}</p>
           <ul className="mt-1 list-disc pl-5">
             {state.overlaps.map((o, i) => (
@@ -119,7 +119,7 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, initial
             name="ignore_overlap"
             value="1"
             disabled={pending}
-            className="mt-3 min-h-11 w-full rounded-lg border border-amber-400 bg-white font-medium disabled:opacity-60"
+            className="mt-3 min-h-11 w-full rounded-xl border border-amber-400 bg-white font-medium disabled:opacity-60"
           >
             {t.saveAnyway}
           </button>

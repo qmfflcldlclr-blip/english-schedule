@@ -34,7 +34,7 @@ export default async function CopyWeekPage({ searchParams }: PageProps<"/calenda
       {items.length === 0 ? (
         <p className="mt-8 text-center text-gray-500">{t.copyNone}</p>
       ) : (
-        <ul className="mt-5 divide-y divide-gray-100 rounded-xl border border-gray-200">
+        <ul className="mt-5 divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
           {items.map((item, i) => {
             const local = toZoned(item.startsAt, timeZone);
             return (
@@ -58,7 +58,7 @@ export default async function CopyWeekPage({ searchParams }: PageProps<"/calenda
         <input type="hidden" name="monday" value={monday} />
         <Link
           href={`/calendar?date=${monday}`}
-          className="flex min-h-12 flex-1 items-center justify-center rounded-lg border border-gray-300 font-medium"
+          className="flex min-h-12 flex-1 items-center justify-center rounded-xl border border-gray-300 bg-white font-medium"
         >
           {t.cancel}
         </Link>

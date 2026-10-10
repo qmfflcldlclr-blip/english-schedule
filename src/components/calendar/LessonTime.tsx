@@ -12,7 +12,7 @@ export const statusStyle: Record<LessonStatus, string> = {
 };
 
 export const statusBadge: Record<LessonStatus, string> = {
-  scheduled: "bg-sky-50 text-sky-700",
+  scheduled: "bg-brand-50 text-brand-700",
   completed: "bg-gray-100 text-gray-600",
   free_cancel: "bg-gray-100 text-gray-500",
   absent: "bg-red-50 text-red-700",

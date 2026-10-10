@@ -28,7 +28,7 @@ export function TopNav({ items }: { items: Item[] }) {
           key={item.href}
           href={item.href}
           aria-current={isActive(pathname, item.href) ? "page" : undefined}
-          className="rounded-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 aria-[current=page]:bg-gray-100 aria-[current=page]:font-semibold aria-[current=page]:text-gray-900"
+          className="rounded-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 aria-[current=page]:bg-brand-50 aria-[current=page]:font-semibold aria-[current=page]:text-brand-700"
         >
           {item.label}
         </Link>
@@ -43,14 +43,14 @@ export function BottomNav({ items, label }: { items: Item[]; label: string }) {
   return (
     <nav
       aria-label={label}
-      className="fixed inset-x-0 bottom-0 z-10 flex border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-10 flex border-t border-brand-100 bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           aria-current={isActive(pathname, item.href) ? "page" : undefined}
-          className="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs text-gray-500 aria-[current=page]:font-semibold aria-[current=page]:text-gray-900"
+          className="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs text-gray-500 aria-[current=page]:font-semibold aria-[current=page]:text-brand-700"
         >
           <svg
             viewBox="0 0 24 24"

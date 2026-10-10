@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
+/*
+ * Andy English 색 모음 — 색을 바꿀 때는 여기만 고치면 전체에 반영됨
+ *   brand  : 대표 색 (하늘·파랑) → 버튼, 선택된 메뉴, 오늘 표시
+ *   sunny  : 포인트 색 (노랑) → 그림·강조 장식
+ *   paper  : 화면 배경 (아주 옅은 하늘색)
+ */
+@theme {
+  --color-brand-50: #eef6ff;
+  --color-brand-100: #d9ebff;
+  --color-brand-200: #b8dbff;
+  --color-brand-300: #86c2ff;
+  --color-brand-400: #4ea2f7;
+  --color-brand-500: #2a84ea;
+  --color-brand-600: #1f6fd1;
+  --color-brand-700: #1a59a8;
+  --color-brand-800: #1a4b87;
+  --color-brand-900: #1b3f6e;
+
+  --color-sunny-100: #fff4cc;
+  --color-sunny-300: #ffd95c;
+  --color-sunny-400: #ffc933;
+  --color-sunny-500: #f5b301;
+
+  --color-paper: #f5f9fe;
+
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+/* 이 사이트는 밝은 화면만 사용 (폰이 다크 모드여도 같은 화면) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-gray-900);
+  /* 한국어는 단어 중간에서 줄바꿈하지 않게 (긴 영어 단어는 넘치지 않게 끊음) */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+@layer base {
+  /* 입력칸은 배경색 위에서도 잘 보이게 흰 바탕 */
+  input,
+  select,
+  textarea {
+    background-color: white;
+  }
 }

@@ -47,13 +47,13 @@ export default async function StudentDetailPage({
         </h1>
         <Link
           href={`/students/${student.id}/edit`}
-          className="flex min-h-11 shrink-0 items-center rounded-lg border border-gray-300 px-4 text-sm font-medium"
+          className="flex min-h-11 shrink-0 items-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium"
         >
           {t.edit}
         </Link>
       </div>
 
-      <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-xl border border-gray-200 p-4">
+      <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
         <dt className="text-gray-500">{t.lessonMinutes}</dt>
         <dd>{format(t.minutesUnit, { n: student.lesson_minutes })}</dd>
         <dt className="text-gray-500">{t.createdAt}</dt>

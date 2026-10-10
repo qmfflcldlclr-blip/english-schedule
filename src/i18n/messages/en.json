@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "English Class Schedule",
+    "title": "Andy English",
     "description": "1:1 online English class schedule & credit management"
   },
   "language": {
@@ -26,8 +26,17 @@
     "logout": "Log out"
   },
   "home": {
-    "greeting": "Hello, {name}!",
-    "comingSoon": "Class plans and the calendar are coming soon."
+    "morning": "Good morning, {name}!",
+    "afternoon": "Good afternoon, {name}!",
+    "evening": "Good evening, {name}!",
+    "todayCount": "{n} classes today",
+    "todayCountOne": "1 class today",
+    "nextLesson": "Next class",
+    "allDone": "All classes are done for today. Great job!",
+    "noLessons": "No classes today.",
+    "noLessonsHint": "You can add classes in the calendar.",
+    "todayTitle": "Today’s classes",
+    "openCalendar": "Open calendar"
   },
   "students": {
     "title": "Students",

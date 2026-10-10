@@ -19,7 +19,7 @@ export default function SubmitButton({
     <button
       type="submit"
       disabled={pending || disabled}
-      className={`min-h-12 rounded-lg bg-gray-900 px-5 font-medium text-white disabled:opacity-60 ${className}`}
+      className={`min-h-12 rounded-xl bg-brand-600 px-5 font-medium text-white disabled:opacity-60 ${className}`}
     >
       {pending ? pendingLabel : label}
     </button>

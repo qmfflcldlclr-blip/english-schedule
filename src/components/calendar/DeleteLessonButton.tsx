@@ -25,7 +25,7 @@ export default function DeleteLessonButton({ action, t, subtle }: Props) {
             if (result?.error) setFailed(true);
           });
         }}
-        className={`min-h-11 rounded-lg px-4 text-sm font-medium hover:bg-red-50 disabled:opacity-60 ${subtle ? "text-red-500" : "text-red-600"}`}
+        className={`min-h-11 rounded-xl px-4 text-sm font-medium hover:bg-red-50 disabled:opacity-60 ${subtle ? "text-red-500" : "text-red-600"}`}
       >
         {pending ? t.deleting : t.delete}
       </button>
