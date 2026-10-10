@@ -15,6 +15,7 @@ type Props = {
   students: StudentOption[];
   zoneLabel: string; // "한국" 등 — 입력 기준 시간대 안내용
   cancelHref: string;
+  keepDuration?: boolean; // 달력에서 드래그로 길이를 정해 왔으면 학생을 골라도 길이를 바꾸지 않음
   initial: {
     lessonId?: string;
     studentId: string;
@@ -25,7 +26,7 @@ type Props = {
   };
 };
 
-export default function LessonForm({ t, students, zoneLabel, cancelHref, initial }: Props) {
+export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDuration, initial }: Props) {
   const [state, onSubmit, pending] = useActionForm<LessonFormState>(saveLesson, {});
   // 값을 직접 들고 있어서, 경고·오류가 나도 입력한 내용이 사라지지 않음
   const [values, setValues] = useState(initial);
@@ -33,10 +34,14 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, initial
     setValues((v) => ({ ...v, [key]: key === "duration" ? Number(e.target.value) : e.target.value }));
   const errors = state.errors ?? {};
 
-  // 학생을 고르면 그 학생의 수업 길이로 자동 변경
+  // 학생을 고르면 그 학생의 수업 길이로 자동 변경 (달력에서 드래그로 길이를 정해 왔으면 유지)
   const chooseStudent = (id: string) => {
     const s = students.find((x) => x.id === id);
-    setValues((v) => ({ ...v, studentId: id, duration: s?.lesson_minutes ?? v.duration }));
+    setValues((v) => ({
+      ...v,
+      studentId: id,
+      duration: keepDuration ? v.duration : (s?.lesson_minutes ?? v.duration),
+    }));
   };
 
   return (

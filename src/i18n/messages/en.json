@@ -264,7 +264,8 @@
       "not_processed": "This class has not been processed yet.",
       "unknown": "Could not process. Please try again."
     },
-    "print": "Print"
+    "print": "Print",
+    "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length."
   },
   "settings": {
     "title": "Settings",
@@ -297,7 +298,7 @@
     "prevMonth": "Previous month",
     "nextMonth": "Next month",
     "printNow": "Print",
-    "hint": "Prints on one A4 landscape page. On a phone you can also save it as a PDF from the print screen.",
+    "hint": "Prints on two A4 landscape pages (page 1: calendar, page 2: this month's counts). On a phone you can also save it as a PDF from the print screen.",
     "summaryTitle": "This month",
     "colStudent": "Student",
     "colMonth": "Classes",

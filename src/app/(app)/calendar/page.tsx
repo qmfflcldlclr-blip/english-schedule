@@ -15,6 +15,7 @@ import {
 } from "@/lib/time";
 import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
 import ZoomButton from "@/components/ZoomButton";
+import DaySlots from "@/components/calendar/DaySlots";
 import { EmptyLessonsArt } from "@/components/Illustrations";
 import { getSettings } from "@/lib/settings";
 
@@ -190,6 +191,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
               {hours.map((h, i) => (
                 <div key={h} className="absolute inset-x-0 border-t border-gray-100" style={{ top: i * HOUR_PX }} />
               ))}
+              <DaySlots date={d} fromHour={fromHour} toHour={toHour} hourPx={HOUR_PX} hint={t.slotHint} minutesUnit={t.minutesUnit} />
               {(byDay.get(d) ?? []).map((l) => {
                 const start = toZoned(l.starts_at, timeZone).minutes;
                 return (
@@ -211,6 +213,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
           ))}
         </div>
         {lessons.length === 0 && <p className="mt-4 text-center text-gray-500">{t.noLessonsWeek}</p>}
+        <p className="mt-2 text-center text-sm text-gray-500">💡 {t.slotHint}</p>
       </div>
     </main>
   );

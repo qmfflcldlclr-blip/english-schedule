@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 // 학생 선택: 바꾸면 주소(?student=)를 바꿔서 다시 그림
@@ -51,32 +50,5 @@ export function PrintButton({ label }: { label: string }) {
     >
       🖨️ {label}
     </button>
-  );
-}
-
-// 안전장치: 내용이 종이 높이를 넘으면 종이 전체를 그만큼 축소 (무조건 한 장)
-export function FitToPage({
-  children,
-  className,
-  style,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const outer = useRef<HTMLDivElement>(null);
-  const inner = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const o = outer.current;
-    const i = inner.current;
-    if (!o || !i) return;
-    i.style.zoom = "1";
-    const ratio = o.clientHeight / i.scrollHeight;
-    if (ratio < 1) i.style.zoom = String(Math.floor(ratio * 1000) / 1000);
-  });
-  return (
-    <div ref={outer} className={className} style={style}>
-      <div ref={inner}>{children}</div>
-    </div>
   );
 }

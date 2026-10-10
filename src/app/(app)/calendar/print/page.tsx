@@ -100,20 +100,18 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
         <p className="mt-2 text-center text-sm text-gray-500 md:text-left">{t.hint}</p>
       </div>
 
-      {/* ───── 종이 미리보기 (폰에서는 이 상자만 옆으로 밀어서 봄) ───── */}
+      {/* ───── 종이 미리보기 두 장 (폰에서는 이 상자만 옆으로 밀어서 봄) ───── */}
       <div className="mt-4 overflow-x-auto pb-2 print:mt-0 print:overflow-visible print:p-0">
-        <div className="w-fit bg-white p-[7mm] shadow-md ring-1 ring-gray-200 print:p-0 print:shadow-none print:ring-0">
-          <PrintSheet
-            month={month}
-            heading={`${monthTitle} · ${student ? student.name : t.allStudents}`}
-            meta={`${format(t.timeZoneNote, { zone: zoneName(timeZone, locale) })} · ${format(t.printedAt, { date: today })}`}
-            days={days}
-            summary={summary}
-            t={t}
-            weekdayNames={all.calendar.weekdayNames}
-            timesUnit={all.credits.timesUnit}
-          />
-        </div>
+        <PrintSheet
+          month={month}
+          heading={`${monthTitle} · ${student ? student.name : t.allStudents}`}
+          meta={`${format(t.timeZoneNote, { zone: zoneName(timeZone, locale) })} · ${format(t.printedAt, { date: today })}`}
+          days={days}
+          summary={summary}
+          t={t}
+          weekdayNames={all.calendar.weekdayNames}
+          timesUnit={all.credits.timesUnit}
+        />
       </div>
     </main>
   );
