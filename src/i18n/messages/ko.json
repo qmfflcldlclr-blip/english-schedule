@@ -40,7 +40,9 @@
     "openCalendar": "달력 보기",
     "lowCreditTitle": "횟수가 얼마 안 남은 학생",
     "lowCreditHint": "남은 횟수 {n}회 이하",
-    "lowCreditItem": "{n}회"
+    "lowCreditItem": "{n}회",
+    "guide": "📖 사용 설명서",
+    "guideHint": "처음이라면 여기부터 · 기능별 사용법"
   },
   "students": {
     "title": "학생",
@@ -496,5 +498,10 @@
     "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0014(학생 노트) 파일을 실행해 주세요.",
     "privatePlaceholder": "나만 볼 메모 (상대방에게는 보이지 않아요)",
     "sharedPlaceholder": "매니저·선생님이 함께 볼 메모"
+  },
+  "guide": {
+    "backHome": "홈",
+    "toc": "목차",
+    "top": "맨 위로"
   }
 }

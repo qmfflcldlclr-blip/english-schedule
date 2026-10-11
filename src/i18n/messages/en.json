@@ -40,7 +40,9 @@
     "openCalendar": "Open calendar",
     "lowCreditTitle": "Students running low on classes",
     "lowCreditHint": "{n} or fewer left",
-    "lowCreditItem": "{n} left"
+    "lowCreditItem": "{n} left",
+    "guide": "📖 User guide",
+    "guideHint": "New here? Start here · how each feature works"
   },
   "students": {
     "title": "Students",
@@ -496,5 +498,10 @@
     "setup": "Database setup needed. Run the 0014 (student notes) file in the Supabase SQL Editor.",
     "privatePlaceholder": "Notes only you can see",
     "sharedPlaceholder": "Notes for both manager and teacher"
+  },
+  "guide": {
+    "backHome": "Home",
+    "toc": "Contents",
+    "top": "Back to top"
   }
 }

@@ -93,6 +93,18 @@ export default async function Home() {
         )}
       </section>
 
+      {/* 사용 설명서 */}
+      <Link
+        href="/guide"
+        className="mt-4 flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-brand-200 bg-white px-4 py-3 shadow-sm hover:bg-brand-50"
+      >
+        <span className="min-w-0">
+          <span className="block font-bold text-brand-800">{t.home.guide}</span>
+          <span className="block truncate text-sm text-gray-500">{t.home.guideHint}</span>
+        </span>
+        <span aria-hidden className="text-xl text-brand-500">›</span>
+      </Link>
+
       {/* 공지: 남은 횟수가 얼마 안 남은 학생 */}
       {lowCredit.length > 0 && (
         <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
