@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { ADJUST_MAX, PLAN_CREDITS_MAX } from "@/config/rules";
 
@@ -11,6 +12,7 @@ export type PlanFormState = {
     expires?: boolean;
     save?: boolean;
   };
+  saved?: number; // 학생 목록 옆 칸에서 저장한 경우: 페이지를 옮기지 않고 저장 시각(매번 다름)만 돌려줌
 };
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -63,11 +65,16 @@ export async function savePlan(
     if (error) return { errors: { save: true } };
   }
 
+  if (formData.get("stay") === "1") {
+    revalidatePath("/students");
+    return { saved: Date.now() };
+  }
   redirect(`/students/${studentId}`);
 }
 
 export type AdjustFormState = {
   errors?: { amount?: boolean; reason?: boolean; save?: boolean };
+  saved?: number; // 옆 칸에서 저장한 경우 (위와 같음)
 };
 
 // 수동 조정: +N 또는 −N, 사유 필수
@@ -98,5 +105,9 @@ export async function adjustCredits(
   });
   if (error) return { errors: { save: true } };
 
+  if (formData.get("stay") === "1") {
+    revalidatePath("/students");
+    return { saved: Date.now() };
+  }
   redirect(`/students/${studentId}`);
 }

@@ -101,7 +101,13 @@
     "privateNote": "개별 노트",
     "sharedNote": "공유 노트",
     "showOriginal": "원문 보기",
-    "showTranslated": "번역 보기"
+    "showTranslated": "번역 보기",
+    "panelHint": "학생을 누르면 여기에서 플랜 추가·횟수 조정·노트·횟수 기록을 바로 볼 수 있어요.",
+    "panelLoading": "불러오는 중…",
+    "panelGone": "학생을 찾을 수 없어요.",
+    "panelClose": "닫기",
+    "details": "자세히",
+    "moreHistory": "더 보기 ({n}개 더)"
   },
   "credits": {
     "title": "수강 횟수",
@@ -176,7 +182,8 @@
       "early_first": "{hours}시간 이상 전 + 이번 달 첫 취소",
       "within_hour": "수업 {hours}시간 이내 취소",
       "monthly_limit": "이번 달 이미 취소한 적 있음"
-    }
+    },
+    "moreOptions": "날짜·만료일·메모 (선택)"
   },
   "calendar": {
     "title": "달력",

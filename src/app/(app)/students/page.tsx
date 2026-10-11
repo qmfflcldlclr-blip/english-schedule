@@ -11,6 +11,7 @@ import { EmptyStudentsArt } from "@/components/Illustrations";
 import StudentList from "@/components/StudentList";
 import { createClient } from "@/lib/supabase/server";
 import { AUTO_ARCHIVE_DAYS } from "@/config/rules";
+import { getSettings } from "@/lib/settings";
 
 // 남은 횟수 0회인 채로 오래된 학생 자동 보관 (SQL 0011 실행 전이면 아무 일도 안 함)
 async function autoArchive() {
@@ -24,11 +25,12 @@ export default async function StudentsPage({
 }: PageProps<"/students">) {
   const showArchived = (await searchParams).show === "archived";
   const archivedNow = showArchived ? 0 : await autoArchive(); // 목록을 읽기 전에 먼저 정리
-  const [{ locale, t: all }, profile, students, notes] = await Promise.all([
+  const [{ locale, t: all }, profile, students, notes, settings] = await Promise.all([
     getDictionary(),
     getCurrentProfile(),
     listStudents(showArchived),
     listNotesByStudent(),
+    getSettings(),
   ]);
   const t = all.students;
   const overview = await getCreditOverview(
@@ -45,7 +47,7 @@ export default async function StudentsPage({
     overview.get(id) ?? { remaining: 0, expired: false };
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 lg:max-w-[88rem]">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">
           {t.title}
@@ -93,6 +95,12 @@ export default async function StudentsPage({
           archivedView={showArchived}
           autoArchiveDays={AUTO_ARCHIVE_DAYS}
           t={{ ...t, timesUnit: all.credits.timesUnit, expired: all.credits.expired }}
+          panel={{
+            t: { students: t, credits: all.credits, notes: all.notes, studentNotes: all.studentNotes },
+            locale,
+            timeZone: profile?.timezone ?? "UTC",
+            hoursBefore: settings.freeCancelHoursBefore,
+          }}
         />
       )}
     </main>

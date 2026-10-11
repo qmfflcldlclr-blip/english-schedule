@@ -49,5 +49,6 @@ export async function saveStudentNote(_prev: NoteFormState, formData: FormData):
   if (isMissingFunction(error)) return { error: "setup" };
   if (error) return { error: "save" };
   revalidatePath(`/students/${studentId}`);
+  revalidatePath("/students"); // 학생 목록의 노트 칸도
   return { saved: true };
 }

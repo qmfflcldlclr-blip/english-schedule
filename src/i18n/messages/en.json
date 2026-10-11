@@ -101,7 +101,13 @@
     "privateNote": "Private notes",
     "sharedNote": "Shared notes",
     "showOriginal": "Show original",
-    "showTranslated": "Show translation"
+    "showTranslated": "Show translation",
+    "panelHint": "Click a student to add a plan, adjust credits, edit notes and see the history here.",
+    "panelLoading": "Loading…",
+    "panelGone": "Student not found.",
+    "panelClose": "Close",
+    "details": "Details",
+    "moreHistory": "Show more ({n} more)"
   },
   "credits": {
     "title": "Class credits",
@@ -176,7 +182,8 @@
       "early_first": "{hours}+ hours before, first cancel this month",
       "within_hour": "Cancelled within {hours} hour(s) of class",
       "monthly_limit": "Already cancelled this month"
-    }
+    },
+    "moreOptions": "Dates, expiry, memo (optional)"
   },
   "calendar": {
     "title": "Calendar",
