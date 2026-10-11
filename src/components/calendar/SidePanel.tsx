@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import type { Lesson } from "@/lib/lessons";
-import { loadLesson, loadStudentMonth, type PanelStudent } from "@/lib/panel-actions";
+import { loadLesson, loadStudentMonth, type PanelLesson, type PanelStudent } from "@/lib/panel-actions";
 import { quickLessonStatus } from "@/lib/lesson-status-actions";
-import { removeLesson } from "@/lib/lesson-actions";
+import { removeLesson, saveLessonMemo } from "@/lib/lesson-actions";
+import { NOTE_MAX } from "@/config/rules";
 import { addMonths } from "@/lib/print-layout";
 import { formatDay, toScheduleDay, toZoned } from "@/lib/time";
 import { DEFAULT_LESSON_MINUTES } from "@/config/rules";
@@ -237,6 +238,7 @@ function StudentMonth({
                     <span className="w-20 shrink-0 tabular-nums">{formatDay(day, locale, { month: "numeric", day: "numeric", weekday: "short" })}</span>
                     <span className={`shrink-0 tabular-nums ${l.status === "free_cancel" ? "line-through" : ""}`}>{toZoned(l.starts_at, timeZone).time}</span>
                     <span className="shrink-0 text-xs text-gray-400">{format(t.minutesUnit, { n: l.duration_minutes })}</span>
+                    {l.memo && <span title={l.memo} aria-label={t.panel.lessonNote} className="shrink-0">📝</span>}
                     <span className={`ml-auto shrink-0 rounded-full px-2 py-0.5 text-xs ${statusBadge[l.status]}`}>{statusText(l, t)}</span>
                   </button>
                 </li>
@@ -263,7 +265,7 @@ function StudentMonth({
 function LessonView(props: Props & { lessonId: string }) {
   const { t, students, timeZone, otherTimeZone, locale, zoneLabel, lessonId } = props;
   const panel = usePanel();
-  const [data, setData] = useState<{ key: string; value: Lesson | null } | null>(null);
+  const [data, setData] = useState<{ key: string; value: PanelLesson | null } | null>(null);
   const key = `${lessonId}|${panel.version}`;
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -334,10 +336,12 @@ function LessonView(props: Props & { lessonId: string }) {
             {" · "}
             {format(t.minutesUnit, { n: lesson.duration_minutes })}
           </p>
-          {lesson.memo && <p className="mt-1 text-sm text-gray-500">📝 {lesson.memo}</p>}
         </div>
         <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusBadge[lesson.status]}`}>{statusText(lesson, t)}</span>
       </div>
+
+      {/* 수업 노트: 둘이 함께 보고 쓰는 노란 상자 (완료된 수업에도 쓸 수 있음) */}
+      <LessonNoteBox key={data.key} t={t} lesson={lesson} timeZone={timeZone} onSaved={panel.refresh} />
 
       {scheduled && (
         <div className="mt-4 grid grid-cols-2 gap-2">
@@ -369,6 +373,7 @@ function LessonView(props: Props & { lessonId: string }) {
               students={options}
               zoneLabel={zoneLabel}
               cancelHref={`/calendar?date=${day}`}
+              hideMemo
               panel={{ onCancel: showStudent, onSaved: () => panel.refresh() }}
               initial={{
                 lessonId: lesson.id,
@@ -435,5 +440,92 @@ function NewLesson({ t, students, zoneLabel, view }: Props & { view: Extract<Pan
         />
       )}
     </div>
+  );
+}
+
+// ───── 수업 노트 상자 ─────
+function LessonNoteBox({ t, lesson, timeZone, onSaved }: { t: Messages["calendar"]; lesson: PanelLesson; timeZone: string; onSaved: () => void }) {
+  const p = t.panel;
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(lesson.memo ?? "");
+  const [original, setOriginal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  const shown = (!original && lesson.memoT) || lesson.memo;
+  const stamp = (iso: string) => {
+    const z = toZoned(iso, timeZone);
+    return `${Number(z.date.slice(5, 7))}/${Number(z.date.slice(8))} ${z.time}`;
+  };
+
+  const save = () =>
+    startTransition(async () => {
+      setError(null);
+      const result = await saveLessonMemo(lesson.id, text);
+      if ("error" in result) {
+        setError(p.noteErrors[result.error]);
+        return;
+      }
+      setEditing(false);
+      onSaved(); // 달력 칸·옆 칸 새로 (번역도 새로)
+    });
+
+  return (
+    <section className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-sm font-bold text-amber-900">📝 {p.lessonNote}</h3>
+        {!editing && (
+          <div className="flex items-center gap-1">
+            {lesson.memo && lesson.memoT && (
+              <button type="button" onClick={() => setOriginal((v) => !v)} className="min-h-9 rounded-full px-2 text-xs text-amber-800 hover:bg-white/70">
+                🌐 {original ? p.showTranslated : p.showOriginal}
+              </button>
+            )}
+            <button type="button" onClick={() => setEditing(true)} className="min-h-9 rounded-full px-3 text-sm font-medium text-amber-900 hover:bg-white/70">
+              ✏️ {p.noteWrite}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {editing ? (
+        <div className="mt-2 flex flex-col gap-2">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={3}
+            maxLength={NOTE_MAX}
+            autoFocus
+            placeholder={p.lessonNotePlaceholder}
+            className="w-full rounded-lg border border-amber-300 bg-white p-2.5 text-base focus:border-amber-500 focus:ring-2 focus:ring-amber-100 focus:outline-none"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                setText(lesson.memo ?? "");
+                setEditing(false);
+                setError(null);
+              }}
+              className="min-h-11 flex-1 rounded-lg border border-gray-300 bg-white text-sm font-medium"
+            >
+              {p.noteCancel}
+            </button>
+            <button type="button" disabled={pending} onClick={save} className="min-h-11 flex-1 rounded-lg bg-amber-500 text-sm font-semibold text-white disabled:opacity-60">
+              {pending ? p.noteSaving : p.noteSave}
+            </button>
+          </div>
+        </div>
+      ) : shown ? (
+        <p className="mt-1 whitespace-pre-wrap break-words text-gray-800">{shown}</p>
+      ) : (
+        <p className="mt-1 text-sm text-amber-700/80">{p.lessonNoteEmpty}</p>
+      )}
+
+      {error && <p role="alert" className="mt-2 text-sm text-red-600">{error}</p>}
+      {!editing && lesson.memo && lesson.memoMeta && (
+        <p className="mt-1 text-xs text-amber-700/80">{format(p.noteBy, { time: stamp(lesson.memoMeta.at), name: lesson.memoMeta.by })}</p>
+      )}
+    </section>
   );
 }

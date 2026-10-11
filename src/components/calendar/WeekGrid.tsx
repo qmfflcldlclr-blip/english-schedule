@@ -5,11 +5,20 @@ import type { Messages } from "@/i18n/server";
 import type { Lesson } from "@/lib/lessons";
 import { flag, type Holiday } from "@/lib/holidays";
 import { formatDay, toScheduleDay, toZoned } from "@/lib/time";
-import { CALENDAR_END_HOUR, CALENDAR_START_HOUR, DAY_CUTOFF_HOUR, HOUR_PX } from "@/config/schedule";
+import { CALENDAR_END_HOUR, CALENDAR_RANGE_TIME_ZONE, CALENDAR_START_HOUR, DAY_CUTOFF_HOUR, HOUR_PX } from "@/config/schedule";
 import LessonTime, { statusStyle } from "@/components/calendar/LessonTime";
 import DaySlots from "@/components/calendar/DaySlots";
 import LessonQuick from "@/components/calendar/LessonQuick";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
+
+// 내 시간대가 기준 시간대(한국)보다 몇 시간 빠른지/늦은지 (필리핀 = -1)
+function hourShift(timeZone: string, date: string) {
+  const at = new Date(`${date}T12:00:00Z`);
+  const mine = toZoned(at, timeZone);
+  const base = toZoned(at, CALENDAR_RANGE_TIME_ZONE);
+  const dayDiff = (Date.parse(mine.date) - Date.parse(base.date)) / 86_400_000; // 날짜가 넘어가는 시간대 대비
+  return Math.round((mine.minutes - base.minutes) / 60 + dayDiff * 24);
+}
 
 // 이보다 낮은 수업 칸은 "시간 이름" 한 줄로 (15·20분 수업)
 const ONE_LINE_BELOW_PX = 44;
@@ -32,9 +41,10 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
   const moveLabels = { confirmMove: t.confirmMove, moveOverlap: t.moveOverlap, moveFailed: t.moveFailed, overlapItem: t.overlapItem };
   const holidayText = (d: string) => (holidays[d] ?? []).map((h) => `${flag[h.country]} ${h.name}`).join(" · ");
 
-  // 시간 범위 (기본 17시 ~ 다음 날 1시, 범위 밖 수업이 있으면 넓힘)
-  let fromHour = CALENDAR_START_HOUR;
-  let toHour = CALENDAR_END_HOUR;
+  // 시간 범위 (한국 17시 ~ 다음 날 1시를 내 시간대로 옮김, 범위 밖 수업이 있으면 넓힘)
+  const shift = hourShift(timeZone, days[0]);
+  let fromHour = CALENDAR_START_HOUR + shift;
+  let toHour = CALENDAR_END_HOUR + shift;
   for (const l of lessons) {
     const start = toScheduleDay(l.starts_at, timeZone).minutes;
     fromHour = Math.min(fromHour, Math.floor(start / 60));
@@ -92,16 +102,17 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
                   studentId={l.student_id}
                   scheduled={l.status === "scheduled"}
                   move={{ date: d, minutes: start, duration: l.duration_minutes, fromHour, hourPx: HOUR_PX, studentName: l.studentName, locale, labels: moveLabels }}
-                  title={`${time} ${l.studentName} · ${minutes}${l.memo ? ` · ${l.memo}` : ""}`}
-                  className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]}`}
+                  title={`${time} ${l.studentName} · ${minutes}${l.memo ? `
+📝 ${l.memoT || l.memo}` : ""}`}
+                  className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]} ${l.memo ? "border-l-4 border-l-amber-400" : ""}`}
                   style={{ top: ((start - fromHour * 60) / 60) * HOUR_PX, height }}
                 >
                   {oneLine ? (
                     <>
                       <span className="shrink-0 font-semibold tabular-nums">{time}</span>
                       <span className="shrink-0 font-medium">{l.studentName}</span>
-                      {/* 수업 메모는 이름 옆에 (누르면 옆 칸에 전체) */}
-                      {l.memo && <span className="min-w-0 truncate opacity-70">{l.memo}</span>}
+                      {/* 수업 노트는 이름 옆에 (누르면 옆 칸에 전체) */}
+                      {l.memo && <span className="min-w-0 truncate text-amber-800">📝 {l.memoT || l.memo}</span>}
                       <span className="ml-auto shrink-0 pl-1 text-[11px] opacity-70">{minutes}</span>
                     </>
                   ) : (
@@ -110,7 +121,7 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
                       <LessonTime startsAt={l.starts_at} {...timeProps} compact />
                       <span className="block truncate font-medium">
                         {l.studentName}
-                        {l.memo && <span className="ml-1 font-normal opacity-70">· {l.memo}</span>}
+                        {l.memo && <span className="ml-1 font-normal text-amber-800">📝 {l.memoT || l.memo}</span>}
                       </span>
                     </>
                   )}

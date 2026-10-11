@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
-import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
+import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN, NOTE_MAX } from "@/config/rules";
+import { isMissingFunction } from "@/lib/db-errors";
 import { fromZoned, isDate, isTime, toZoned } from "@/lib/time";
 
 export type LessonFormState = {
@@ -63,6 +64,8 @@ export async function saveLesson(
   const date = formData.get("date");
   const time = formData.get("time");
   const duration = Number(formData.get("duration_minutes"));
+  // 노트 칸이 없는 폼(옆 칸 "수업 수정")에서는 노트를 건드리지 않음 (옆 칸 노트 상자에서 따로 저장)
+  const hasMemo = formData.has("memo");
   const memo = String(formData.get("memo") ?? "").trim() || null;
   const ignoreOverlap = formData.get("ignore_overlap") === "1";
   const stay = formData.get("stay") === "1"; // 달력 옆 칸에서 보냄 → 이동하지 않음
@@ -97,7 +100,7 @@ export async function saveLesson(
     student_id: studentId,
     starts_at: start.toISOString(),
     duration_minutes: duration,
-    memo,
+    ...(hasMemo ? { memo } : {}),
   };
   const { data: row, error } = lessonId
     ? await supabase.from("lessons").update(values).eq("id", lessonId).select("id").maybeSingle()
@@ -164,5 +167,17 @@ export async function moveLesson(
     .update({ starts_at: start.toISOString() }, { count: "exact" })
     .eq("id", lessonId);
   if (!count) return { error: "move_failed" };
+  return { ok: true };
+}
+
+export type MemoResult = { ok: true } | { error: "setup" | "save" | "tooLong" };
+
+// 수업 노트만 저장 (완료·결석된 수업에도 가능, 데이터베이스 함수 0016). 쓴 사람·시각은 자동 기록
+export async function saveLessonMemo(lessonId: string, memo: string): Promise<MemoResult> {
+  if (memo.length > NOTE_MAX) return { error: "tooLong" };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_lesson_memo", { p_lesson_id: lessonId, p_memo: memo });
+  if (isMissingFunction(error)) return { error: "setup" };
+  if (error) return { error: "save" };
   return { ok: true };
 }

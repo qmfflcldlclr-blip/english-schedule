@@ -1,9 +1,10 @@
 // 달력 화면 설정 (바꿀 땐 여기만 수정)
 
-// PC 주간 시간표의 기본 시간 범위. 24 이상은 다음 날 새벽 (25 = 다음 날 01:00)
-// 범위 밖에 수업이 있으면 자동으로 넓어짐
+// PC 주간 시간표의 기본 시간 범위 (CALENDAR_RANGE_TIME_ZONE 기준). 24 이상은 다음 날 새벽 (25 = 다음 날 01:00)
+// 보는 사람 시간대로 옮겨서 보여 줌: 한국 17:00~01:00 → 필리핀 16:00~00:00. 범위 밖에 수업이 있으면 자동으로 넓어짐
 export const CALENDAR_START_HOUR = 17;
 export const CALENDAR_END_HOUR = 25;
+export const CALENDAR_RANGE_TIME_ZONE = "Asia/Seoul";
 
 // 이 시각 전에 시작하는 새벽 수업은 화면에서 "전날" 칸에 이어서 보여 줌 (횟수·취소 규칙과는 무관)
 export const DAY_CUTOFF_HOUR = 5;

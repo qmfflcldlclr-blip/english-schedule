@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getDictionary } from "@/i18n/server";
 import { format } from "@/i18n/format";
 import { getCurrentProfile } from "@/lib/supabase/server";
-import { getOtherTimeZone, listLessons, type Lesson } from "@/lib/lessons";
+import { getOtherTimeZone, listLessons, withMemoTranslations, type Lesson } from "@/lib/lessons";
 import {
   addDays,
   formatDay,
@@ -43,7 +43,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekFirst, i));
 
   const month = selected.slice(0, 7);
-  const [lessons, otherTimeZone, settings, holidays, students, monthLessons] = await Promise.all([
+  const [weekLessons, otherTimeZone, settings, holidays, students, monthLessons] = await Promise.all([
     // 수업일 기준 한 주 (첫날 새벽 5시 ~ 다음 주 첫날 새벽 5시)
     listLessons(scheduleDayStart(weekFirst, timeZone), scheduleDayStart(addDays(weekFirst, 7), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
@@ -53,6 +53,9 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
     // 이번 달 현황용 (수업일 기준 한 달)
     listLessons(scheduleDayStart(`${month}-01`, timeZone), scheduleDayStart(`${addMonths(month, 1)}-01`, timeZone)),
   ]);
+
+  // 수업 노트 번역 (화면 언어와 다른 노트만)
+  const lessons = await withMemoTranslations(weekLessons, locale);
 
   // 수업일별로 묶기 (내 시간대 기준, 새벽 수업은 전날)
   const byDay = new Map<string, Lesson[]>(days.map((d) => [d, []]));
@@ -151,14 +154,17 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                         lessonId={l.id}
                         studentId={l.student_id}
                         scheduled={l.status === "scheduled"}
-                        className={`flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 ${statusStyle[l.status]}`}
+                        className={`flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 ${statusStyle[l.status]} ${l.memo ? "border-l-4 border-l-amber-400" : ""}`}
                       >
                         <div className="min-w-0">
                           <LessonTime startsAt={l.starts_at} {...timeProps} />
                           <p className="truncate font-medium">
                             {l.studentName}
-                            {l.memo && <span className="ml-1.5 font-normal text-gray-500">· {l.memo}</span>}
                           </p>
+                          {/* 수업 노트 (번역된 것이 있으면 번역) */}
+                          {l.memo && (
+                            <p className="mt-0.5 truncate text-sm text-amber-800">📝 {l.memoT || l.memo}</p>
+                          )}
                         </div>
                         <div className="flex shrink-0 flex-col items-end gap-1 text-sm">
                           <span className="text-gray-500">{format(t.minutesUnit, { n: l.duration_minutes })}</span>

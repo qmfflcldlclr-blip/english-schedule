@@ -17,6 +17,7 @@ type Props = {
   zoneLabel: string; // "한국" 등 — 입력 기준 시간대 안내용
   cancelHref: string;
   keepDuration?: boolean; // 달력에서 드래그로 길이를 정해 왔으면 학생을 골라도 길이를 바꾸지 않음
+  hideMemo?: boolean; // 노트 칸 숨김 (옆 칸에서는 노트 상자가 따로 있음). 숨기면 저장해도 노트는 그대로
   // 달력 옆 칸에서 쓸 때: 저장해도 페이지를 옮기지 않고 onSaved 호출
   panel?: {
     onCancel: () => void;
@@ -34,7 +35,7 @@ type Props = {
   };
 };
 
-export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDuration, panel, initial }: Props) {
+export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDuration, hideMemo, panel, initial }: Props) {
   const [state, onSubmit, pending] = useActionForm<LessonFormState>(saveLesson, {});
   // 값을 직접 들고 있어서, 경고·오류가 나도 입력한 내용이 사라지지 않음
   const [values, setValues] = useState(initial);
@@ -125,10 +126,12 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDur
         )}
       </label>
 
-      <label className="block text-sm font-medium">
-        {t.memo}
-        <input name="memo" value={values.memo} onChange={set("memo")} placeholder={t.memoPlaceholder} className={fieldClass} />
-      </label>
+      {!hideMemo && (
+        <label className="block text-sm font-medium">
+          {t.memo}
+          <input name="memo" value={values.memo} onChange={set("memo")} placeholder={t.memoPlaceholder} className={fieldClass} />
+        </label>
+      )}
 
       {state.overlaps && (
         <div role="alert" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">

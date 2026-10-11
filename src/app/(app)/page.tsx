@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getDictionary } from "@/i18n/server";
 import { format } from "@/i18n/format";
 import { getCurrentProfile } from "@/lib/supabase/server";
-import { getOtherTimeZone, listLessons } from "@/lib/lessons";
+import { getOtherTimeZone, listLessons, withMemoTranslations } from "@/lib/lessons";
 import { addDays, formatDay, scheduleDayStart, scheduleToday, toZoned } from "@/lib/time";
 import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
 import { EmptyLessonsArt, GreetingArt, type DayPart } from "@/components/Illustrations";
@@ -23,12 +23,13 @@ export default async function Home() {
   const today = scheduleToday(timeZone); // 새벽 수업은 전날에 포함
   const now = new Date();
 
-  const [lessons, otherTimeZone, notes, lowCredit] = await Promise.all([
+  const [todayLessons, otherTimeZone, notes, lowCredit] = await Promise.all([
     listLessons(scheduleDayStart(today, timeZone), scheduleDayStart(addDays(today, 1), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
     getStaffNotes(),
     listLowCreditStudents(LOW_CREDIT_THRESHOLD),
   ]);
+  const lessons = await withMemoTranslations(todayLessons, locale); // 수업 노트 번역
   // 메모 자동 번역 (화면 언어와 다른 글만)
   const translations = await Promise.all(notes.map((n) => translateNote(n.content, locale)));
   // 메모 수정 시각 "10/10 16:20" (내 시간대)
@@ -153,11 +154,13 @@ export default async function Home() {
             <li key={l.id}>
               <Link
                 href={`/calendar/lessons/${l.id}`}
-                className={`flex min-h-16 items-center justify-between gap-3 rounded-2xl border px-4 py-3 shadow-sm ${statusStyle[l.status]}`}
+                className={`flex min-h-16 items-center justify-between gap-3 rounded-2xl border px-4 py-3 shadow-sm ${statusStyle[l.status]} ${l.memo ? "border-l-4 border-l-amber-400" : ""}`}
               >
                 <div className="min-w-0">
                   <LessonTime startsAt={l.starts_at} {...timeProps} />
                   <p className="truncate font-medium">{l.studentName}</p>
+                  {/* 오늘 수업 노트 */}
+                  {l.memo && <p className="mt-0.5 line-clamp-2 text-sm text-amber-800">📝 {l.memoT || l.memo}</p>}
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1 text-sm">
                   <span className="text-gray-500">{format(t.calendar.minutesUnit, { n: l.duration_minutes })}</span>

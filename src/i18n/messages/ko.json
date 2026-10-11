@@ -331,7 +331,22 @@
       "hm": "{h}시간 {m}분",
       "h": "{h}시간",
       "cancelNote": "취소(연기)는 횟수·시간에서 빠져요.",
-      "overview": "📊 이번 달 현황"
+      "overview": "📊 이번 달 현황",
+      "lessonNote": "수업 노트",
+      "lessonNoteEmpty": "아직 노트가 없어요. Lee·Michelle 모두 보고 쓸 수 있어요.",
+      "lessonNotePlaceholder": "예: 교재 3단원, 숙제 확인, 발음 연습 필요",
+      "noteWrite": "쓰기",
+      "noteSave": "저장",
+      "noteSaving": "저장 중…",
+      "noteCancel": "취소",
+      "noteBy": "{time} · {name}",
+      "showOriginal": "원문 보기",
+      "showTranslated": "번역 보기",
+      "noteErrors": {
+        "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0016(수업 노트) 파일을 실행해 주세요.",
+        "save": "저장하지 못했습니다. 다시 시도해 주세요.",
+        "tooLong": "노트는 2000자까지 쓸 수 있어요."
+      }
     },
     "copyFrom": "가져올 주",
     "copyPick": "다른 날짜로 고르기",

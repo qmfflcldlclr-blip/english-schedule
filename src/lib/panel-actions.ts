@@ -2,7 +2,9 @@
 
 // 달력 옆 칸(폰은 아래 창)에 보여 줄 내용을 가져오는 함수들
 import { getCurrentProfile } from "@/lib/supabase/server";
-import { getLesson, getRemaining, listLessons, type Lesson } from "@/lib/lessons";
+import { getLesson, getMemoMeta, getRemaining, listLessons, type Lesson } from "@/lib/lessons";
+import { getLocale } from "@/i18n/server";
+import { translateNote } from "@/lib/translate";
 import { getStudent } from "@/lib/students";
 import { addMonths, isMonth } from "@/lib/print-layout";
 import { scheduleDayStart } from "@/lib/time";
@@ -35,7 +37,14 @@ export async function loadStudentMonth(studentId: string, month: string): Promis
   };
 }
 
-// 수업 한 개 (오른쪽 칸 위쪽 카드용)
-export async function loadLesson(lessonId: string): Promise<Lesson | null> {
-  return getLesson(lessonId);
+export type PanelLesson = Lesson & {
+  memoMeta: { at: string; by: string } | null; // 노트를 마지막으로 쓴 시각·사람
+};
+
+// 수업 한 개 (오른쪽 칸 위쪽 카드용) + 노트 번역·쓴 사람
+export async function loadLesson(lessonId: string): Promise<PanelLesson | null> {
+  const [lesson, memoMeta, locale] = await Promise.all([getLesson(lessonId), getMemoMeta(lessonId), getLocale()]);
+  if (!lesson) return null;
+  const t = lesson.memo ? await translateNote(lesson.memo, locale) : null;
+  return { ...lesson, memoT: t && "text" in t ? t.text : null, memoMeta };
 }

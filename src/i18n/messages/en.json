@@ -331,7 +331,22 @@
       "hm": "{h}h {m}m",
       "h": "{h}h",
       "cancelNote": "Cancelled (postponed) classes are not counted.",
-      "overview": "📊 This month"
+      "overview": "📊 This month",
+      "lessonNote": "Class note",
+      "lessonNoteEmpty": "No note yet. Both Lee and Michelle can see and write it.",
+      "lessonNotePlaceholder": "e.g. Book unit 3, check homework, practice pronunciation",
+      "noteWrite": "Write",
+      "noteSave": "Save",
+      "noteSaving": "Saving…",
+      "noteCancel": "Cancel",
+      "noteBy": "{time} · {name}",
+      "showOriginal": "Show original",
+      "showTranslated": "Show translation",
+      "noteErrors": {
+        "setup": "Database setup needed. Run the 0016 (class notes) file in the Supabase SQL Editor.",
+        "save": "Could not save. Please try again.",
+        "tooLong": "Notes can be up to 2000 characters."
+      }
     },
     "copyFrom": "Copy from",
     "copyPick": "Pick another date",
