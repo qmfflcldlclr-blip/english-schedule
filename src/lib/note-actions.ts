@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { NOTE_MAX } from "@/config/rules";
-import { isMissingTable } from "@/lib/db-errors";
+import { isMissingFunction, isMissingTable } from "@/lib/db-errors";
 
 export type NoteFormState = { saved?: boolean; error?: "tooLong" | "save" | "setup" };
 
@@ -29,5 +29,25 @@ export async function saveNote(_prev: NoteFormState, formData: FormData): Promis
     if (insertError) return { error: "save" };
   }
   revalidatePath("/");
+  return { saved: true };
+}
+
+// 학생 노트 저장: visibility = "private"(나만 보기) / "shared"(함께 보기). 규칙은 데이터베이스 함수(0014)가 지킴
+export async function saveStudentNote(_prev: NoteFormState, formData: FormData): Promise<NoteFormState> {
+  const studentId = String(formData.get("student_id") ?? "");
+  const visibility = String(formData.get("visibility") ?? "");
+  const content = String(formData.get("content") ?? "").trimEnd();
+  if (content.length > NOTE_MAX) return { error: "tooLong" };
+  if (!studentId || (visibility !== "private" && visibility !== "shared")) return { error: "save" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("save_student_note", {
+    p_student_id: studentId,
+    p_visibility: visibility,
+    p_content: content,
+  });
+  if (isMissingFunction(error)) return { error: "setup" };
+  if (error) return { error: "save" };
+  revalidatePath(`/students/${studentId}`);
   return { saved: true };
 }

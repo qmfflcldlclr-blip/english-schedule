@@ -156,17 +156,18 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
             <td className="w-12 py-3 pl-4">
               {check(s)}
             </td>
-            <td className="py-3 pr-4">
+            {/* 이름은 항상 한 줄 (영어 이름이 길어도). 메모가 길면 메모 쪽을 "…"으로 줄임 */}
+            <td className="py-3 pr-4 whitespace-nowrap">
               <Link href={`/students/${s.id}`} className="font-semibold hover:underline">
                 {s.label}
               </Link>
               {!s.label.startsWith(s.name) && <span className="ml-2 text-sm text-gray-400">{s.name}</span>}
             </td>
-            <td className="w-40 py-3 pr-4">
+            <td className="w-40 py-3 pr-4 whitespace-nowrap">
               {remaining(s)}
             </td>
-            <td className="w-28 py-3 pr-4 text-gray-600">{format(t.minutesUnit, { n: s.lesson_minutes })}</td>
-            <td className="max-w-md truncate py-3 pr-4 text-gray-500">{s.memo}</td>
+            <td className="w-28 py-3 pr-4 whitespace-nowrap text-gray-600">{format(t.minutesUnit, { n: s.lesson_minutes })}</td>
+            <td className="w-full max-w-0 truncate py-3 pr-4 text-gray-500" title={s.memo ?? undefined}>{s.memo}</td>
           </tr>
         ))}
       </tbody>

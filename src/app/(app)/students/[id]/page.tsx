@@ -11,6 +11,10 @@ import ArchiveButton from "@/components/ArchiveButton";
 import CreditSection from "@/components/CreditSection";
 import FeedbackList from "@/components/feedback/FeedbackList";
 import { listFeedback } from "@/lib/feedback";
+import { getStudentNotes } from "@/lib/student-notes";
+import { translateNote } from "@/lib/translate";
+import { toZoned } from "@/lib/time";
+import NoteCard from "@/components/NoteCard";
 
 // 학생 상세에서 보여 줄 최근 피드백 개수
 const RECENT_FEEDBACK = 3;
@@ -27,11 +31,19 @@ export default async function StudentDetailPage({
   if (!student) notFound();
   const t = all.students;
   const timeZone = profile?.timezone ?? "UTC";
-  const [credits, settings, feedback] = await Promise.all([
+  const [credits, settings, feedback, notes] = await Promise.all([
     getStudentCredits(student.id, todayIn(timeZone)),
     getSettings(),
     listFeedback({ studentId: student.id }),
+    getStudentNotes(student.id),
   ]);
+  // 공유용 노트는 상대방 글일 수 있어서 자동 번역 (개별용은 내가 쓴 글이라 번역 안 함)
+  const sharedTranslation = notes ? await translateNote(notes.shared.content, locale) : null;
+  const sn = all.studentNotes;
+  const stamp = (iso: string) => {
+    const z = toZoned(iso, timeZone);
+    return `${Number(z.date.slice(5, 7))}/${Number(z.date.slice(8))} ${z.time}`;
+  };
   const fb = all.feedback;
   const here = `/students/${student.id}`;
 
@@ -73,6 +85,44 @@ export default async function StudentDetailPage({
         <dt className="text-gray-500">{t.memo}</dt>
         <dd className="whitespace-pre-wrap break-words">{student.memo || "—"}</dd>
       </dl>
+
+      {/* 학생 노트: 개별용(나만) · 공유용(함께) */}
+      <section className="mt-6">
+        <h2 className="mb-2 text-lg font-bold">{sn.title}</h2>
+        {notes ? (
+          <div className="grid gap-3 md:grid-cols-2">
+            <NoteCard
+              title={sn.private}
+              icon="🔒"
+              content={notes.private.content}
+              updatedLabel={notes.private.updatedAt ? format(all.notes.updated, { time: stamp(notes.private.updatedAt) }) : null}
+              editable
+              accent="sunny"
+              locale={locale}
+              studentNote={{ studentId: student.id, visibility: "private" }}
+              t={{ ...all.notes, placeholder: sn.privatePlaceholder, errors: { ...all.notes.errors, setup: sn.setup } }}
+            />
+            <NoteCard
+              title={sn.shared}
+              icon="👥"
+              content={notes.shared.content}
+              updatedLabel={
+                notes.shared.updatedAt
+                  ? format(sn.updatedBy, { time: stamp(notes.shared.updatedAt), name: notes.shared.updatedByName ?? "" })
+                  : null
+              }
+              editable
+              accent="brand"
+              locale={locale}
+              translation={sharedTranslation}
+              studentNote={{ studentId: student.id, visibility: "shared" }}
+              t={{ ...all.notes, placeholder: sn.sharedPlaceholder, errors: { ...all.notes.errors, setup: sn.setup } }}
+            />
+          </div>
+        ) : (
+          <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">{sn.setup}</p>
+        )}
+      </section>
 
       {/* 피드백 (최근 몇 개 + 모두 보기) */}
       <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

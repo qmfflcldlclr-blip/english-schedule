@@ -400,7 +400,8 @@
       "save": "저장하지 못했습니다. 다시 시도해 주세요.",
       "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0009(메모) 파일을 실행해 주세요."
     },
-    "translate": "번역"
+    "translate": "번역",
+    "autoTranslated": "자동 번역 (DeepL)"
   },
   "feedback": {
     "title": "피드백",
@@ -440,5 +441,14 @@
       "save": "저장하지 못했습니다. 다시 시도해 주세요.",
       "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0010(피드백) 파일을 실행해 주세요."
     }
+  },
+  "studentNotes": {
+    "title": "학생 노트",
+    "private": "개별용 · 나만 보기",
+    "shared": "공유용 · 함께 보기",
+    "updatedBy": "마지막 수정 {time} · {name}",
+    "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0014(학생 노트) 파일을 실행해 주세요.",
+    "privatePlaceholder": "나만 볼 메모 (상대방에게는 보이지 않아요)",
+    "sharedPlaceholder": "매니저·선생님이 함께 볼 메모"
   }
 }

@@ -400,7 +400,8 @@
       "save": "Could not save. Please try again.",
       "setup": "The database needs setup: run migration 0009 (notes) in the Supabase SQL Editor."
     },
-    "translate": "Translate"
+    "translate": "Translate",
+    "autoTranslated": "Auto-translated (DeepL)"
   },
   "feedback": {
     "title": "Feedback",
@@ -440,5 +441,14 @@
       "save": "Could not save. Please try again.",
       "setup": "The database needs setup: run migration 0010 (feedback) in the Supabase SQL Editor."
     }
+  },
+  "studentNotes": {
+    "title": "Student notes",
+    "private": "Private · only me",
+    "shared": "Shared · both of us",
+    "updatedBy": "Last edited {time} · {name}",
+    "setup": "Database setup needed. Run the 0014 (student notes) file in the Supabase SQL Editor.",
+    "privatePlaceholder": "Notes only you can see",
+    "sharedPlaceholder": "Notes for both manager and teacher"
   }
 }

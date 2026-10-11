@@ -8,6 +8,7 @@ import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/Less
 import { EmptyLessonsArt, GreetingArt, type DayPart } from "@/components/Illustrations";
 import NoteCard from "@/components/NoteCard";
 import { getStaffNotes } from "@/lib/notes";
+import { translateNote } from "@/lib/translate";
 import { listLowCreditStudents } from "@/lib/students";
 import { LOW_CREDIT_THRESHOLD } from "@/config/rules";
 
@@ -28,6 +29,8 @@ export default async function Home() {
     getStaffNotes(),
     listLowCreditStudents(LOW_CREDIT_THRESHOLD),
   ]);
+  // 메모 자동 번역 (화면 언어와 다른 글만)
+  const translations = await Promise.all(notes.map((n) => translateNote(n.content, locale)));
   // 메모 수정 시각 "10/10 16:20" (내 시간대)
   const stamp = (iso: string) => {
     const z = toZoned(iso, timeZone);
@@ -116,7 +119,7 @@ export default async function Home() {
 
       {/* 서로 남기는 메모 (매니저 · 선생님 각자 한 칸) */}
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {notes.map((n) => (
+        {notes.map((n, i) => (
           <NoteCard
             key={n.ownerId}
             title={`${n.role === "manager" ? t.notes.manager : t.notes.teacher} · ${n.name}`}
@@ -125,6 +128,7 @@ export default async function Home() {
             editable={n.ownerId === profile?.id}
             accent={n.role === "manager" ? "brand" : "sunny"}
             locale={locale}
+            translation={translations[i]}
             t={t.notes}
           />
         ))}
