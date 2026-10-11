@@ -27,6 +27,7 @@ type Props = {
   days: string[]; // 한 주 7일 (WEEK_STARTS_ON 부터)
   today: string;
   byDay: Record<string, Lesson[]>; // 수업일별 수업
+  feedbackIds?: string[]; // 피드백이 있는 수업 (💬 표시)
   holidays: Record<string, Holiday[]>;
   timeZone: string;
   otherTimeZone: string | null;
@@ -34,7 +35,8 @@ type Props = {
   t: Messages["calendar"];
 };
 
-export default function WeekGrid({ days, today, byDay, holidays, timeZone, otherTimeZone, locale, t }: Props) {
+export default function WeekGrid({ days, today, byDay, feedbackIds = [], holidays, timeZone, otherTimeZone, locale, t }: Props) {
+  const hasFeedback = new Set(feedbackIds);
   const lessons = days.flatMap((d) => byDay[d] ?? []);
   const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.otherTime };
   const tone = (d: string) => toneText[dayTone(d, Boolean(holidays[d]))];
@@ -113,11 +115,17 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
                       <span className="shrink-0 font-medium">{l.studentName}</span>
                       {/* 수업 노트는 이름 옆에 (누르면 옆 칸에 전체) */}
                       {l.memo && <span className="min-w-0 truncate text-amber-800">📝 {l.memoT || l.memo}</span>}
-                      <span className="ml-auto shrink-0 pl-1 text-[11px] opacity-70">{minutes}</span>
+                      <span className="ml-auto shrink-0 pl-1 text-[11px] opacity-70">
+                        {hasFeedback.has(l.id) && "💬 "}
+                        {minutes}
+                      </span>
                     </>
                   ) : (
                     <>
-                      <span className="absolute top-1 right-1.5 text-[11px] opacity-70">{minutes}</span>
+                      <span className="absolute top-1 right-1.5 text-[11px] opacity-70">
+                        {hasFeedback.has(l.id) && "💬 "}
+                        {minutes}
+                      </span>
                       <LessonTime startsAt={l.starts_at} {...timeProps} compact />
                       <span className="block truncate font-medium">
                         {l.studentName}

@@ -8,10 +8,15 @@ import { useRouter } from "next/navigation";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import type { Lesson } from "@/lib/lessons";
-import { loadLesson, loadStudentMonth, type PanelLesson, type PanelStudent } from "@/lib/panel-actions";
+import { loadLesson, loadLessonFeedback, loadStudentMonth, type PanelFeedback, type PanelLesson, type PanelStudent } from "@/lib/panel-actions";
+import { addLessonFeedback, removeFeedback } from "@/lib/feedback-actions";
+import { feedbackCopyText, kindIcon, kindStyle } from "@/components/feedback/kinds";
+import CopyFeedbackButton from "@/components/feedback/CopyFeedbackButton";
 import { quickLessonStatus } from "@/lib/lesson-status-actions";
 import { removeLesson, saveLessonMemo } from "@/lib/lesson-actions";
-import { NOTE_MAX } from "@/config/rules";
+import { FEEDBACK_MAX, NOTE_MAX } from "@/config/rules";
+
+type FeedbackKindKey = keyof typeof kindIcon;
 import { addMonths } from "@/lib/print-layout";
 import { formatDay, toScheduleDay, toZoned } from "@/lib/time";
 import { DEFAULT_LESSON_MINUTES } from "@/config/rules";
@@ -23,6 +28,8 @@ import LessonForm from "@/components/calendar/LessonForm";
 import StudentCombobox from "@/components/StudentCombobox";
 
 type StudentOption = { id: string; name: string; lesson_minutes: number };
+// 달력 문구 + 피드백 문구 (수업 피드백 상자용)
+export type CalendarT = Messages["calendar"] & { feedbackKinds: Messages["feedback"] };
 
 // 이번 달(고른 날짜의 달) 현황. 취소(연기)는 횟수·시간에서 뺌
 export type MonthSummary = {
@@ -38,7 +45,7 @@ export type MonthSummary = {
 };
 
 type Props = {
-  t: Messages["calendar"];
+  t: CalendarT;
   students: StudentOption[]; // 보관 안 된 학생 (동명이인 번호 포함 이름)
   weekStudents: { id: string; name: string }[]; // 보고 있는 주에 수업이 있는 학생
   days: string[]; // 보고 있는 주 7일
@@ -342,6 +349,18 @@ function LessonView(props: Props & { lessonId: string }) {
 
       {/* 수업 노트: 둘이 함께 보고 쓰는 노란 상자 (완료된 수업에도 쓸 수 있음) */}
       <LessonNoteBox key={data.key} t={t} lesson={lesson} timeZone={timeZone} onSaved={panel.refresh} />
+      <LessonFeedbackBox
+        key={lesson.id}
+        t={t}
+        lessonId={lesson.id}
+        studentName={lesson.studentName}
+        lessonLabel={format(t.feedbackKinds.lessonOf, {
+          date: `${formatDay(day, locale, { month: "numeric", day: "numeric", weekday: "short" })} ${local.time}`,
+        })}
+        timeZone={timeZone}
+        version={panel.version}
+        onChanged={panel.refresh}
+      />
 
       {scheduled && (
         <div className="mt-4 grid grid-cols-2 gap-2">
@@ -444,7 +463,7 @@ function NewLesson({ t, students, zoneLabel, view }: Props & { view: Extract<Pan
 }
 
 // ───── 수업 노트 상자 ─────
-function LessonNoteBox({ t, lesson, timeZone, onSaved }: { t: Messages["calendar"]; lesson: PanelLesson; timeZone: string; onSaved: () => void }) {
+function LessonNoteBox({ t, lesson, timeZone, onSaved }: { t: CalendarT; lesson: PanelLesson; timeZone: string; onSaved: () => void }) {
   const p = t.panel;
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(lesson.memo ?? "");
@@ -525,6 +544,157 @@ function LessonNoteBox({ t, lesson, timeZone, onSaved }: { t: Messages["calendar
       {error && <p role="alert" className="mt-2 text-sm text-red-600">{error}</p>}
       {!editing && lesson.memo && lesson.memoMeta && (
         <p className="mt-1 text-xs text-amber-700/80">{format(p.noteBy, { time: stamp(lesson.memoMeta.at), name: lesson.memoMeta.by })}</p>
+      )}
+    </section>
+  );
+}
+
+// ───── 수업 피드백: 이 수업의 피드백 목록(번역·카톡용 복사) + 쓰기 ─────
+function LessonFeedbackBox({ t, lessonId, studentName, lessonLabel, timeZone, version, onChanged }: {
+  t: CalendarT;
+  lessonId: string;
+  studentName: string;
+  lessonLabel: string; // 복사할 때 "10/12 (월) 18:00 수업"
+  timeZone: string;
+  version: number;
+  onChanged: () => void;
+}) {
+  const p = t.panel;
+  const fb = t.feedbackKinds;
+  const [data, setData] = useState<{ key: string; me: string; items: PanelFeedback[] } | null>(null);
+  const key = `${lessonId}|${version}`;
+  const [writing, setWriting] = useState(false);
+  const [kind, setKind] = useState<FeedbackKindKey>("good");
+  const [text, setText] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let alive = true;
+    loadLessonFeedback(lessonId).then((r) => alive && setData({ key, ...r }));
+    return () => {
+      alive = false;
+    };
+  }, [lessonId, key]);
+
+  const stamp = (iso: string) => {
+    const z = toZoned(iso, timeZone);
+    return `${Number(z.date.slice(5, 7))}/${Number(z.date.slice(8))} ${z.time}`;
+  };
+
+  const save = () =>
+    startTransition(async () => {
+      setError(null);
+      const result = await addLessonFeedback(lessonId, kind, text);
+      if ("error" in result) {
+        setError(p.feedbackErrors[result.error]);
+        return;
+      }
+      setText("");
+      setWriting(false);
+      onChanged(); // 달력 💬 표시 + 목록 새로
+    });
+
+  const remove = (id: string) => {
+    if (!window.confirm(fb.deleteConfirm)) return;
+    startTransition(async () => {
+      await removeFeedback(id);
+      onChanged();
+    });
+  };
+
+  return (
+    <section className="mt-3 rounded-xl border border-brand-200 bg-brand-50/60 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-sm font-bold text-brand-900">💬 {p.lessonFeedback}</h3>
+        {!writing && (
+          <button type="button" onClick={() => setWriting(true)} className="min-h-9 rounded-full px-3 text-sm font-medium text-brand-800 hover:bg-white/70">
+            {p.feedbackWrite}
+          </button>
+        )}
+      </div>
+
+      {writing && (
+        <div className="mt-2 flex flex-col gap-2">
+          <div className="flex gap-1.5">
+            {(Object.keys(kindIcon) as FeedbackKindKey[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={kind === k}
+                onClick={() => setKind(k)}
+                className={`min-h-10 flex-1 rounded-lg border text-sm font-medium ${kind === k ? kindStyle[k] + " ring-2 ring-brand-300" : "border-gray-200 bg-white text-gray-600"}`}
+              >
+                {kindIcon[k]} {fb.kinds[k]}
+              </button>
+            ))}
+          </div>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={3}
+            maxLength={FEEDBACK_MAX}
+            autoFocus
+            placeholder={p.feedbackPlaceholder}
+            className="w-full rounded-lg border border-brand-200 bg-white p-2.5 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                setWriting(false);
+                setError(null);
+              }}
+              className="min-h-11 flex-1 rounded-lg border border-gray-300 bg-white text-sm font-medium"
+            >
+              {p.feedbackCancel}
+            </button>
+            <button type="button" disabled={pending || !text.trim()} onClick={save} className="min-h-11 flex-1 rounded-lg bg-brand-600 text-sm font-semibold text-white disabled:opacity-60">
+              {pending ? p.feedbackSaving : p.feedbackSave}
+            </button>
+          </div>
+        </div>
+      )}
+      {error && <p role="alert" className="mt-2 text-sm text-red-600">{error}</p>}
+
+      {!data ? (
+        <p className="mt-2 text-sm text-gray-400">{p.loading}</p>
+      ) : data.items.length === 0 ? (
+        !writing && <p className="mt-1 text-sm text-brand-800/70">{p.feedbackEmpty}</p>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-2">
+          {data.items.map((f) => (
+            <li key={f.id} className="rounded-lg bg-white p-2.5 shadow-sm">
+              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${kindStyle[f.kind]}`}>
+                {kindIcon[f.kind]} {fb.kinds[f.kind]}
+              </span>
+              <p className="mt-1.5 text-sm whitespace-pre-wrap text-gray-800">{f.translated || f.content}</p>
+              {f.translated && (
+                <details className="mt-1 text-xs text-gray-500">
+                  <summary className="cursor-pointer">🌐 {fb.original}</summary>
+                  <p className="mt-1 whitespace-pre-wrap">{f.content}</p>
+                </details>
+              )}
+              <div className="mt-1 flex items-center justify-between gap-1 text-xs text-gray-500">
+                <span>
+                  {f.authorName} · {stamp(f.createdAt)}
+                </span>
+                <span className="-my-2 flex items-center">
+                  <CopyFeedbackButton
+                    labels={{ copy: fb.copy, copied: fb.copied }}
+                    text={feedbackCopyText({ studentName, lessonLabel, icon: kindIcon[f.kind], kind: fb.kinds[f.kind], text: f.translated || f.content })}
+                  />
+                  {f.createdBy === data.me && (
+                    <button type="button" disabled={pending} onClick={() => remove(f.id)} className="flex min-h-11 items-center rounded-full px-2 text-red-600 hover:bg-red-50">
+                      {fb.delete}
+                    </button>
+                  )}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </section>
   );

@@ -6,10 +6,11 @@ import { isFeedbackKind, listFeedback } from "@/lib/feedback";
 import FeedbackList from "@/components/feedback/FeedbackList";
 import FeedbackFilters from "@/components/feedback/FeedbackFilters";
 import { EmptyStudentsArt } from "@/components/Illustrations";
+import { translateMany } from "@/lib/translate";
 
 // 피드백 메뉴: 전체 피드백 최신순, 학생·종류로 거르기
 export default async function FeedbackPage({ searchParams }: PageProps<"/feedback">) {
-  const [{ t: all }, profile, sp, students] = await Promise.all([
+  const [{ locale, t: all }, profile, sp, students] = await Promise.all([
     getDictionary(),
     getCurrentProfile(),
     searchParams,
@@ -19,6 +20,7 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/feedbac
   const studentId = students.some((s) => s.id === sp.student) ? (sp.student as string) : "";
   const kind = isFeedbackKind(sp.kind) ? sp.kind : "";
   const items = await listFeedback({ studentId: studentId || undefined, kind: kind || undefined });
+  const translations = await translateMany(items.map((f) => f.content), locale); // 화면 언어와 다른 피드백만
   const back = `/feedback${studentId || kind ? `?${new URLSearchParams({ ...(studentId && { student: studentId }), ...(kind && { kind }) })}` : ""}`;
 
   return (
@@ -50,7 +52,16 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/feedbac
             <p className="mt-1 text-sm text-gray-500">{t.emptyHint}</p>
           </div>
         ) : (
-          <FeedbackList items={items} t={t} me={profile?.id ?? ""} timeZone={profile?.timezone ?? "UTC"} back={back} showStudent />
+          <FeedbackList
+            items={items}
+            translations={translations}
+            t={t}
+            me={profile?.id ?? ""}
+            timeZone={profile?.timezone ?? "UTC"}
+            locale={locale}
+            back={back}
+            showStudent
+          />
         )}
       </div>
     </main>

@@ -24,6 +24,7 @@ import AddLessonButton, { OverviewButton } from "@/components/calendar/AddLesson
 import type { MonthSummary } from "@/components/calendar/SidePanel";
 import { addMonths } from "@/lib/print-layout";
 import { listStudents } from "@/lib/students";
+import { lessonIdsWithFeedback } from "@/lib/feedback";
 import { zoneName } from "@/config/timezones";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
 import { getSettings } from "@/lib/settings";
@@ -55,7 +56,13 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   ]);
 
   // 수업 노트 번역 (화면 언어와 다른 노트만)
-  const lessons = await withMemoTranslations(weekLessons, locale);
+  const [lessons, feedbackIds] = await Promise.all([
+    withMemoTranslations(weekLessons, locale),
+    lessonIdsWithFeedback(weekLessons.map((l) => l.id)), // 💬 표시용
+  ]);
+  const hasFeedback = new Set(feedbackIds);
+  // 피드백 페이지의 "수업 보기"로 오면 그 수업을 옆 칸에 바로 엶
+  const openLesson = typeof sp.lesson === "string" ? lessons.find((l) => l.id === sp.lesson) : undefined;
 
   // 수업일별로 묶기 (내 시간대 기준, 새벽 수업은 전날)
   const byDay = new Map<string, Lesson[]>(days.map((d) => [d, []]));
@@ -92,7 +99,9 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4 lg:max-w-[88rem]">
-      <CalendarPanelProvider>
+      <CalendarPanelProvider
+        initial={openLesson ? { mode: "lesson", lessonId: openLesson.id, studentId: openLesson.student_id } : undefined}
+      >
         {/* 넓은 PC: 왼쪽 달력 + 오른쪽 옆 칸 / 그보다 좁으면 옆 칸은 아래에서 올라오는 창 */}
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start lg:gap-4">
           <div className="min-w-0">
@@ -161,6 +170,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                           <p className="truncate font-medium">
                             {l.studentName}
                           </p>
+                          {hasFeedback.has(l.id) && <p className="mt-0.5 text-xs font-medium text-brand-700">💬 {t.panel.lessonFeedback}</p>}
                           {/* 수업 노트 (번역된 것이 있으면 번역) */}
                           {l.memo && (
                             <p className="mt-0.5 truncate text-sm text-amber-800">📝 {l.memoT || l.memo}</p>
@@ -192,6 +202,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                 days={days}
                 today={today}
                 byDay={Object.fromEntries(byDay)}
+                feedbackIds={feedbackIds}
                 holidays={holidays}
                 timeZone={timeZone}
                 otherTimeZone={otherTimeZone}
@@ -202,7 +213,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
           </div>
 
           <SidePanel
-            t={t}
+            t={{ ...t, feedbackKinds: all.feedback }}
             students={studentOptions}
             weekStudents={weekStudents}
             days={days}

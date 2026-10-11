@@ -12,7 +12,7 @@ import CreditSection from "@/components/CreditSection";
 import FeedbackList from "@/components/feedback/FeedbackList";
 import { listFeedback } from "@/lib/feedback";
 import { getStudentNotes } from "@/lib/student-notes";
-import { translateNote } from "@/lib/translate";
+import { translateMany, translateNote } from "@/lib/translate";
 import { toZoned } from "@/lib/time";
 import NoteCard from "@/components/NoteCard";
 
@@ -40,6 +40,8 @@ export default async function StudentDetailPage({
   // 공유용 노트는 상대방 글일 수 있어서 자동 번역 (개별용은 내가 쓴 글이라 번역 안 함)
   const sharedTranslation = notes ? await translateNote(notes.shared.content, locale) : null;
   const sn = all.studentNotes;
+  const recentFeedback = feedback.slice(0, RECENT_FEEDBACK);
+  const feedbackTranslations = await translateMany(recentFeedback.map((f) => f.content), locale);
   const stamp = (iso: string) => {
     const z = toZoned(iso, timeZone);
     return `${Number(z.date.slice(5, 7))}/${Number(z.date.slice(8))} ${z.time}`;
@@ -139,7 +141,15 @@ export default async function StudentDetailPage({
           <p className="mt-3 text-sm text-gray-500">{fb.empty}</p>
         ) : (
           <div className="mt-3">
-            <FeedbackList items={feedback.slice(0, RECENT_FEEDBACK)} t={fb} me={profile?.id ?? ""} timeZone={timeZone} back={here} />
+            <FeedbackList
+              items={recentFeedback}
+              translations={feedbackTranslations}
+              t={fb}
+              me={profile?.id ?? ""}
+              timeZone={timeZone}
+              locale={locale}
+              back={here}
+            />
             {feedback.length > RECENT_FEEDBACK && (
               <Link href={`/feedback?student=${student.id}`} className="mt-2 flex min-h-11 items-center justify-center text-sm font-medium text-brand-700">
                 {format(fb.seeAll, { n: feedback.length })} ›

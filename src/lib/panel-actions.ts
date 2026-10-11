@@ -4,7 +4,9 @@
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getLesson, getMemoMeta, getRemaining, listLessons, type Lesson } from "@/lib/lessons";
 import { getLocale } from "@/i18n/server";
-import { translateNote } from "@/lib/translate";
+import { translateMany, translateNote } from "@/lib/translate";
+import { listFeedback, type Feedback } from "@/lib/feedback";
+import { createClient } from "@/lib/supabase/server";
 import { getStudent } from "@/lib/students";
 import { addMonths, isMonth } from "@/lib/print-layout";
 import { scheduleDayStart } from "@/lib/time";
@@ -47,4 +49,21 @@ export async function loadLesson(lessonId: string): Promise<PanelLesson | null> 
   if (!lesson) return null;
   const t = lesson.memo ? await translateNote(lesson.memo, locale) : null;
   return { ...lesson, memoT: t && "text" in t ? t.text : null, memoMeta };
+}
+
+export type PanelFeedback = Feedback & { translated: string | null };
+
+// 수업 한 개의 피드백 (최신순) + 화면 언어 번역 + 내 id (내 것만 지우기 버튼)
+export async function loadLessonFeedback(lessonId: string) {
+  const supabase = await createClient();
+  const [items, locale, { data: claims }] = await Promise.all([
+    listFeedback({ lessonId }),
+    getLocale(),
+    supabase.auth.getClaims(),
+  ]);
+  const translated = await translateMany(items.map((f) => f.content), locale);
+  return {
+    me: (claims?.claims?.sub as string | undefined) ?? "",
+    items: items.map((f, i): PanelFeedback => ({ ...f, translated: translated[i] })),
+  };
 }

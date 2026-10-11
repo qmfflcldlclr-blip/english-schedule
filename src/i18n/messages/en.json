@@ -353,6 +353,19 @@
         "setup": "Database setup needed. Run the 0016 (class notes) file in the Supabase SQL Editor.",
         "save": "Could not save. Please try again.",
         "tooLong": "Notes can be up to 2000 characters."
+      },
+      "lessonFeedback": "Class feedback",
+      "feedbackEmpty": "No feedback for this class yet.",
+      "feedbackPlaceholder": "What to tell the parent about this class",
+      "feedbackWrite": "+ Write feedback",
+      "feedbackSave": "Save feedback",
+      "feedbackSaving": "Saving…",
+      "feedbackCancel": "Cancel",
+      "feedbackErrors": {
+        "kind": "Choose a type.",
+        "content": "Enter the feedback (up to 2000 characters).",
+        "save": "Could not save. Please try again.",
+        "setup": "Database setup needed. Run the 0017 (class feedback) file in the Supabase SQL Editor."
       }
     },
     "copyFrom": "Copy from",
@@ -466,7 +479,12 @@
       "content": "Enter 1–2000 characters.",
       "save": "Could not save. Please try again.",
       "setup": "The database needs setup: run migration 0010 (feedback) in the Supabase SQL Editor."
-    }
+    },
+    "lessonOf": "Class {date}",
+    "general": "General",
+    "copy": "Copy",
+    "copied": "Copied",
+    "original": "Show original"
   },
   "studentNotes": {
     "title": "Student notes",

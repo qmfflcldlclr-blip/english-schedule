@@ -353,6 +353,19 @@
         "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0016(수업 노트) 파일을 실행해 주세요.",
         "save": "저장하지 못했습니다. 다시 시도해 주세요.",
         "tooLong": "노트는 2000자까지 쓸 수 있어요."
+      },
+      "lessonFeedback": "수업 피드백",
+      "feedbackEmpty": "이 수업의 피드백이 아직 없어요.",
+      "feedbackPlaceholder": "이 수업에서 전할 내용",
+      "feedbackWrite": "+ 피드백 쓰기",
+      "feedbackSave": "피드백 저장",
+      "feedbackSaving": "저장 중…",
+      "feedbackCancel": "취소",
+      "feedbackErrors": {
+        "kind": "종류를 고르세요.",
+        "content": "내용을 입력하세요 (2000자까지).",
+        "save": "저장하지 못했습니다. 다시 시도해 주세요.",
+        "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0017(수업 피드백) 파일을 실행해 주세요."
       }
     },
     "copyFrom": "가져올 주",
@@ -466,7 +479,12 @@
       "content": "내용을 1~2000자로 입력하세요.",
       "save": "저장하지 못했습니다. 다시 시도해 주세요.",
       "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0010(피드백) 파일을 실행해 주세요."
-    }
+    },
+    "lessonOf": "{date} 수업",
+    "general": "일반",
+    "copy": "카톡용 복사",
+    "copied": "복사했어요",
+    "original": "원문 보기"
   },
   "studentNotes": {
     "title": "학생 노트",

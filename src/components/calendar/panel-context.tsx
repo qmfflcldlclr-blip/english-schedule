@@ -28,9 +28,9 @@ type PanelContext = {
 
 const Ctx = createContext<PanelContext | null>(null);
 
-export function CalendarPanelProvider({ children }: { children: React.ReactNode }) {
+export function CalendarPanelProvider({ children, initial }: { children: React.ReactNode; initial?: PanelView }) {
   const router = useRouter();
-  const [view, setView] = useState<PanelView>({ mode: "home" });
+  const [view, setView] = useState<PanelView>(initial ?? { mode: "home" });
   const [version, setVersion] = useState(0);
 
   const openNew = useCallback(
