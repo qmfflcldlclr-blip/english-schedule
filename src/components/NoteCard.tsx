@@ -11,11 +11,12 @@ type Props = {
   updatedLabel: string | null; // "마지막 수정 10/10 16:20"
   editable: boolean; // 내 메모 칸이면 true
   accent: "brand" | "sunny";
-  t: { placeholder: string; empty: string; save: string; saving: string; saved: string; edit: string; cancel: string; errors: { tooLong: string; save: string; setup: string } };
+  locale: string; // 번역 버튼: 이 언어로 번역
+  t: { translate: string; placeholder: string; empty: string; save: string; saving: string; saved: string; edit: string; cancel: string; errors: { tooLong: string; save: string; setup: string } };
 };
 
 // 홈 메모 한 칸: 내 칸은 고치기, 상대 칸은 읽기만
-export default function NoteCard({ title, content, updatedLabel, editable, accent, t }: Props) {
+export default function NoteCard({ title, content, updatedLabel, editable, accent, locale, t }: Props) {
   const [state, onSubmit, pending] = useActionForm<NoteFormState>(saveNote, {});
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(content);
@@ -78,9 +79,20 @@ export default function NoteCard({ title, content, updatedLabel, editable, accen
       )}
 
       {state.error && <p className="mt-2 text-sm text-red-600">{t.errors[state.error]}</p>}
-      <p className="mt-2 text-xs text-gray-500">
-        {saved ? `✓ ${t.saved}` : updatedLabel}
-      </p>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <p className="text-xs text-gray-500">{saved ? `✓ ${t.saved}` : updatedLabel}</p>
+        {/* 번역: 구글 번역을 새 창으로 (언어 자동 감지 → 지금 화면 언어) */}
+        {text && !editing && (
+          <a
+            href={`https://translate.google.com/?sl=auto&tl=${locale}&op=translate&text=${encodeURIComponent(text)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="-mr-2 -mb-2 flex min-h-11 shrink-0 items-center rounded-full px-3 text-sm font-medium text-brand-700 hover:bg-white/70"
+          >
+            🌐 {t.translate}
+          </a>
+        )}
+      </div>
     </section>
   );
 }

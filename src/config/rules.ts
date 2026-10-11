@@ -21,3 +21,6 @@ export const FEEDBACK_MAX = 2000;
 
 // 남은 횟수 0회인 채로 이 일수가 지나고 예정 수업이 없으면 자동 보관
 export const AUTO_ARCHIVE_DAYS = 30;
+
+// 홈 공지: 남은 횟수가 이 값 이하인 학생을 보여 줌 (0회·마이너스 포함)
+export const LOW_CREDIT_THRESHOLD = 3;

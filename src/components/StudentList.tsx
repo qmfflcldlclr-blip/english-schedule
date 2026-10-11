@@ -34,7 +34,7 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const shown = students.filter((s) => matchesSearch(`${s.label} ${s.memo ?? ""}`, query));
+  const shown = students.filter((s) => matchesSearch(`${s.label} ${s.name} ${s.memo ?? ""}`, query));
   const zero = archivedView ? [] : shown.filter((s) => s.remaining === 0);
   const main = archivedView ? shown : shown.filter((s) => s.remaining !== 0);
 
@@ -108,7 +108,11 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
             }`}
           >
             <div className="min-w-0">
-              <p className="truncate font-semibold">{s.label}</p>
+              <p className="truncate font-semibold">
+                {s.label}
+                {/* 영어 화면: 한글 이름도 작게 */}
+                {!s.label.startsWith(s.name) && <span className="ml-1.5 text-sm font-normal text-gray-400">{s.name}</span>}
+              </p>
               {s.memo && <p className="truncate text-sm text-gray-500">{s.memo}</p>}
             </div>
             <div className="shrink-0 text-right">
@@ -156,6 +160,7 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
               <Link href={`/students/${s.id}`} className="font-semibold hover:underline">
                 {s.label}
               </Link>
+              {!s.label.startsWith(s.name) && <span className="ml-2 text-sm text-gray-400">{s.name}</span>}
             </td>
             <td className="w-40 py-3 pr-4">
               {remaining(s)}

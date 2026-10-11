@@ -37,7 +37,10 @@
     "noLessons": "No classes today.",
     "noLessonsHint": "You can add classes in the calendar.",
     "todayTitle": "Today’s classes",
-    "openCalendar": "Open calendar"
+    "openCalendar": "Open calendar",
+    "lowCreditTitle": "Students running low on classes",
+    "lowCreditHint": "{n} or fewer left",
+    "lowCreditItem": "{n} left"
   },
   "students": {
     "title": "Students",
@@ -92,7 +95,9 @@
       "invalid": "Could not read the selected students.",
       "save": "Could not complete. Please try again.",
       "setup": "To delete permanently, first run migration 0011 in the Supabase SQL Editor."
-    }
+    },
+    "nameEn": "English name",
+    "nameEnHint": "Leave empty to show it automatically: {auto}"
   },
   "credits": {
     "title": "Class credits",
@@ -215,14 +220,14 @@
       "save": "Could not save. Please try again.",
       "delete": "Could not delete. The class may already be processed."
     },
-    "copyWeek": "Copy last week",
+    "copyWeek": "Copy week",
     "repeat": "Repeat",
-    "copyTitle": "Copy last week",
+    "copyTitle": "Copy another week",
     "copyDesc": "Copy classes from {from} to {to} on the same days and times.",
-    "copyNone": "No classes last week to copy.",
+    "copyNone": "No classes to copy in that week.",
     "copyConfirm": "Copy {n}",
     "copying": "Copying…",
-    "copySkipNote": "Classes that already exist at the same time are skipped. Archived students, free-cancelled classes, and notes are not copied.",
+    "copySkipNote": "Classes that already exist at the same time and Korean public holidays are skipped. Archived students, free-cancelled classes, and notes are not copied.",
     "alreadyExists": "Already exists",
     "repeatTitle": "Create repeating classes",
     "weekdays": "Days",
@@ -314,8 +319,21 @@
       "lessonGone": "Class not found. It may have been deleted.",
       "loading": "Loading…",
       "archived": "Archived",
-      "processedHint": "Cancel or revert from 'Details'."
-    }
+      "processedHint": "Cancel or revert from 'Details'.",
+      "monthTitle": "{month} overview",
+      "monthTotal": "{n} classes · {time}",
+      "byLength": "{m} min × {n}",
+      "doneTime": "Time taught {time}",
+      "hm": "{h}h {m}m",
+      "h": "{h}h",
+      "cancelNote": "Cancelled (postponed) classes are not counted.",
+      "overview": "📊 This month"
+    },
+    "copyFrom": "Copy from",
+    "copyPick": "Pick another date",
+    "copyWeekItem": "{range} · {n}",
+    "copyThisWeek": "Copy to",
+    "holidaySkip": "Holiday · {name}"
   },
   "settings": {
     "title": "Settings",
@@ -381,7 +399,8 @@
       "tooLong": "Notes can be up to 2000 characters.",
       "save": "Could not save. Please try again.",
       "setup": "The database needs setup: run migration 0009 (notes) in the Supabase SQL Editor."
-    }
+    },
+    "translate": "Translate"
   },
   "feedback": {
     "title": "Feedback",

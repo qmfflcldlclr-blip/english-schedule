@@ -3,7 +3,9 @@
 
 export type NameRow = { id: string; name: string; created_at: string };
 
-export function computeNameLabels(rows: NameRow[]): Map<string, string> {
+// display: 화면에 보일 이름 (영어 화면 등). 없으면 name 그대로. 같은 이름인지는 항상 name 으로 판단
+export function computeNameLabels<R extends NameRow>(rows: R[], display?: (row: R) => string): Map<string, string> {
+  const shown = (r: R) => (display ? display(r) : r.name);
   const key = (n: string) => n.trim().replace(/\s+/g, " ").toLowerCase();
   const sorted = [...rows].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id));
   const total = new Map<string, number>();
@@ -14,12 +16,12 @@ export function computeNameLabels(rows: NameRow[]): Map<string, string> {
   for (const r of sorted) {
     const k = key(r.name);
     if ((total.get(k) ?? 0) < 2) {
-      labels.set(r.id, r.name);
+      labels.set(r.id, shown(r));
       continue;
     }
     const n = (seen.get(k) ?? 0) + 1;
     seen.set(k, n);
-    labels.set(r.id, `${r.name} #${n}`);
+    labels.set(r.id, `${shown(r)} #${n}`);
   }
   return labels;
 }

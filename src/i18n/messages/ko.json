@@ -37,7 +37,10 @@
     "noLessons": "오늘은 수업이 없어요.",
     "noLessonsHint": "달력에서 수업을 추가할 수 있어요.",
     "todayTitle": "오늘 수업",
-    "openCalendar": "달력 보기"
+    "openCalendar": "달력 보기",
+    "lowCreditTitle": "횟수가 얼마 안 남은 학생",
+    "lowCreditHint": "남은 횟수 {n}회 이하",
+    "lowCreditItem": "{n}회"
   },
   "students": {
     "title": "학생",
@@ -92,7 +95,9 @@
       "invalid": "선택한 학생을 확인할 수 없어요.",
       "save": "처리하지 못했습니다. 다시 시도해 주세요.",
       "setup": "완전 삭제를 쓰려면 Supabase SQL Editor 에서 0011 파일을 먼저 실행해 주세요."
-    }
+    },
+    "nameEn": "영어 이름",
+    "nameEnHint": "비워 두면 영어 화면에서 자동으로 바꿔 보여 줘요: {auto}"
   },
   "credits": {
     "title": "수강 횟수",
@@ -215,14 +220,14 @@
       "save": "저장하지 못했습니다. 다시 시도해 주세요.",
       "delete": "삭제하지 못했습니다. 이미 처리된 수업일 수 있습니다."
     },
-    "copyWeek": "지난주 복사",
+    "copyWeek": "주 복사",
     "repeat": "반복 생성",
-    "copyTitle": "지난주 수업 복사",
+    "copyTitle": "다른 주 수업 복사",
     "copyDesc": "{from} 수업을 {to}로 같은 요일·시간에 복사합니다.",
-    "copyNone": "복사할 지난주 수업이 없습니다.",
+    "copyNone": "고른 주에 복사할 수업이 없습니다.",
     "copyConfirm": "{n}개 복사",
     "copying": "복사 중…",
-    "copySkipNote": "이미 같은 시간에 있는 수업은 건너뜁니다. 보관된 학생, 무료 취소된 수업, 메모는 복사하지 않습니다.",
+    "copySkipNote": "이미 같은 시간에 있는 수업과 한국 공휴일인 날은 건너뜁니다. 보관된 학생, 무료 취소된 수업, 메모는 복사하지 않습니다.",
     "alreadyExists": "이미 있음",
     "repeatTitle": "반복 일정 생성",
     "weekdays": "요일",
@@ -314,8 +319,21 @@
       "lessonGone": "수업을 찾을 수 없어요. 삭제됐을 수 있어요.",
       "loading": "불러오는 중…",
       "archived": "보관됨",
-      "processedHint": "취소·되돌리기는 '자세히'에서 할 수 있어요."
-    }
+      "processedHint": "취소·되돌리기는 '자세히'에서 할 수 있어요.",
+      "monthTitle": "{month} 현황",
+      "monthTotal": "수업 {n}회 · {time}",
+      "byLength": "{m}분 {n}회",
+      "doneTime": "진행한 수업 시간 {time}",
+      "hm": "{h}시간 {m}분",
+      "h": "{h}시간",
+      "cancelNote": "취소(연기)는 횟수·시간에서 빠져요.",
+      "overview": "📊 이번 달 현황"
+    },
+    "copyFrom": "가져올 주",
+    "copyPick": "다른 날짜로 고르기",
+    "copyWeekItem": "{range} · {n}개",
+    "copyThisWeek": "넣을 주",
+    "holidaySkip": "공휴일 · {name}"
   },
   "settings": {
     "title": "설정",
@@ -381,7 +399,8 @@
       "tooLong": "메모는 2000자까지 쓸 수 있어요.",
       "save": "저장하지 못했습니다. 다시 시도해 주세요.",
       "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0009(메모) 파일을 실행해 주세요."
-    }
+    },
+    "translate": "번역"
   },
   "feedback": {
     "title": "피드백",

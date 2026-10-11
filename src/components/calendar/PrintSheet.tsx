@@ -1,7 +1,7 @@
 // 월간 일정 인쇄용 종이 (A4 가로 두 장: 1쪽 달력, 2쪽 이번 달 횟수 표). 데이터는 받기만 하고 그리기만 함
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
-import { fitCalendar, fitSummary, monthWeeks, PAGE } from "@/lib/print-layout";
+import { fitCalendar, fitSummary, monthWeeks, PAGE, textEm } from "@/lib/print-layout";
 import { LogoMark } from "@/components/Illustrations";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
 
@@ -63,7 +63,13 @@ function Title({ heading, meta, sub }: { heading: string; meta: string; sub?: st
 
 export default function PrintSheet({ month, heading, meta, days, holidays = {}, summary, t, weekdayNames, timesUnit }: Props) {
   const weeks = monthWeeks(month);
-  const fit = fitCalendar(weeks.map((w) => Math.max(...w.map((d) => days[d]?.length ?? 0))));
+  // 한 줄 = "18:30 나상현(메모)" — 메모는 0.85배 크기
+  const lineEm = (e: { time: string; name: string; note?: string | null }) =>
+    textEm(`${e.time} ${e.name}`) + (e.note ? textEm(`(${e.note})`) * 0.85 : 0);
+  const fit = fitCalendar(
+    weeks.map((w) => Math.max(...w.map((d) => days[d]?.length ?? 0))),
+    weeks.map((w) => Math.max(0, ...w.flatMap((d) => (days[d] ?? []).map(lineEm)))),
+  );
   const sf = fitSummary(summary.length);
   const chunks = Array.from({ length: sf.cols }, (_, i) => summary.slice(i * sf.perCol, (i + 1) * sf.perCol)).filter(
     (c) => c.length,
@@ -111,7 +117,7 @@ export default function PrintSheet({ month, heading, meta, days, holidays = {}, 
                         {items.length > 0 && (
                           <ul
                             style={{
-                              fontSize: `${fit.fontMm}mm`,
+                              fontSize: `${fit.weekFonts[wi]}mm`,
                               lineHeight: 1.25,
                               columnCount: fit.weekCols[wi],
                               columnGap: "1mm",

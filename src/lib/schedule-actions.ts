@@ -12,14 +12,16 @@ async function requireProfile() {
   return { id: profile.id as string, timeZone: profile.timezone as string };
 }
 
-// 지난주 수업을 이번 주로 복사 (이미 있는 건 건너뜀 → 두 번 눌러도 중복 없음)
-export async function copyLastWeek(formData: FormData) {
+// 고른 주(source)의 수업을 지금 보는 주(weekFirst)로 복사
+// 이미 있는 건 건너뜀(두 번 눌러도 중복 없음), 넣을 날이 한국 공휴일이면 건너뜀
+export async function copyWeek(formData: FormData) {
   const weekFirst = formData.get("weekFirst");
-  if (!isDate(weekFirst)) redirect("/calendar");
+  const source = formData.get("source");
+  if (!isDate(weekFirst) || !isDate(source)) redirect("/calendar");
   const me = await requireProfile();
 
-  const rows = (await planCopyWeek(weekStart(weekFirst), me.timeZone))
-    .filter((item) => !item.duplicate)
+  const rows = (await planCopyWeek(weekStart(weekFirst), weekStart(source), me.timeZone))
+    .filter((item) => !item.duplicate && !item.holiday)
     .map((item) => ({
       student_id: item.studentId,
       starts_at: item.startsAt,

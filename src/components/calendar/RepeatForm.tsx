@@ -9,6 +9,7 @@ import type { Messages } from "@/i18n/server";
 import { formatDay, toZoned } from "@/lib/time";
 import { ErrorText, fieldClass } from "@/components/PlanForm";
 import StudentCombobox from "@/components/StudentCombobox";
+import { DEFAULT_LESSON_TIME } from "@/config/schedule";
 
 type Props = {
   t: Messages["calendar"];
@@ -27,7 +28,7 @@ export default function RepeatForm({ t, students, zoneLabel, timeZone, locale, i
   const [studentId, setStudentId] = useState(initial.studentId);
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [startDate, setStartDate] = useState(initial.startDate);
-  const [time, setTime] = useState("16:00");
+  const [time, setTime] = useState(DEFAULT_LESSON_TIME);
   const [weeks, setWeeks] = useState(8);
   const [duration, setDuration] = useState(initial.duration);
   // 미리보기 뒤에 입력을 바꾸면 미리보기를 숨김 (보이는 목록과 실제 생성 내용이 달라지지 않게)

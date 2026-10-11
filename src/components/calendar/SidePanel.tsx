@@ -14,6 +14,7 @@ import { removeLesson } from "@/lib/lesson-actions";
 import { addMonths } from "@/lib/print-layout";
 import { formatDay, toScheduleDay, toZoned } from "@/lib/time";
 import { DEFAULT_LESSON_MINUTES } from "@/config/rules";
+import { DEFAULT_LESSON_TIME } from "@/config/schedule";
 import { usePanel, type PanelView } from "@/components/calendar/panel-context";
 import { quickLabels, statusText } from "@/components/calendar/quick-labels";
 import LessonTime, { statusBadge } from "@/components/calendar/LessonTime";
@@ -21,6 +22,19 @@ import LessonForm from "@/components/calendar/LessonForm";
 import StudentCombobox from "@/components/StudentCombobox";
 
 type StudentOption = { id: string; name: string; lesson_minutes: number };
+
+// 이번 달(고른 날짜의 달) 현황. 취소(연기)는 횟수·시간에서 뺌
+export type MonthSummary = {
+  month: string; // "YYYY-MM"
+  lessons: number;
+  minutes: number;
+  doneMinutes: number;
+  byMinutes: [number, number][]; // [수업 길이, 횟수] 짧은 순
+  completed: number;
+  scheduled: number;
+  absent: number;
+  cancelled: number;
+};
 
 type Props = {
   t: Messages["calendar"];
@@ -32,6 +46,7 @@ type Props = {
   otherTimeZone: string | null;
   locale: string;
   zoneLabel: string;
+  summary: MonthSummary;
 };
 
 export default function SidePanel(props: Props) {
@@ -50,9 +65,13 @@ export default function SidePanel(props: Props) {
       >
         {!isHome && (
           <div className="-mt-1 mb-2 flex items-center justify-between">
-            <button type="button" onClick={panel.close} className="min-h-11 text-sm text-gray-600">
-              ← {t.panel.home}
-            </button>
+            {view.mode === "overview" ? (
+              <span />
+            ) : (
+              <button type="button" onClick={panel.close} className="min-h-11 text-sm text-gray-600">
+                ← {t.panel.home}
+              </button>
+            )}
             <button type="button" onClick={panel.close} aria-label={t.panel.close} className="flex size-11 items-center justify-center rounded-full text-xl text-gray-500 hover:bg-gray-100 lg:hidden">
               ✕
             </button>
@@ -72,12 +91,35 @@ function PanelBody(props: Props & { view: PanelView }) {
   return <Home {...props} />;
 }
 
-// ───── 처음: 이름 검색 + 이번 주 학생 ─────
-function Home({ t, students, weekStudents }: Props) {
+// ───── 처음: 이번 달 현황 + 이름 검색 + 이번 주 학생 ─────
+function Home({ t, students, weekStudents, summary, locale }: Props) {
   const panel = usePanel();
   const show = (id: string) => id && panel.open({ mode: "student", studentId: id });
+  const p = t.panel;
+  const time = (min: number) =>
+    min % 60 ? format(p.hm, { h: Math.floor(min / 60), m: min % 60 }) : format(p.h, { h: min / 60 });
+  const monthLabel = new Intl.DateTimeFormat(locale, { month: "long", timeZone: "UTC" }).format(new Date(`${summary.month}-01T00:00:00Z`));
   return (
     <div>
+      <section className="mb-5 rounded-xl bg-brand-50 p-3">
+        <h2 className="font-bold text-brand-900">{format(p.monthTitle, { month: monthLabel })}</h2>
+        <p className="mt-1 text-lg font-semibold">{format(p.monthTotal, { n: summary.lessons, time: time(summary.minutes) })}</p>
+        {summary.byMinutes.length > 0 && (
+          <ul className="mt-1 flex flex-wrap gap-1.5 text-sm">
+            {summary.byMinutes.map(([m, n]) => (
+              <li key={m} className="rounded-full bg-white px-2.5 py-0.5">
+                {format(p.byLength, { m, n })}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-2 text-sm text-gray-700">
+          {format(p.counts, { done: summary.completed, scheduled: summary.scheduled, absent: summary.absent, cancel: summary.cancelled })}
+        </p>
+        <p className="mt-1 text-sm font-medium text-brand-800">{format(p.doneTime, { time: time(summary.doneMinutes) })}</p>
+        <p className="mt-1 text-xs text-gray-500">{p.cancelNote}</p>
+      </section>
+
       <h2 className="text-lg font-bold">{t.panel.findTitle}</h2>
       <p className="mt-1 text-sm text-gray-500">{t.panel.findHint}</p>
       <div className="mt-3">
@@ -207,7 +249,7 @@ function StudentMonth({
       {!compact && (
         <button
           type="button"
-          onClick={() => panel.openNew({ date: selected, time: "16:00", studentId, duration: info?.student.lesson_minutes })}
+          onClick={() => panel.openNew({ date: selected, time: DEFAULT_LESSON_TIME, studentId, duration: info?.student.lesson_minutes })}
           className="mt-4 min-h-12 w-full rounded-xl border border-brand-200 bg-brand-50 font-medium text-brand-700 hover:bg-brand-100"
         >
           {t.panel.addForStudent}

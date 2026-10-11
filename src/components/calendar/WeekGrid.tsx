@@ -32,7 +32,7 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
   const moveLabels = { confirmMove: t.confirmMove, moveOverlap: t.moveOverlap, moveFailed: t.moveFailed, overlapItem: t.overlapItem };
   const holidayText = (d: string) => (holidays[d] ?? []).map((h) => `${flag[h.country]} ${h.name}`).join(" · ");
 
-  // 시간 범위 (기본 15시 ~ 다음 날 1시, 범위 밖 수업이 있으면 넓힘)
+  // 시간 범위 (기본 17시 ~ 다음 날 1시, 범위 밖 수업이 있으면 넓힘)
   let fromHour = CALENDAR_START_HOUR;
   let toHour = CALENDAR_END_HOUR;
   for (const l of lessons) {

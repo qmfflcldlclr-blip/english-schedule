@@ -47,6 +47,8 @@ export default async function StudentDetailPage({
       <div className="mt-2 flex items-start justify-between gap-3">
         <h1 className="min-w-0 break-words text-2xl font-bold">
           {student.label}
+          {/* 영어 화면: 한글 이름도 작게 */}
+          {!student.label.startsWith(student.name) && <span className="ml-2 text-base font-normal text-gray-400">{student.name}</span>}
           {student.archived && (
             <span className="ml-2 rounded-full bg-gray-100 px-2 py-0.5 align-middle text-xs font-medium text-gray-600">
               {t.archivedBadge}

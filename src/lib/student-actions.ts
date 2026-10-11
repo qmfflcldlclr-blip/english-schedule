@@ -19,6 +19,7 @@ export async function saveStudent(
   const name = String(formData.get("name") ?? "").trim();
   const minutes = Number(formData.get("lesson_minutes"));
   const memo = String(formData.get("memo") ?? "").trim() || null;
+  const nameEn = String(formData.get("name_en") ?? "").trim() || null;
 
   const errors: NonNullable<StudentFormState["errors"]> = {};
   if (!name) errors.name = true;
@@ -32,7 +33,7 @@ export async function saveStudent(
   if (Object.keys(errors).length) return { errors };
 
   const supabase = await createClient();
-  const values = { name, lesson_minutes: minutes, memo };
+  const values = { name, name_en: nameEn, lesson_minutes: minutes, memo };
 
   let savedId = id;
   if (id) {

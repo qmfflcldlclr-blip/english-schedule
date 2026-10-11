@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { romanizeName } from "@/lib/romanize";
 import { useActionForm } from "@/lib/use-action-form";
 import { saveStudent, type StudentFormState } from "@/lib/student-actions";
 import {
@@ -21,6 +23,7 @@ type Props = {
 export default function StudentForm({ t, student, cancelHref }: Props) {
   const [state, onSubmit, pending] = useActionForm<StudentFormState>(saveStudent, {});
   const errors = state.errors ?? {};
+  const [name, setName] = useState(student?.name ?? ""); // 영어 이름 자동 변환 미리보기용
 
   const inputClass =
     "mt-1 w-full rounded-xl border border-gray-300 px-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none aria-invalid:border-red-500";
@@ -35,11 +38,28 @@ export default function StudentForm({ t, student, cancelHref }: Props) {
           name="name"
           required
           defaultValue={student?.name}
+          onChange={(e) => setName(e.target.value)}
           aria-invalid={errors.name || undefined}
           className={`${inputClass} min-h-12`}
         />
         {errors.name && (
           <span className="mt-1 block text-sm text-red-600">{t.errors.name}</span>
+        )}
+      </label>
+
+      <label className="block text-sm font-medium">
+        {t.nameEn}
+        <input
+          name="name_en"
+          defaultValue={student?.name_en ?? ""}
+          placeholder={romanizeName(name)}
+          autoCapitalize="words"
+          className={`${inputClass} min-h-12`}
+        />
+        {name.trim() && (
+          <span className="mt-1 block text-sm font-normal text-gray-500">
+            {format(t.nameEnHint, { auto: romanizeName(name) })}
+          </span>
         )}
       </label>
 

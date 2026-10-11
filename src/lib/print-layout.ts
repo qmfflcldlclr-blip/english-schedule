@@ -39,14 +39,32 @@ export function monthWeeks(month: string): string[][] {
 }
 
 export type Fit = {
-  fontMm: number; // 수업 글자 크기
+  fontMm: number; // 수업 글자 크기 (줄 높이 기준)
+  weekFonts: number[]; // 주마다 실제 글자 크기: 가장 긴 "시간 이름"이 칸 폭에 들어가도록 필요하면 조금 더 작게
   weekCols: number[]; // 주마다 칸 안 단 수 (1 또는 2)
   weekHeights: number[]; // 주마다 줄 높이
   scale: number; // 글자를 최소로 줄여도 넘칠 때 종이 전체 축소 비율 (1 = 축소 없음)
 };
 
-// 1쪽 달력. maxPerWeek: 주마다 "가장 수업이 많은 날의 수업 수"
-export function fitCalendar(maxPerWeek: number[]): Fit {
+// 글자 폭 어림값 (글자 크기 1 기준): 한글 1, 숫자·영문 약 0.55~0.7, 공백·쌍점 0.3. 굵은 글씨·글꼴 차이 여유 12%
+export function textEm(text: string) {
+  let em = 0;
+  for (const ch of text) {
+    if (/[가-힣ㄱ-ㅎㅏ-ㅣ]/.test(ch)) em += 1;
+    else if (/[0-9]/.test(ch)) em += 0.56;
+    else if (/[A-Z]/.test(ch)) em += 0.68;
+    else if (/[a-z]/.test(ch)) em += 0.55;
+    else if (/[\s:.]/.test(ch)) em += 0.3;
+    else em += 0.6;
+  }
+  return em * 1.12;
+}
+
+const CELL_TEXT_W = PAGE.width / 7 - 2.4; // 칸 폭 − 좌우 여백·테두리
+const COL_GAP = 1; // 칸 안 두 줄 사이 간격
+
+// 1쪽 달력. maxPerWeek: 주마다 "가장 수업이 많은 날의 수업 수", widestEm: 주마다 가장 긴 줄의 폭(textEm)
+export function fitCalendar(maxPerWeek: number[], widestEm: number[] = []): Fit {
   const weekCols = maxPerWeek.map((n) => (n >= TWO_COLS_FROM ? 2 : 1));
   const weekLines = maxPerWeek.map((n, i) => Math.max(MIN_LINES, Math.ceil(n / weekCols[i])));
   const totalLines = weekLines.reduce((a, b) => a + b, 0);
@@ -62,7 +80,14 @@ export function fitCalendar(maxPerWeek: number[]): Fit {
   const spare = Math.max(0, PAGE.height - SAFETY - HEADER_H - WEEKDAY_H - natural.reduce((a, b) => a + b, 0));
   const weekHeights = natural.map((h) => h + spare / natural.length);
 
-  return { fontMm, weekCols, weekHeights, scale };
+  // 이름이 길어 "…"으로 잘리지 않게, 그 주만 글자를 칸 폭에 맞춰 줄임 (줄 높이는 그대로)
+  const weekFonts = weekCols.map((cols, i) => {
+    const colW = (CELL_TEXT_W - COL_GAP * (cols - 1)) / cols;
+    const em = widestEm[i] ?? 0;
+    return em > 0 ? Math.min(fontMm, colW / em) : fontMm;
+  });
+
+  return { fontMm, weekFonts, weekCols, weekHeights, scale };
 }
 
 // 2쪽 횟수 표: 학생 수에 맞춰 단 수와 줄 높이·글자 크기 (한 장 안)

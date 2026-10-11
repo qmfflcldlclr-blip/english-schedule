@@ -20,7 +20,9 @@ import LessonQuick from "@/components/calendar/LessonQuick";
 import { statusText } from "@/components/calendar/quick-labels";
 import { CalendarPanelProvider } from "@/components/calendar/panel-context";
 import SidePanel from "@/components/calendar/SidePanel";
-import AddLessonButton from "@/components/calendar/AddLessonButton";
+import AddLessonButton, { OverviewButton } from "@/components/calendar/AddLessonButton";
+import type { MonthSummary } from "@/components/calendar/SidePanel";
+import { addMonths } from "@/lib/print-layout";
 import { listStudents } from "@/lib/students";
 import { zoneName } from "@/config/timezones";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
@@ -40,13 +42,16 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   const weekFirst = weekStart(selected);
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekFirst, i));
 
-  const [lessons, otherTimeZone, settings, holidays, students] = await Promise.all([
+  const month = selected.slice(0, 7);
+  const [lessons, otherTimeZone, settings, holidays, students, monthLessons] = await Promise.all([
     // 수업일 기준 한 주 (첫날 새벽 5시 ~ 다음 주 첫날 새벽 5시)
     listLessons(scheduleDayStart(weekFirst, timeZone), scheduleDayStart(addDays(weekFirst, 7), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
     getSettings(),
     getHolidays(weekFirst, days[6]),
     listStudents(false),
+    // 이번 달 현황용 (수업일 기준 한 달)
+    listLessons(scheduleDayStart(`${month}-01`, timeZone), scheduleDayStart(`${addMonths(month, 1)}-01`, timeZone)),
   ]);
 
   // 수업일별로 묶기 (내 시간대 기준, 새벽 수업은 전날)
@@ -59,6 +64,22 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   const link = (date: string) => `/calendar?date=${date}`;
 
   const dayLessons = byDay.get(selected) ?? [];
+
+  // 옆 칸: 이번 달 현황 (취소(연기)는 횟수·시간에서 뺌)
+  const counted = monthLessons.filter((l) => l.status !== "free_cancel");
+  const lengths = new Map<number, number>();
+  for (const l of counted) lengths.set(l.duration_minutes, (lengths.get(l.duration_minutes) ?? 0) + 1);
+  const summary: MonthSummary = {
+    month,
+    lessons: counted.length,
+    minutes: counted.reduce((sum, l) => sum + l.duration_minutes, 0),
+    doneMinutes: counted.filter((l) => l.status === "completed").reduce((sum, l) => sum + l.duration_minutes, 0),
+    byMinutes: [...lengths].sort((a, b) => a[0] - b[0]),
+    completed: monthLessons.filter((l) => l.status === "completed").length,
+    scheduled: monthLessons.filter((l) => l.status === "scheduled").length,
+    absent: monthLessons.filter((l) => l.status === "absent").length,
+    cancelled: monthLessons.length - counted.length,
+  };
 
   // 옆 칸: 학생 고르기 목록(동명이인 번호 포함), 이번 주 수업 학생(이름순)
   const studentOptions = students.map((s) => ({ id: s.id, name: s.label, lesson_minutes: s.lesson_minutes }));
@@ -106,6 +127,12 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                   );
                 })}
               </nav>
+
+              {/* 폰: 이번 달 현황·학생 검색을 아래 창으로 */}
+              <OverviewButton
+                label={t.panel.overview}
+                className="mt-3 flex min-h-11 w-full items-center justify-center rounded-xl border border-brand-200 bg-brand-50 text-sm font-medium text-brand-700"
+              />
 
               <h2 className={`mt-5 text-sm font-medium ${tone(selected) || "text-gray-500"}`}>
                 {formatDay(selected, locale, { month: "long", day: "numeric", weekday: "long" })}
@@ -175,6 +202,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
             otherTimeZone={otherTimeZone}
             locale={locale}
             zoneLabel={zoneName(timeZone, locale)}
+            summary={summary}
           />
         </div>
       </CalendarPanelProvider>

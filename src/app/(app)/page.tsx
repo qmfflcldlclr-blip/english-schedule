@@ -8,6 +8,8 @@ import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/Less
 import { EmptyLessonsArt, GreetingArt, type DayPart } from "@/components/Illustrations";
 import NoteCard from "@/components/NoteCard";
 import { getStaffNotes } from "@/lib/notes";
+import { listLowCreditStudents } from "@/lib/students";
+import { LOW_CREDIT_THRESHOLD } from "@/config/rules";
 
 // 내 시간대 기준: 12시 전 아침, 18시 전 오후, 그 뒤 저녁
 function dayPart(minutes: number): DayPart {
@@ -20,10 +22,11 @@ export default async function Home() {
   const today = scheduleToday(timeZone); // 새벽 수업은 전날에 포함
   const now = new Date();
 
-  const [lessons, otherTimeZone, notes] = await Promise.all([
+  const [lessons, otherTimeZone, notes, lowCredit] = await Promise.all([
     listLessons(scheduleDayStart(today, timeZone), scheduleDayStart(addDays(today, 1), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
     getStaffNotes(),
+    listLowCreditStudents(LOW_CREDIT_THRESHOLD),
   ]);
   // 메모 수정 시각 "10/10 16:20" (내 시간대)
   const stamp = (iso: string) => {
@@ -86,6 +89,31 @@ export default async function Home() {
         )}
       </section>
 
+      {/* 공지: 남은 횟수가 얼마 안 남은 학생 */}
+      {lowCredit.length > 0 && (
+        <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
+          <h2 className="font-bold text-amber-900">
+            📢 {t.home.lowCreditTitle}
+            <span className="ml-2 text-sm font-normal text-amber-700">{format(t.home.lowCreditHint, { n: LOW_CREDIT_THRESHOLD })}</span>
+          </h2>
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {lowCredit.map((s) => (
+              <li key={s.id}>
+                <Link
+                  href={`/students/${s.id}`}
+                  className="flex min-h-10 items-center gap-1.5 rounded-full border border-amber-200 bg-white px-3 text-sm hover:bg-amber-100"
+                >
+                  <span className="font-medium">{s.name}</span>
+                  <span className={`tabular-nums ${s.remaining <= 0 ? "font-semibold text-red-600" : "text-amber-700"}`}>
+                    {format(t.home.lowCreditItem, { n: s.remaining })}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {/* 서로 남기는 메모 (매니저 · 선생님 각자 한 칸) */}
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {notes.map((n) => (
@@ -96,6 +124,7 @@ export default async function Home() {
             updatedLabel={n.updatedAt ? format(t.notes.updated, { time: stamp(n.updatedAt) }) : null}
             editable={n.ownerId === profile?.id}
             accent={n.role === "manager" ? "brand" : "sunny"}
+            locale={locale}
             t={t.notes}
           />
         ))}

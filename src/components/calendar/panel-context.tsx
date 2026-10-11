@@ -6,7 +6,8 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { useRouter } from "next/navigation";
 
 export type PanelView =
-  | { mode: "home" } // 이름 검색 + 이번 주 학생
+  | { mode: "home" } // 이번 달 현황 + 이름 검색 + 이번 주 학생
+  | { mode: "overview" } // home 과 같은 내용. 폰에서 "이번 달 현황" 버튼으로 아래 창에 띄울 때
   | { mode: "student"; studentId: string } // 학생의 한 달 수업
   | { mode: "lesson"; lessonId: string; studentId: string } // 수업 처리·수정 + 그 학생의 한 달 수업
   // 새 수업. slot 은 달력에서 빈 시간을 누를 때마다 1씩 늘어서 폼이 날짜·시각을 다시 받음
