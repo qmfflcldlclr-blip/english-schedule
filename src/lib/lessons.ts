@@ -28,15 +28,16 @@ function toLesson({ student, ...row }: Row, labels: Map<string, string>): Lesson
   return { ...row, studentName: labels.get(row.student_id) ?? s?.name ?? "" };
 }
 
-// from 이상 to 미만에 시작하는 수업 (시간순)
-export async function listLessons(from: Date, to: Date): Promise<Lesson[]> {
+// from 이상 to 미만에 시작하는 수업 (시간순). studentId 를 주면 그 학생 수업만
+export async function listLessons(from: Date, to: Date, studentId?: string): Promise<Lesson[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("lessons")
     .select(COLUMNS)
     .gte("starts_at", from.toISOString())
-    .lt("starts_at", to.toISOString())
-    .order("starts_at");
+    .lt("starts_at", to.toISOString());
+  if (studentId) query = query.eq("student_id", studentId);
+  const { data, error } = await query.order("starts_at");
   if (error) throw error;
   const labels = await getStudentLabels();
   return (data as Row[]).map((r) => toLesson(r, labels));

@@ -1,4 +1,4 @@
-// PC 주간 시간표 (일~토 × 시간). 빈 시간 더블클릭·드래그로 추가, 수업 칸 누르면 수업 정보, 예정 수업 칸 끌면 옮기기
+// PC 주간 시간표 (일~토 × 시간). 빈 시간 더블클릭·드래그로 추가, 수업 칸 누르면 옆 칸에 수업 정보, 예정 수업 칸 끌면 옮기기
 import Link from "next/link";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
@@ -9,7 +9,6 @@ import { CALENDAR_END_HOUR, CALENDAR_START_HOUR, DAY_CUTOFF_HOUR, HOUR_PX } from
 import LessonTime, { statusStyle } from "@/components/calendar/LessonTime";
 import DaySlots from "@/components/calendar/DaySlots";
 import LessonQuick from "@/components/calendar/LessonQuick";
-import { quickLabels, statusText } from "@/components/calendar/quick-labels";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
 
 // 이보다 낮은 수업 칸은 "시간 이름" 한 줄로 (15·20분 수업)
@@ -30,7 +29,6 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
   const lessons = days.flatMap((d) => byDay[d] ?? []);
   const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.otherTime };
   const tone = (d: string) => toneText[dayTone(d, Boolean(holidays[d]))];
-  const labels = quickLabels(t);
   const moveLabels = { confirmMove: t.confirmMove, moveOverlap: t.moveOverlap, moveFailed: t.moveFailed, overlapItem: t.overlapItem };
   const holidayText = (d: string) => (holidays[d] ?? []).map((h) => `${flag[h.country]} ${h.name}`).join(" · ");
 
@@ -91,10 +89,8 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
                 <LessonQuick
                   key={l.id}
                   lessonId={l.id}
+                  studentId={l.student_id}
                   scheduled={l.status === "scheduled"}
-                  heading={`${time} · ${l.studentName}`}
-                  sub={`${minutes} · ${statusText(l, t)}`}
-                  labels={labels}
                   move={{ date: d, minutes: start, duration: l.duration_minutes, fromHour, hourPx: HOUR_PX, studentName: l.studentName, locale, labels: moveLabels }}
                   title={`${time} ${l.studentName} · ${minutes}`}
                   className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]}`}

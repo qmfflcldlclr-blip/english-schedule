@@ -295,7 +295,27 @@
     "searchStudent": "Search by name",
     "noMatch": "No matching student.",
     "details": "Details",
-    "close": "Close"
+    "close": "Close",
+    "panel": {
+      "findTitle": "Student classes",
+      "findHint": "Click a class on the calendar or search a name.",
+      "weekStudents": "Students this week",
+      "noWeekStudents": "No classes this week.",
+      "monthLessons": "Classes in {month}",
+      "counts": "Done {done} · Scheduled {scheduled} · Absent {absent} · Cancelled {cancel}",
+      "noMonthLessons": "No classes this month.",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "addForStudent": "+ Add class for this student",
+      "studentPage": "Student info",
+      "close": "Close",
+      "home": "Back",
+      "slotHint": "While this form is open, click an empty time on the calendar to change the date and time.",
+      "lessonGone": "Class not found. It may have been deleted.",
+      "loading": "Loading…",
+      "archived": "Archived",
+      "processedHint": "Cancel or revert from 'Details'."
+    }
   },
   "settings": {
     "title": "Settings",

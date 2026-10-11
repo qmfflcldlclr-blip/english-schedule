@@ -3,7 +3,7 @@
 // PC 시간표에서 예정 수업 칸을 끌어 다른 날·시각으로 옮기기 (15분 단위)
 // 마우스를 조금(DRAG_START_PX) 이상 움직여야 "끌기"로 봄 → 그냥 누르면 지금처럼 빠른 처리 창이 열림
 import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { usePanel } from "@/components/calendar/panel-context";
 import { format } from "@/i18n/format";
 import { moveLesson } from "@/lib/lesson-actions";
 import { formatDay, scheduleToActual } from "@/lib/time";
@@ -34,7 +34,7 @@ export type MoveConfig = {
 type Target = { date: string; minutes: number; dx: number; dy: number };
 
 export function useLessonDrag(lessonId: string, move?: MoveConfig) {
-  const router = useRouter();
+  const panel = usePanel();
   const [pending, startTransition] = useTransition();
   const [target, setTarget] = useState<Target | null>(null);
   const start = useRef<{ x: number; y: number; grab: number; colLeft: number } | null>(null);
@@ -93,7 +93,7 @@ export function useLessonDrag(lessonId: string, move?: MoveConfig) {
         window.alert(move.labels.moveFailed);
         return reset();
       }
-      router.refresh();
+      panel.refresh(); // 달력 + 옆 칸 목록 새로
       reset();
     });
   };

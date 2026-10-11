@@ -24,21 +24,27 @@ export function ErrorText({ children }: { children: React.ReactNode }) {
 
 export function FormButtons({
   cancelHref,
+  onCancel,
   pending,
   t,
 }: {
   cancelHref: string;
+  onCancel?: () => void; // 있으면 링크 대신 버튼 (달력 옆 칸처럼 페이지를 옮기지 않을 때)
   pending: boolean;
   t: { cancel: string; save: string; saving: string };
 }) {
+  const cancelClass = "flex min-h-12 flex-1 items-center justify-center rounded-xl border border-gray-300 bg-white font-medium";
   return (
     <div className="flex gap-3">
-      <Link
-        href={cancelHref}
-        className="flex min-h-12 flex-1 items-center justify-center rounded-xl border border-gray-300 bg-white font-medium"
-      >
-        {t.cancel}
-      </Link>
+      {onCancel ? (
+        <button type="button" onClick={onCancel} className={cancelClass}>
+          {t.cancel}
+        </button>
+      ) : (
+        <Link href={cancelHref} className={cancelClass}>
+          {t.cancel}
+        </Link>
+      )}
       <button
         type="submit"
         disabled={pending}

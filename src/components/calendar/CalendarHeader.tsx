@@ -4,6 +4,7 @@ import type { Messages } from "@/i18n/server";
 import { addDays, formatDayRange } from "@/lib/time";
 import ZoomButton from "@/components/ZoomButton";
 import WeekPicker from "@/components/calendar/WeekPicker";
+import AddLessonButton from "@/components/calendar/AddLessonButton";
 
 type Props = {
   weekFirst: string;
@@ -34,12 +35,11 @@ export default function CalendarHeader({ weekFirst, weekLast, selected, today, s
         <Link href={`/calendar/print?month=${selected.slice(0, 7)}`} className="flex min-h-11 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white px-1 text-xs whitespace-nowrap md:px-4 md:text-sm">
           🖨️ {t.print}
         </Link>
-        <Link
-          href={`/calendar/new?date=${selected}`}
+        <AddLessonButton
+          date={selected}
+          label={t.add}
           className="hidden min-h-11 shrink-0 items-center rounded-full bg-brand-600 px-4 text-sm font-medium whitespace-nowrap text-white shadow-sm md:flex"
-        >
-          + {t.add}
-        </Link>
+        />
       </div>
 
       {/* 주 제목 상자: ◀ 10월 5일 ~ 11일 ▶ (제목을 누르면 날짜 선택기) */}

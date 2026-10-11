@@ -15,6 +15,8 @@ export type LessonFormState = {
   };
   // 겹치는 수업 경고 (사용자가 "그래도 저장"을 누르면 무시하고 저장)
   overlaps?: { time: string; name: string; minutes: number }[];
+  // 달력 옆 칸에서 저장한 경우: 페이지를 옮기지 않고 결과만 돌려줌
+  saved?: { lessonId: string; studentId: string; date: string };
 };
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -63,6 +65,7 @@ export async function saveLesson(
   const duration = Number(formData.get("duration_minutes"));
   const memo = String(formData.get("memo") ?? "").trim() || null;
   const ignoreOverlap = formData.get("ignore_overlap") === "1";
+  const stay = formData.get("stay") === "1"; // 달력 옆 칸에서 보냄 → 이동하지 않음
 
   const errors: NonNullable<LessonFormState["errors"]> = {};
   if (!studentId) errors.student = true;
@@ -96,12 +99,23 @@ export async function saveLesson(
     duration_minutes: duration,
     memo,
   };
-  const { error } = lessonId
-    ? await supabase.from("lessons").update(values).eq("id", lessonId)
-    : await supabase.from("lessons").insert({ ...values, created_by: profile.id });
-  if (error) return { errors: { save: true } };
+  const { data: row, error } = lessonId
+    ? await supabase.from("lessons").update(values).eq("id", lessonId).select("id").maybeSingle()
+    : await supabase.from("lessons").insert({ ...values, created_by: profile.id }).select("id").single();
+  if (error || !row) return { errors: { save: true } };
 
+  if (stay) return { saved: { lessonId: row.id, studentId, date: date as string } };
   redirect(`/calendar?date=${date}`);
+}
+
+// 달력 옆 칸에서 예정 수업 삭제 (페이지 이동 없음)
+export async function removeLesson(lessonId: string) {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("lessons")
+    .delete({ count: "exact" })
+    .eq("id", lessonId);
+  return count ? {} : { error: true };
 }
 
 // 예정 수업 삭제 (처리된 수업은 데이터베이스가 거부)

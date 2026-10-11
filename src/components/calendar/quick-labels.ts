@@ -1,7 +1,19 @@
-// 달력 빠른 처리 창의 문구 모음 + 수업 상태 글자 (달력 PC·폰 공용)
+// 달력 옆 칸의 빠른 처리 문구 모음 + 수업 상태 글자 (달력 PC·폰 공용)
 import type { Messages } from "@/i18n/server";
 import type { Lesson } from "@/lib/lessons";
-import type { QuickLabels } from "@/components/calendar/LessonQuick";
+
+// 옆 칸의 완료·결석 버튼 문구
+export type QuickLabels = {
+  complete: string;
+  absent: string;
+  details: string;
+  close: string;
+  processing: string;
+  confirmComplete: string;
+  confirmCompleteNoCredits: string; // "{n}"
+  confirmAbsent: string;
+  errors: Record<string, string>; // statusErrors
+};
 
 export function quickLabels(t: Messages["calendar"]): QuickLabels {
   return {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useActionForm } from "@/lib/use-action-form";
 import { saveLesson, type LessonFormState } from "@/lib/lesson-actions";
 import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
@@ -17,6 +17,13 @@ type Props = {
   zoneLabel: string; // "한국" 등 — 입력 기준 시간대 안내용
   cancelHref: string;
   keepDuration?: boolean; // 달력에서 드래그로 길이를 정해 왔으면 학생을 골라도 길이를 바꾸지 않음
+  // 달력 옆 칸에서 쓸 때: 저장해도 페이지를 옮기지 않고 onSaved 호출
+  panel?: {
+    onCancel: () => void;
+    onSaved: (saved: NonNullable<LessonFormState["saved"]>) => void;
+    // 달력에서 빈 시간을 누를 때마다 바뀜 (n 이 바뀌면 날짜·시각을 새로 받음)
+    slot?: { date: string; time: string; duration?: number; n: number };
+  };
   initial: {
     lessonId?: string;
     studentId: string;
@@ -27,13 +34,27 @@ type Props = {
   };
 };
 
-export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDuration, initial }: Props) {
+export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDuration, panel, initial }: Props) {
   const [state, onSubmit, pending] = useActionForm<LessonFormState>(saveLesson, {});
   // 값을 직접 들고 있어서, 경고·오류가 나도 입력한 내용이 사라지지 않음
   const [values, setValues] = useState(initial);
   const set = (key: keyof typeof values) => (e: { target: { value: string } }) =>
     setValues((v) => ({ ...v, [key]: key === "duration" ? Number(e.target.value) : e.target.value }));
   const errors = state.errors ?? {};
+
+  // 옆 칸에서 빈 시간을 다시 고르면 날짜·시각(·드래그 길이)만 바꿈. 고른 학생·메모는 그대로
+  const slot = panel?.slot;
+  const [slotN, setSlotN] = useState(slot?.n);
+  if (slot && slot.n !== slotN) {
+    setSlotN(slot.n);
+    setValues((v) => ({ ...v, date: slot.date, time: slot.time, duration: slot.duration ?? v.duration }));
+  }
+
+  // 옆 칸에서 저장이 끝나면 알려 줌 (저장할 때마다 새 결과가 와서 한 번씩만 실행)
+  const onSaved = panel?.onSaved;
+  useEffect(() => {
+    if (state.saved) onSaved?.(state.saved);
+  }, [state.saved, onSaved]);
 
   // 학생을 고르면 그 학생의 수업 길이로 자동 변경 (달력에서 드래그로 길이를 정해 왔으면 유지)
   const chooseStudent = (id: string) => {
@@ -48,6 +69,7 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDur
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
       {values.lessonId && <input type="hidden" name="lesson_id" value={values.lessonId} />}
+      {panel && <input type="hidden" name="stay" value="1" />}
 
       <label className="block text-sm font-medium">
         {t.student}
@@ -130,7 +152,7 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDur
         </p>
       )}
 
-      <FormButtons cancelHref={cancelHref} pending={pending} t={t} />
+      <FormButtons cancelHref={cancelHref} onCancel={panel?.onCancel} pending={pending} t={t} />
     </form>
   );
 }
