@@ -17,11 +17,12 @@ type Props = {
   lessonId: string;
   status: LessonStatus;
   remaining: number;
+  units: number; // 이 수업이 몇 회인지 (30분 = 1회)
   hoursBefore: number; // 무료 취소 기준 (설정 값)
   now: { date: string; time: string }; // 내 시간대의 지금 (취소 시각 기본값)
 };
 
-export default function LessonStatusPanel({ t, lessonId, status, remaining, hoursBefore, now }: Props) {
+export default function LessonStatusPanel({ t, lessonId, status, remaining, units, hoursBefore, now }: Props) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -96,7 +97,7 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
             t.checking
           ) : (
             <>
-              <p className="font-semibold">{p.free ? `✅ ${t.cancelPreviewFree}` : `⚠️ ${t.cancelPreviewCharged}`}</p>
+              <p className="font-semibold">{p.free ? `✅ ${t.cancelPreviewFree}` : `⚠️ ${format(t.cancelPreviewCharged, { units })}`}</p>
               <p className="mt-0.5">{format(t.reasons[p.reason], { hours: hoursBefore, n: p.cancels })}</p>
             </>
           )}
@@ -132,7 +133,7 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
           type="button"
           disabled={pending}
           onClick={() =>
-            run("complete", remaining <= 0 ? format(t.confirmCompleteNoCredits, { n: remaining }) : t.confirmComplete)
+            run("complete", remaining < units ? format(t.confirmCompleteNoCredits, { n: remaining }) : format(t.confirmComplete, { units }))
           }
           className={`${big} bg-brand-600 text-white`}
         >
@@ -144,7 +145,7 @@ export default function LessonStatusPanel({ t, lessonId, status, remaining, hour
         <button
           type="button"
           disabled={pending}
-          onClick={() => run("absent", t.confirmAbsent)}
+          onClick={() => run("absent", format(t.confirmAbsent, { units }))}
           className={`${big} border border-red-200 text-red-700`}
         >
           {t.actions.absent}

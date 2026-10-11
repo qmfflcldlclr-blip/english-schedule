@@ -14,7 +14,7 @@ import { feedbackCopyText, kindIcon, kindStyle } from "@/components/feedback/kin
 import CopyFeedbackButton from "@/components/feedback/CopyFeedbackButton";
 import { quickLessonStatus } from "@/lib/lesson-status-actions";
 import { removeLesson, saveLessonMemo } from "@/lib/lesson-actions";
-import { FEEDBACK_MAX, NOTE_MAX } from "@/config/rules";
+import { FEEDBACK_MAX, NOTE_MAX, creditUnits } from "@/config/rules";
 
 type FeedbackKindKey = keyof typeof kindIcon;
 import { addMonths } from "@/lib/print-layout";
@@ -36,6 +36,7 @@ export type MonthSummary = {
   month: string; // "YYYY-MM"
   lessons: number;
   minutes: number;
+  credits: number; // 횟수 환산 (30분 = 1회)
   doneMinutes: number;
   byMinutes: [number, number][]; // [수업 길이, 횟수] 짧은 순
   completed: number;
@@ -112,6 +113,7 @@ function Home({ t, students, weekStudents, summary, locale }: Props) {
       <section className="mb-5 rounded-xl bg-brand-50 p-3">
         <h2 className="font-bold text-brand-900">{format(p.monthTitle, { month: monthLabel })}</h2>
         <p className="mt-1 text-lg font-semibold">{format(p.monthTotal, { n: summary.lessons, time: time(summary.minutes) })}</p>
+        <p className="text-sm text-brand-800">{format(p.monthCredits, { n: summary.credits })}</p>
         {summary.byMinutes.length > 0 && (
           <ul className="mt-1 flex flex-wrap gap-1.5 text-sm">
             {summary.byMinutes.map(([m, n]) => (
@@ -296,7 +298,8 @@ function LessonView(props: Props & { lessonId: string }) {
   const showStudent = () => panel.open({ mode: "student", studentId: lesson.student_id });
 
   const run = (action: "complete" | "absent") => {
-    if (!window.confirm(action === "complete" ? labels.confirmComplete : labels.confirmAbsent)) return;
+    const units = { units: creditUnits(lesson.duration_minutes) };
+    if (!window.confirm(format(action === "complete" ? labels.confirmComplete : labels.confirmAbsent, units))) return;
     setError(null);
     startTransition(async () => {
       let result = await quickLessonStatus(lesson.id, action);
@@ -342,6 +345,7 @@ function LessonView(props: Props & { lessonId: string }) {
             <LessonTime startsAt={lesson.starts_at} timeZone={timeZone} otherTimeZone={otherTimeZone} locale={locale} otherLabel={t.otherTime} />
             {" · "}
             {format(t.minutesUnit, { n: lesson.duration_minutes })}
+            <span className="ml-1 text-gray-400">({format(t.creditUnits, { units: creditUnits(lesson.duration_minutes) })})</span>
           </p>
         </div>
         <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusBadge[lesson.status]}`}>{statusText(lesson, t)}</span>

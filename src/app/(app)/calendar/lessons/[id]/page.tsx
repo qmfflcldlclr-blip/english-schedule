@@ -10,6 +10,7 @@ import ZoomButton from "@/components/ZoomButton";
 import { listStudents } from "@/lib/students";
 import { formatDay, toZoned } from "@/lib/time";
 import { zoneName } from "@/config/timezones";
+import { creditUnits } from "@/config/rules";
 import LessonForm from "@/components/calendar/LessonForm";
 import DeleteLessonButton from "@/components/calendar/DeleteLessonButton";
 import { deleteLesson } from "@/lib/lesson-actions";
@@ -81,6 +82,7 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
         lessonId={lesson.id}
         status={lesson.status}
         remaining={remaining}
+        units={creditUnits(lesson.duration_minutes)}
         hoursBefore={settings.freeCancelHoursBefore}
         now={{ date: now.date, time: now.time }}
       />

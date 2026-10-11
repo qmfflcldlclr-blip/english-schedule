@@ -73,10 +73,11 @@ export default function PlanForm({ t, studentId, today, plan }: Props) {
         <input
           name="credits"
           type="number"
-          inputMode="numeric"
+          inputMode="decimal"
           required={!plan}
           disabled={Boolean(plan)}
-          min={1}
+          min={0.5}
+          step={0.5}
           max={PLAN_CREDITS_MAX}
           defaultValue={plan?.credits}
           aria-invalid={errors.credits || undefined}

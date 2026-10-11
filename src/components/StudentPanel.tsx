@@ -252,7 +252,7 @@ function QuickPlan({ t, studentId, today, onSaved }: { t: Messages["credits"]; s
       <div className="mt-2 flex items-end gap-2">
         <label className="block flex-1 text-xs font-medium text-gray-600">
           {t.credits}
-          <input name="credits" type="number" inputMode="numeric" required min={1} max={PLAN_CREDITS_MAX} placeholder="10" className={`${field} min-h-11`} />
+          <input name="credits" type="number" inputMode="decimal" required min={0.5} step={0.5} max={PLAN_CREDITS_MAX} placeholder="10" className={`${field} min-h-11`} />
         </label>
         <button type="submit" disabled={pending} className="min-h-11 shrink-0 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-60">
           {pending ? t.saving : t.save}
@@ -314,7 +314,7 @@ function QuickAdjust({ t, studentId, onSaved }: { t: Messages["credits"]; studen
       <div className="mt-2 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2">
         <label className="block text-xs font-medium text-gray-600">
           {t.amount}
-          <input name="amount" type="number" inputMode="numeric" required min={1} max={ADJUST_MAX} defaultValue={1} className={`${field} min-h-11`} />
+          <input name="amount" type="number" inputMode="decimal" required min={0.5} step={0.5} max={ADJUST_MAX} defaultValue={1} className={`${field} min-h-11`} />
         </label>
         <label className="block text-xs font-medium text-gray-600">
           {t.reason}

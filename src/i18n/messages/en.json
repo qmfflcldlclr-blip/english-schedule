@@ -275,15 +275,15 @@
       "revert": "Revert"
     },
     "processing": "Processing…",
-    "confirmComplete": "Mark this class as completed? 1 credit will be used.",
+    "confirmComplete": "Mark this class as completed? {units} credit(s) will be used.",
     "confirmCompleteNoCredits": "This student has {n} credits left. Complete anyway? The balance will go negative.",
-    "confirmAbsent": "Mark as absent (no-show)? 1 credit will be used.",
+    "confirmAbsent": "Mark as absent (no-show)? {units} credit(s) will be used.",
     "confirmRevert": "Revert to \"Scheduled\"? Any credit change from this class will be undone.",
     "cancelTitle": "Cancel class",
     "cancelledAt": "When the cancellation was received",
     "cancelledAtHint": "Defaults to now. If you were told earlier, change it to that time.",
     "cancelPreviewFree": "Free cancellation — no credit used.",
-    "cancelPreviewCharged": "1 credit will be used.",
+    "cancelPreviewCharged": "{units} credit(s) will be used.",
     "checking": "Checking…",
     "confirmCancel": "Cancel class",
     "back": "Back",
@@ -303,7 +303,7 @@
       "unknown": "Could not process. Please try again."
     },
     "print": "Print",
-    "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length. Drag a scheduled class to move it to another day or time.",
+    "slotHint": "Click an empty time to add a class there, or drag to set the time and length. Drag a scheduled class to move it to another day or time.",
     "confirmMove": "Move {name}'s class?\n{from} → {to}",
     "moveOverlap": "This overlaps another class: {list}\nMove anyway?",
     "moveFailed": "Could not move. Only scheduled classes can be moved. Please refresh the page.",
@@ -326,7 +326,7 @@
       "studentPage": "Student info",
       "close": "Close",
       "home": "Back",
-      "slotHint": "While this form is open, click an empty time on the calendar to change the date and time.",
+      "slotHint": "While this form is open, click an empty time on the calendar to change only the date and time.",
       "lessonGone": "Class not found. It may have been deleted.",
       "loading": "Loading…",
       "archived": "Archived",
@@ -366,13 +366,15 @@
         "content": "Enter the feedback (up to 2000 characters).",
         "save": "Could not save. Please try again.",
         "setup": "Database setup needed. Run the 0017 (class feedback) file in the Supabase SQL Editor."
-      }
+      },
+      "monthCredits": "= {n} credits (30 min = 1)"
     },
     "copyFrom": "Copy from",
     "copyPick": "Pick another date",
     "copyWeekItem": "{range} · {n}",
     "copyThisWeek": "Copy to",
-    "holidaySkip": "Holiday · {name}"
+    "holidaySkip": "Holiday · {name}",
+    "creditUnits": "uses {units}"
   },
   "settings": {
     "title": "Settings",

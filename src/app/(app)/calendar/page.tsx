@@ -26,6 +26,7 @@ import { addMonths } from "@/lib/print-layout";
 import { listStudents } from "@/lib/students";
 import { lessonIdsWithFeedback } from "@/lib/feedback";
 import { zoneName } from "@/config/timezones";
+import { creditUnits } from "@/config/rules";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
 import { getSettings } from "@/lib/settings";
 import { flag, getHolidays } from "@/lib/holidays";
@@ -83,6 +84,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
     month,
     lessons: counted.length,
     minutes: counted.reduce((sum, l) => sum + l.duration_minutes, 0),
+    credits: counted.reduce((sum, l) => sum + creditUnits(l.duration_minutes), 0),
     doneMinutes: counted.filter((l) => l.status === "completed").reduce((sum, l) => sum + l.duration_minutes, 0),
     byMinutes: [...lengths].sort((a, b) => a[0] - b[0]),
     completed: monthLessons.filter((l) => l.status === "completed").length,

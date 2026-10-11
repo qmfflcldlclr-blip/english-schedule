@@ -21,8 +21,8 @@ type Props = {
   minutesUnit: string; // "{n}분"
 };
 
-// PC 주간 시간표 하루 칸의 빈 곳: 더블클릭 → 그 시각으로 추가, 드래그 → 시작 시각 + 길이로 추가 (15분 단위).
-// 추가 폼은 옆 칸(좁은 화면은 아래 창)에 뜨고, 폼이 열려 있는 동안 빈 곳을 한 번 누르면 날짜·시각만 바뀜.
+// PC 주간 시간표 하루 칸의 빈 곳: 한 번 누르기 → 그 시각으로 추가, 드래그 → 시작 시각 + 길이로 추가 (15분 단위).
+// 추가 폼은 옆 칸(좁은 화면은 아래 창)에 뜨고, 폼이 이미 열려 있으면 고른 학생·메모는 두고 날짜·시각만 바뀜.
 // 자정 넘은 칸은 다음 날 날짜로 넘김. 수업 칸은 이 위에 그려져서 클릭이 그대로 수업으로 감
 export default function DaySlots({ date, fromHour, toHour, hourPx, hint, minutesUnit }: Props) {
   const panel = usePanel();
@@ -36,8 +36,6 @@ export default function DaySlots({ date, fromHour, toHour, hourPx, hint, minutes
     return Math.min(Math.max(snapped, fromHour * 60), toHour * 60 - step);
   };
   const open = (start: number, duration?: number) => panel.openNew({ ...scheduleToActual(date, start), duration });
-  // 새 수업 폼이 열려 있을 때 한 번 누르기 → 폼의 날짜·시각만 바꿈
-  const pick = (start: number) => panel.pickSlot({ ...scheduleToActual(date, start) });
 
   // 드래그 범위 → 시작, 길이 (위로 끌어도 됨)
   const range = drag && {
@@ -62,11 +60,10 @@ export default function DaySlots({ date, fromHour, toHour, hourPx, hint, minutes
       }}
       onPointerUp={() => {
         if (range && drag && drag.end !== drag.start) open(range.start, range.length);
-        else if (drag) pick(drag.start);
+        else if (drag) open(drag.start); // 한 번 누르기
         setDrag(null);
       }}
       onPointerLeave={() => setHover(null)}
-      onDoubleClick={(e) => open(minutesAt(e, SNAP))}
     >
       {range ? (
         <div

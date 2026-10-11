@@ -275,15 +275,15 @@
       "revert": "되돌리기"
     },
     "processing": "처리 중…",
-    "confirmComplete": "이 수업을 완료 처리할까요? 1회 차감됩니다.",
+    "confirmComplete": "이 수업을 완료 처리할까요? {units}회 차감됩니다.",
     "confirmCompleteNoCredits": "남은 횟수가 {n}회입니다. 그래도 완료 처리할까요? 남은 횟수가 마이너스가 됩니다.",
-    "confirmAbsent": "결석(노쇼)으로 처리할까요? 1회 차감됩니다.",
+    "confirmAbsent": "결석(노쇼)으로 처리할까요? {units}회 차감됩니다.",
     "confirmRevert": "\"예정\"으로 되돌릴까요? 이 수업으로 바뀐 횟수가 원래대로 돌아옵니다.",
     "cancelTitle": "수업 취소",
     "cancelledAt": "취소 연락 받은 시각",
     "cancelledAtHint": "기본값은 지금입니다. 미리 연락받았다면 그 시각으로 바꾸세요.",
     "cancelPreviewFree": "무료 취소 가능 — 차감되지 않습니다.",
-    "cancelPreviewCharged": "1회 차감됩니다.",
+    "cancelPreviewCharged": "{units}회 차감됩니다.",
     "checking": "확인 중…",
     "confirmCancel": "취소 처리",
     "back": "돌아가기",
@@ -303,7 +303,7 @@
       "unknown": "처리하지 못했습니다. 다시 시도해 주세요."
     },
     "print": "인쇄",
-    "slotHint": "빈 시간을 더블클릭하면 그 시간으로, 드래그하면 그 시간과 길이로 수업을 추가할 수 있어요. 예정 수업 칸을 끌어서 다른 날·시간으로 옮길 수도 있어요.",
+    "slotHint": "빈 시간을 누르면 그 시간으로, 드래그하면 그 시간과 길이로 수업을 추가할 수 있어요. 예정 수업 칸을 끌어서 다른 날·시간으로 옮길 수도 있어요.",
     "confirmMove": "{name} 수업을 옮길까요?\n{from} → {to}",
     "moveOverlap": "옮길 시간에 겹치는 수업이 있어요: {list}\n그래도 옮길까요?",
     "moveFailed": "옮기지 못했습니다. 예정 수업만 옮길 수 있어요. 화면을 새로고침해 주세요.",
@@ -326,7 +326,7 @@
       "studentPage": "학생 정보",
       "close": "닫기",
       "home": "처음으로",
-      "slotHint": "폼이 열려 있는 동안 달력의 빈 시간을 누르면 날짜·시간이 바뀌어요.",
+      "slotHint": "폼이 열려 있는 동안 달력의 빈 시간을 누르면 날짜·시간만 바뀌어요.",
       "lessonGone": "수업을 찾을 수 없어요. 삭제됐을 수 있어요.",
       "loading": "불러오는 중…",
       "archived": "보관됨",
@@ -366,13 +366,15 @@
         "content": "내용을 입력하세요 (2000자까지).",
         "save": "저장하지 못했습니다. 다시 시도해 주세요.",
         "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0017(수업 피드백) 파일을 실행해 주세요."
-      }
+      },
+      "monthCredits": "횟수 환산 {n}회 (30분 = 1회)"
     },
     "copyFrom": "가져올 주",
     "copyPick": "다른 날짜로 고르기",
     "copyWeekItem": "{range} · {n}개",
     "copyThisWeek": "넣을 주",
-    "holidaySkip": "공휴일 · {name}"
+    "holidaySkip": "공휴일 · {name}",
+    "creditUnits": "{units}회 차감"
   },
   "settings": {
     "title": "설정",

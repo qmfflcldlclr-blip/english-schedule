@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { ADJUST_MAX, PLAN_CREDITS_MAX } from "@/config/rules";
+import { ADJUST_MAX, PLAN_CREDITS_MAX, isHalfStep } from "@/config/rules";
 
 export type PlanFormState = {
   errors?: {
@@ -33,7 +33,7 @@ export async function savePlan(
   const errors: NonNullable<PlanFormState["errors"]> = {};
   if (
     !planId &&
-    (!Number.isInteger(credits) || credits < 1 || credits > PLAN_CREDITS_MAX)
+    (!isHalfStep(credits) || credits < 0.5 || credits > PLAN_CREDITS_MAX)
   ) {
     errors.credits = true;
   }
@@ -88,7 +88,7 @@ export async function adjustCredits(
   const reason = String(formData.get("reason") ?? "").trim();
 
   const errors: NonNullable<AdjustFormState["errors"]> = {};
-  if (!Number.isInteger(amount) || amount < 1 || amount > ADJUST_MAX) {
+  if (!isHalfStep(amount) || amount < 0.5 || amount > ADJUST_MAX) {
     errors.amount = true;
   }
   if (!reason) errors.reason = true;

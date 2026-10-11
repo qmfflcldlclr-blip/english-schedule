@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getLesson, getRemaining } from "@/lib/lessons";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { fromZoned, isDate, isTime } from "@/lib/time";
+import { creditUnits } from "@/config/rules";
 
 export type CancelReason = "early_first" | "within_hour" | "monthly_limit";
 export type CancelPreview =
@@ -72,7 +73,8 @@ export async function quickLessonStatus(
     const lesson = await getLesson(lessonId);
     if (!lesson) return { error: "unknown" };
     const remaining = await getRemaining(lesson.student_id);
-    if (remaining <= 0) return { confirmRemaining: remaining };
+    // 이 수업만큼(예: 60분 = 2회) 빼면 마이너스가 되면 한 번 더 확인
+    if (remaining < creditUnits(lesson.duration_minutes)) return { confirmRemaining: remaining };
   }
   const supabase = await createClient();
   const { error } = await supabase.rpc("set_lesson_status", { p_lesson_id: lessonId, p_action: action });

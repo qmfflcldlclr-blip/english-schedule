@@ -19,8 +19,6 @@ type PanelContext = {
   view: PanelView;
   open: (view: PanelView) => void;
   openNew: (slot: NewSlot) => void;
-  // 새 수업 폼이 열려 있으면 날짜·시각만 바꾸고 true (아니면 아무 일도 안 하고 false)
-  pickSlot: (slot: Omit<NewSlot, "studentId">) => boolean;
   close: () => void;
   version: number; // 저장·처리 후 1씩 늘어남 → 옆 칸이 내용을 다시 가져옴
   refresh: () => void; // 달력 새로 그리기 + 옆 칸 다시 가져오기
@@ -45,21 +43,11 @@ export function CalendarPanelProvider({ children, initial }: { children: React.R
     [],
   );
 
-  const pickSlot = useCallback(
-    (s: Omit<NewSlot, "studentId">) => {
-      if (view.mode !== "new") return false;
-      openNew(s);
-      return true;
-    },
-    [view.mode, openNew],
-  );
-
   const value = useMemo<PanelContext>(
     () => ({
       view,
       open: setView,
       openNew,
-      pickSlot,
       close: () => setView({ mode: "home" }),
       version,
       refresh: () => {
@@ -67,7 +55,7 @@ export function CalendarPanelProvider({ children, initial }: { children: React.R
         setVersion((n) => n + 1);
       },
     }),
-    [view, openNew, pickSlot, version, router],
+    [view, openNew, version, router],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

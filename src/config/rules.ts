@@ -24,3 +24,16 @@ export const AUTO_ARCHIVE_DAYS = 30;
 
 // 홈 공지: 남은 횟수가 이 값 이하인 학생을 보여 줌 (0회·마이너스 포함)
 export const LOW_CREDIT_THRESHOLD = 3;
+
+// 횟수 차감 기준: 이 길이(분) 수업 = 1회. 15분 = 0.5회, 45분 = 1.5회, 60분 = 2회 (데이터베이스 0018 설정과 같은 값)
+export const CREDIT_BASE_MINUTES = 30;
+
+// 수업 1개가 몇 회인지 (0.5회 단위 반올림, 최소 0.5회) — 데이터베이스 함수 lesson_credit_units 와 같은 계산
+export function creditUnits(minutes: number) {
+  return Math.max(0.5, Math.round((minutes * 2) / CREDIT_BASE_MINUTES) / 2);
+}
+
+// 0.5회 단위인지 (플랜·조정 입력 검사)
+export function isHalfStep(n: number) {
+  return Number.isFinite(n) && Math.round(n * 2) === n * 2;
+}
