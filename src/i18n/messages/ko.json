@@ -99,7 +99,9 @@
     "nameEn": "영어 이름",
     "nameEnHint": "비워 두면 영어 화면에서 자동으로 바꿔 보여 줘요: {auto}",
     "privateNote": "개별 노트",
-    "sharedNote": "공유 노트"
+    "sharedNote": "공유 노트",
+    "showOriginal": "원문 보기",
+    "showTranslated": "번역 보기"
   },
   "credits": {
     "title": "수강 횟수",

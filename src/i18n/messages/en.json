@@ -99,7 +99,9 @@
     "nameEn": "English name",
     "nameEnHint": "Leave empty to show it automatically: {auto}",
     "privateNote": "Private notes",
-    "sharedNote": "Shared notes"
+    "sharedNote": "Shared notes",
+    "showOriginal": "Show original",
+    "showTranslated": "Show translation"
   },
   "credits": {
     "title": "Class credits",

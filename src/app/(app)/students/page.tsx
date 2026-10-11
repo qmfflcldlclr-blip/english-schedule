@@ -5,6 +5,7 @@ import { listStudents } from "@/lib/students";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getCreditOverview } from "@/lib/credits";
 import { listNotesByStudent } from "@/lib/student-notes";
+import { translateMany } from "@/lib/translate";
 import { todayIn } from "@/lib/credit-math";
 import { EmptyStudentsArt } from "@/components/Illustrations";
 import StudentList from "@/components/StudentList";
@@ -23,7 +24,7 @@ export default async function StudentsPage({
 }: PageProps<"/students">) {
   const showArchived = (await searchParams).show === "archived";
   const archivedNow = showArchived ? 0 : await autoArchive(); // 목록을 읽기 전에 먼저 정리
-  const [{ t: all }, profile, students, notes] = await Promise.all([
+  const [{ locale, t: all }, profile, students, notes] = await Promise.all([
     getDictionary(),
     getCurrentProfile(),
     listStudents(showArchived),
@@ -34,11 +35,17 @@ export default async function StudentsPage({
     students.map((s) => s.id),
     todayIn(profile?.timezone ?? "UTC"),
   );
+  // 노트 번역 (화면 언어와 다른 글만, 한 번에)
+  const noteOf = (id: string) => notes.get(id) ?? { privateNote: "", sharedNote: "" };
+  const translated = await translateMany(
+    students.flatMap((st) => [noteOf(st.id).privateNote, noteOf(st.id).sharedNote]),
+    locale,
+  );
   const creditsOf = (id: string) =>
     overview.get(id) ?? { remaining: 0, expired: false };
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">
+    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">
           {t.title}
@@ -76,11 +83,12 @@ export default async function StudentsPage({
         </div>
       ) : (
         <StudentList
-          students={students.map((st) => ({
+          students={students.map((st, i) => ({
             ...st,
             ...creditsOf(st.id),
-            privateNote: notes.get(st.id)?.privateNote ?? "",
-            sharedNote: notes.get(st.id)?.sharedNote ?? "",
+            ...noteOf(st.id),
+            privateNoteT: translated[i * 2],
+            sharedNoteT: translated[i * 2 + 1],
           }))}
           archivedView={showArchived}
           autoArchiveDays={AUTO_ARCHIVE_DAYS}

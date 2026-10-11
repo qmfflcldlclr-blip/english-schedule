@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import { matchesSearch } from "@/lib/search";
+import { LOW_CREDIT_THRESHOLD } from "@/config/rules";
 import { archiveStudents, deleteStudentsPermanently, type BulkResult } from "@/lib/student-actions";
 
 export type StudentRow = {
@@ -14,6 +15,8 @@ export type StudentRow = {
   label: string; // 동명이인은 "김민준 #2"
   privateNote: string; // 내 개별용 노트
   sharedNote: string; // 공유용 노트
+  privateNoteT?: string | null; // 화면 언어로 번역한 노트 (번역 필요 없으면 null)
+  sharedNoteT?: string | null;
   lesson_minutes: number;
   remaining: number;
   expired: boolean;
@@ -34,8 +37,12 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
+  // 노트: 번역(기본) ↔ 원문. 번역된 노트가 하나라도 있을 때만 버튼을 보여 줌
+  const [original, setOriginal] = useState(false);
+  const hasTranslation = students.some((s) => s.privateNoteT || s.sharedNoteT);
+  const note = (text: string, translated?: string | null) => (!original && translated) || text;
 
-  const shown = students.filter((s) => matchesSearch(`${s.label} ${s.name} ${s.privateNote} ${s.sharedNote}`, query));
+  const shown = students.filter((s) => matchesSearch(`${s.label} ${s.name} ${s.privateNote} ${s.sharedNote} ${s.privateNoteT ?? ""} ${s.sharedNoteT ?? ""}`, query));
   const zero = archivedView ? [] : shown.filter((s) => s.remaining === 0);
   const main = archivedView ? shown : shown.filter((s) => s.remaining !== 0);
 
@@ -72,10 +79,18 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
     startTransition(async () => finish(await deleteStudentsPermanently(ids)));
   };
 
-  // 남은 횟수 + "기간 지남" 표시 (0회 이하면 빨간색)
+  // 남은 횟수 배지 + "기간 지남" 표시 (0회 이하 빨강, 얼마 안 남으면 주황, 넉넉하면 초록)
   const remaining = (s: StudentRow) => (
     <span className="inline-flex items-center gap-1.5">
-      <span className={`font-semibold tabular-nums ${s.remaining <= 0 ? "text-red-600" : ""}`}>
+      <span
+        className={`inline-flex min-w-12 justify-center rounded-full px-2.5 py-0.5 text-sm font-bold tabular-nums ${
+          s.remaining <= 0
+            ? "bg-red-100 text-red-700"
+            : s.remaining <= LOW_CREDIT_THRESHOLD
+              ? "bg-amber-100 text-amber-800"
+              : "bg-emerald-100 text-emerald-800"
+        }`}
+      >
         {format(t.timesUnit, { n: s.remaining })}
       </span>
       {s.expired && (
@@ -114,8 +129,8 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
                 {/* 영어 화면: 한글 이름도 작게 */}
                 {!s.label.startsWith(s.name) && <span className="ml-1.5 text-sm font-normal text-gray-400">{s.name}</span>}
               </p>
-              {s.privateNote && <p className="truncate text-sm text-gray-500">🔒 {s.privateNote}</p>}
-              {s.sharedNote && <p className="truncate text-sm text-gray-500">👥 {s.sharedNote}</p>}
+              {s.privateNote && <p className="truncate text-sm text-gray-500">🔒 {note(s.privateNote, s.privateNoteT)}</p>}
+              {s.sharedNote && <p className="truncate text-sm text-gray-500">👥 {note(s.sharedNote, s.sharedNoteT)}</p>}
             </div>
             <div className="shrink-0 text-right">
               {remaining(s)}
@@ -127,56 +142,66 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
     </ul>
   );
 
-  // PC: 표
-  const table = (rows: StudentRow[], withHeader: boolean) => (
-    <table className="hidden w-full rounded-2xl bg-white text-left shadow-sm md:table">
-      {withHeader && (
-        <thead className="border-b border-gray-200 text-sm text-gray-500">
-          <tr>
-            <th className="w-14 min-w-14 py-2 pr-3 pl-4">
-              <input
-                type="checkbox"
-                checked={allShownSelected}
-                onChange={toggleAll}
-                aria-label={t.selectAll}
-                className="size-5 cursor-pointer accent-brand-600"
-              />
-            </th>
-            <th className="py-2 pr-4 font-medium">{t.name}</th>
-            <th className="py-2 pr-4 font-medium">{t.remaining}</th>
-            <th className="py-2 pr-4 font-medium">{t.lessonMinutes}</th>
-            <th className="py-2 pr-4 font-medium">🔒 {t.privateNote}</th>
-            <th className="py-2 pr-4 font-medium">👥 {t.sharedNote}</th>
-          </tr>
-        </thead>
+  // PC: 표 (머리글 회색 띠, 줄마다 옅은 줄무늬, 노트는 두 줄까지)
+  const noteCell = (text: string, translated?: string | null) => (
+    <td className="w-1/2 max-w-0 px-3 py-3 align-top text-sm text-gray-600" title={text || undefined}>
+      {text ? (
+        <p className="line-clamp-2 break-words whitespace-pre-line">{note(text, translated)}</p>
+      ) : (
+        <span className="text-gray-300">—</span>
       )}
-      <tbody>
-        {rows.map((s) => (
-          <tr
-            key={s.id}
-            className={`border-b border-gray-100 last:border-0 hover:bg-gray-50 ${selected.has(s.id) ? "bg-brand-50/60" : ""}`}
-          >
-            <td className="w-14 min-w-14 py-3 pr-3 pl-4">
-              {check(s)}
-            </td>
-            {/* 이름은 항상 한 줄 (영어 이름이 길어도). 메모가 길면 메모 쪽을 "…"으로 줄임 */}
-            <td className="py-3 pr-4 whitespace-nowrap">
-              <Link href={`/students/${s.id}`} className="font-semibold hover:underline">
-                {s.label}
-              </Link>
-              {!s.label.startsWith(s.name) && <span className="ml-2 text-sm text-gray-400">{s.name}</span>}
-            </td>
-            <td className="w-40 py-3 pr-4 whitespace-nowrap">
-              {remaining(s)}
-            </td>
-            <td className="w-28 py-3 pr-4 whitespace-nowrap text-gray-600">{format(t.minutesUnit, { n: s.lesson_minutes })}</td>
-            {/* 노트가 길면 "…"으로 줄임 (마우스를 올리면 전체) */}
-            <td className="w-1/2 max-w-0 truncate py-3 pr-4 text-gray-500" title={s.privateNote || undefined}>{s.privateNote}</td>
-            <td className="w-1/2 max-w-0 truncate py-3 pr-4 text-gray-500" title={s.sharedNote || undefined}>{s.sharedNote}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    </td>
+  );
+  const table = (rows: StudentRow[], withHeader: boolean) => (
+    <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm md:block">
+      <table className="w-full text-left">
+        {withHeader && (
+          <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+            <tr>
+              <th className="w-14 min-w-14 py-3 pr-3 pl-4">
+                <input
+                  type="checkbox"
+                  checked={allShownSelected}
+                  onChange={toggleAll}
+                  aria-label={t.selectAll}
+                  className="size-5 cursor-pointer accent-brand-600"
+                />
+              </th>
+              <th className="py-3 pr-4 whitespace-nowrap">{t.name}</th>
+              <th className="py-3 pr-4 whitespace-nowrap">{t.remaining}</th>
+              <th className="py-3 pr-4 whitespace-nowrap">{t.lessonMinutes}</th>
+              <th className="px-3 py-3 whitespace-nowrap">🔒 {t.privateNote}</th>
+              <th className="px-3 py-3 whitespace-nowrap">👥 {t.sharedNote}</th>
+            </tr>
+          </thead>
+        )}
+        <tbody className="divide-y divide-gray-100">
+          {rows.map((s) => (
+            <tr
+              key={s.id}
+              className={`transition-colors hover:bg-brand-50/60 ${selected.has(s.id) ? "bg-brand-50" : "even:bg-gray-50/60"}`}
+            >
+              <td className="w-14 min-w-14 py-3 pr-3 pl-4 align-top">{check(s)}</td>
+              {/* 이름은 항상 한 줄 (영어 이름이 길어도) */}
+              <td className="py-3 pr-4 align-top whitespace-nowrap">
+                <Link href={`/students/${s.id}`} className="font-semibold text-gray-900 hover:text-brand-700 hover:underline">
+                  {s.label}
+                </Link>
+                {!s.label.startsWith(s.name) && <span className="block text-xs text-gray-400">{s.name}</span>}
+              </td>
+              <td className="py-3 pr-4 align-top whitespace-nowrap">{remaining(s)}</td>
+              <td className="py-3 pr-4 align-top whitespace-nowrap">
+                <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-sm text-gray-700">
+                  {format(t.minutesUnit, { n: s.lesson_minutes })}
+                </span>
+              </td>
+              {noteCell(s.privateNote, s.privateNoteT)}
+              {noteCell(s.sharedNote, s.sharedNoteT)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
   return (
@@ -195,6 +220,19 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
             className="min-h-12 w-full rounded-xl border border-gray-300 pr-3 pl-10 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none"
           />
         </label>
+        {/* 노트 번역 ↔ 원문 */}
+        {hasTranslation && (
+          <button
+            type="button"
+            onClick={() => setOriginal((v) => !v)}
+            aria-pressed={!original}
+            className={`flex min-h-12 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-sm font-medium ${
+              original ? "border-gray-300 bg-white text-gray-700" : "border-brand-300 bg-brand-50 text-brand-700"
+            }`}
+          >
+            🌐 <span className="hidden sm:inline">{original ? t.showTranslated : t.showOriginal}</span>
+          </button>
+        )}
         {/* 폰: 전체 선택 (PC는 표 머리글의 체크박스) */}
         <label className="flex min-h-12 shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-gray-300 bg-white px-3 text-sm md:hidden">
           <input type="checkbox" checked={allShownSelected} onChange={toggleAll} className="size-5 accent-brand-600" />
