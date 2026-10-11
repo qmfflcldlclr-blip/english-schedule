@@ -1,7 +1,7 @@
 // 반복 일정 계산 (데이터베이스 없이 순수 계산만)
 import { addDays, fromZoned, toZoned, weekStart } from "@/lib/time";
 
-// 요일 번호: 0=월 … 6=일 (화면의 요일 순서와 같음)
+// 요일 번호: 주의 첫날부터 0 … 6 (화면의 요일 순서와 같음, 지금은 0=일 … 6=토)
 export function weekdayOf(date: string) {
   return Math.round(
     (Date.parse(`${date}T00:00:00Z`) - Date.parse(`${weekStart(date)}T00:00:00Z`)) / 86_400_000,

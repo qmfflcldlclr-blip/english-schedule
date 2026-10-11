@@ -13,3 +13,7 @@ export const SLOT_MINUTES = 15;
 
 // PC 시간표 1시간 높이(px). 15분 수업도 한 줄이 보이도록 넉넉하게
 export const HOUR_PX = 112;
+
+// 한 주의 첫 요일 (0 = 일요일, 1 = 월요일). 달력·인쇄·지난주 복사·반복 요일 순서가 모두 따름
+// 바꿀 땐 번역 파일의 weekdayNames 순서도 같이 맞출 것
+export const WEEK_STARTS_ON = 0;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { quickLessonStatus } from "@/lib/lesson-status-actions";
 import { format } from "@/i18n/format";
+import { useLessonDrag, type MoveConfig } from "@/components/calendar/useLessonDrag";
 
 export type QuickLabels = {
   complete: string;
@@ -28,14 +29,17 @@ type Props = {
   style?: React.CSSProperties;
   title?: string;
   children: React.ReactNode; // 달력에 보이는 수업 칸 내용
+  move?: MoveConfig; // 있으면 PC 시간표에서 끌어서 옮기기 가능 (예정 수업만)
 };
 
 // 수업 칸을 누르면 작은 창: [✓ 완료] [✕ 결석] [자세히]. 처리 후 달력만 새로 그림
-export default function LessonQuick({ lessonId, scheduled, heading, sub, labels, className, style, title, children }: Props) {
+// move 가 있으면 칸을 끌어서 다른 날·시각으로 옮길 수 있음 (끌기 직후에는 창을 열지 않음)
+export default function LessonQuick({ lessonId, scheduled, heading, sub, labels, className, style, title, children, move }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const drag = useLessonDrag(lessonId, scheduled ? move : undefined);
 
   const run = (action: "complete" | "absent") => {
     if (!window.confirm(action === "complete" ? labels.confirmComplete : labels.confirmAbsent)) return;
@@ -61,13 +65,20 @@ export default function LessonQuick({ lessonId, scheduled, heading, sub, labels,
         type="button"
         title={title}
         onClick={() => {
+          if (drag.consumeClick()) return;
           setError(null);
           dialog.current?.showModal();
         }}
-        className={`text-left ${className ?? ""}`}
-        style={style}
+        {...drag.handlers}
+        className={`text-left ${move && scheduled ? "cursor-grab active:cursor-grabbing" : ""} ${drag.dragStyle ? "opacity-80 ring-2 ring-brand-500" : ""} ${drag.pending ? "animate-pulse" : ""} ${className ?? ""}`}
+        style={{ ...style, ...drag.dragStyle }}
       >
         {children}
+        {drag.dragLabel && (
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-brand-600/90 px-1 text-[11px] font-semibold whitespace-nowrap text-white">
+            {drag.dragLabel}
+          </span>
+        )}
       </button>
       <dialog
         ref={dialog}

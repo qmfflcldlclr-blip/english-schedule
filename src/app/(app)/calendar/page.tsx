@@ -33,15 +33,15 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   const timeZone = (profile?.timezone as string) ?? "UTC";
   const today = scheduleToday(timeZone); // 새벽 1시라면 아직 "어제"
   const selected = isDate(sp.date) ? sp.date : today;
-  const monday = weekStart(selected);
-  const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+  const weekFirst = weekStart(selected);
+  const days = Array.from({ length: 7 }, (_, i) => addDays(weekFirst, i));
 
   const [lessons, otherTimeZone, settings, holidays] = await Promise.all([
-    // 수업일 기준 한 주 (월요일 새벽 5시 ~ 다음 월요일 새벽 5시)
-    listLessons(scheduleDayStart(monday, timeZone), scheduleDayStart(addDays(monday, 7), timeZone)),
+    // 수업일 기준 한 주 (첫날 새벽 5시 ~ 다음 주 첫날 새벽 5시)
+    listLessons(scheduleDayStart(weekFirst, timeZone), scheduleDayStart(addDays(weekFirst, 7), timeZone)),
     getOtherTimeZone(profile?.id ?? "", timeZone),
     getSettings(),
-    getHolidays(monday, days[6]),
+    getHolidays(weekFirst, days[6]),
   ]);
 
   // 수업일별로 묶기 (내 시간대 기준, 새벽 수업은 전날)
@@ -58,8 +58,8 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4">
       <CalendarHeader
-        monday={monday}
-        sunday={days[6]}
+        weekFirst={weekFirst}
+        weekLast={days[6]}
         selected={selected}
         showToday={!days.includes(today)}
         today={today}

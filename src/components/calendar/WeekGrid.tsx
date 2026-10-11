@@ -1,4 +1,4 @@
-// PC 주간 시간표 (월~일 × 시간). 빈 시간 더블클릭·드래그로 추가, 수업 칸 누르면 수업 정보
+// PC 주간 시간표 (일~토 × 시간). 빈 시간 더블클릭·드래그로 추가, 수업 칸 누르면 수업 정보, 예정 수업 칸 끌면 옮기기
 import Link from "next/link";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
@@ -16,7 +16,7 @@ import { dayTone, toneText } from "@/components/calendar/day-tone";
 const ONE_LINE_BELOW_PX = 44;
 
 type Props = {
-  days: string[]; // 월~일
+  days: string[]; // 한 주 7일 (WEEK_STARTS_ON 부터)
   today: string;
   byDay: Record<string, Lesson[]>; // 수업일별 수업
   holidays: Record<string, Holiday[]>;
@@ -31,6 +31,7 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
   const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.otherTime };
   const tone = (d: string) => toneText[dayTone(d, Boolean(holidays[d]))];
   const labels = quickLabels(t);
+  const moveLabels = { confirmMove: t.confirmMove, moveOverlap: t.moveOverlap, moveFailed: t.moveFailed, overlapItem: t.overlapItem };
   const holidayText = (d: string) => (holidays[d] ?? []).map((h) => `${flag[h.country]} ${h.name}`).join(" · ");
 
   // 시간 범위 (기본 15시 ~ 다음 날 1시, 범위 밖 수업이 있으면 넓힘)
@@ -75,7 +76,7 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
 
         {/* 날짜별 칸 */}
         {days.map((d) => (
-          <div key={d} className={`relative border-l border-gray-200 ${d === today ? "bg-brand-50/40" : ""}`} style={{ height: hours.length * HOUR_PX }}>
+          <div key={d} data-day={d} className={`relative border-l border-gray-200 ${d === today ? "bg-brand-50/40" : ""}`} style={{ height: hours.length * HOUR_PX }}>
             {hours.map((h, i) => (
               <div key={h} className={`absolute inset-x-0 border-t ${h === 24 ? "border-gray-300 border-dashed" : "border-gray-100"}`} style={{ top: i * HOUR_PX }} />
             ))}
@@ -94,6 +95,7 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
                   heading={`${time} · ${l.studentName}`}
                   sub={`${minutes} · ${statusText(l, t)}`}
                   labels={labels}
+                  move={{ date: d, minutes: start, duration: l.duration_minutes, fromHour, hourPx: HOUR_PX, studentName: l.studentName, locale, labels: moveLabels }}
                   title={`${time} ${l.studentName} · ${minutes}`}
                   className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]}`}
                   style={{ top: ((start - fromHour * 60) / 60) * HOUR_PX, height }}

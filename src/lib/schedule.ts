@@ -34,12 +34,12 @@ export type CopyItem = {
   duplicate: boolean; // 이번 주 같은 학생·같은 시각에 이미 있음 → 건너뜀
 };
 
-// monday 가 속한 주로, 바로 전 주의 수업을 복사할 계획
-export async function planCopyWeek(monday: string, timeZone: string): Promise<CopyItem[]> {
+// weekFirst(주 첫날)가 속한 주로, 바로 전 주의 수업을 복사할 계획
+export async function planCopyWeek(weekFirst: string, timeZone: string): Promise<CopyItem[]> {
   const supabase = await createClient();
-  const prevFrom = fromZoned(addDays(monday, -7), "00:00", timeZone);
-  const thisFrom = fromZoned(monday, "00:00", timeZone);
-  const thisTo = fromZoned(addDays(monday, 7), "00:00", timeZone);
+  const prevFrom = fromZoned(addDays(weekFirst, -7), "00:00", timeZone);
+  const thisFrom = fromZoned(weekFirst, "00:00", timeZone);
+  const thisTo = fromZoned(addDays(weekFirst, 7), "00:00", timeZone);
 
   const [{ data: source, error }, target] = await Promise.all([
     supabase

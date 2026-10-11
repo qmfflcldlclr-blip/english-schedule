@@ -6,8 +6,8 @@ import ZoomButton from "@/components/ZoomButton";
 import WeekPicker from "@/components/calendar/WeekPicker";
 
 type Props = {
-  monday: string;
-  sunday: string;
+  weekFirst: string;
+  weekLast: string;
   selected: string;
   today: string;
   showToday: boolean; // 보고 있는 주에 오늘이 없으면 "오늘" 버튼
@@ -17,7 +17,7 @@ type Props = {
   settingsT: Messages["settings"];
 };
 
-export default function CalendarHeader({ monday, sunday, selected, today, showToday, locale, zoomUrl, t, settingsT }: Props) {
+export default function CalendarHeader({ weekFirst, weekLast, selected, today, showToday, locale, zoomUrl, t, settingsT }: Props) {
   const link = (date: string) => `/calendar?date=${date}`;
   return (
     <>
@@ -25,7 +25,7 @@ export default function CalendarHeader({ monday, sunday, selected, today, showTo
           (폰은 화면 아래에 떠 있는 추가 버튼이 있어서 여기선 빼고, 나머지 4개를 같은 폭으로) */}
       <div className="grid grid-cols-4 gap-1.5 md:flex md:items-center md:justify-end md:gap-2">
         <ZoomButton url={zoomUrl} t={settingsT} />
-        <Link href={`/calendar/copy?date=${monday}`} className="flex min-h-11 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white px-1 text-xs whitespace-nowrap md:px-4 md:text-sm">
+        <Link href={`/calendar/copy?date=${weekFirst}`} className="flex min-h-11 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white px-1 text-xs whitespace-nowrap md:px-4 md:text-sm">
           {t.copyWeek}
         </Link>
         <Link href={`/calendar/repeat?date=${selected}`} className="flex min-h-11 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white px-1 text-xs whitespace-nowrap md:px-4 md:text-sm">
@@ -51,7 +51,7 @@ export default function CalendarHeader({ monday, sunday, selected, today, showTo
         </Link>
         <div className="flex min-w-0 flex-col items-center">
           <h1>
-            <WeekPicker label={formatDayRange(monday, sunday, locale)} value={selected} ariaLabel={t.pickWeek} className="hover:bg-white/15" />
+            <WeekPicker label={formatDayRange(weekFirst, weekLast, locale)} value={selected} ariaLabel={t.pickWeek} className="hover:bg-white/15" />
           </h1>
           {showToday && (
             <Link href={link(today)} className="-mt-1 rounded-full bg-white/20 px-3 py-0.5 text-xs font-medium hover:bg-white/30">

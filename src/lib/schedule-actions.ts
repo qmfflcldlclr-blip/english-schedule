@@ -14,11 +14,11 @@ async function requireProfile() {
 
 // 지난주 수업을 이번 주로 복사 (이미 있는 건 건너뜀 → 두 번 눌러도 중복 없음)
 export async function copyLastWeek(formData: FormData) {
-  const monday = formData.get("monday");
-  if (!isDate(monday)) redirect("/calendar");
+  const weekFirst = formData.get("weekFirst");
+  if (!isDate(weekFirst)) redirect("/calendar");
   const me = await requireProfile();
 
-  const rows = (await planCopyWeek(weekStart(monday), me.timeZone))
+  const rows = (await planCopyWeek(weekStart(weekFirst), me.timeZone))
     .filter((item) => !item.duplicate)
     .map((item) => ({
       student_id: item.studentId,
@@ -31,7 +31,7 @@ export async function copyLastWeek(formData: FormData) {
     const { error } = await supabase.from("lessons").insert(rows);
     if (error) throw error;
   }
-  redirect(`/calendar?date=${monday}`);
+  redirect(`/calendar?date=${weekFirst}`);
 }
 
 export type RepeatFormState = {

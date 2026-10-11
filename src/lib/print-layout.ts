@@ -27,13 +27,13 @@ export function addMonths(month: string, n: number) {
   return `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
-// 그 달을 덮는 주(월요일 시작) 목록. 각 주는 날짜 7개, 다른 달 날짜도 들어 있음
+// 그 달을 덮는 주(WEEK_STARTS_ON 요일 시작) 목록. 각 주는 날짜 7개, 다른 달 날짜도 들어 있음
 export function monthWeeks(month: string): string[][] {
   const first = `${month}-01`;
   const next = `${addMonths(month, 1)}-01`;
   const weeks: string[][] = [];
-  for (let monday = weekStart(first); monday < next; monday = addDays(monday, 7)) {
-    weeks.push(Array.from({ length: 7 }, (_, i) => addDays(monday, i)));
+  for (let start = weekStart(first); start < next; start = addDays(start, 7)) {
+    weeks.push(Array.from({ length: 7 }, (_, i) => addDays(start, i)));
   }
   return weeks;
 }

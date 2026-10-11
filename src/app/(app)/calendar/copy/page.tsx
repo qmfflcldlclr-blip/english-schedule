@@ -17,8 +17,8 @@ export default async function CopyWeekPage({ searchParams }: PageProps<"/calenda
   ]);
   const t = all.calendar;
   const timeZone = (profile?.timezone as string) ?? "UTC";
-  const monday = weekStart(isDate(sp.date) ? sp.date : todayIn(timeZone));
-  const items = await planCopyWeek(monday, timeZone);
+  const weekFirst = weekStart(isDate(sp.date) ? sp.date : todayIn(timeZone));
+  const items = await planCopyWeek(weekFirst, timeZone);
   const toCopy = items.filter((i) => !i.duplicate).length;
 
   return (
@@ -26,8 +26,8 @@ export default async function CopyWeekPage({ searchParams }: PageProps<"/calenda
       <h1 className="text-2xl font-bold">{t.copyTitle}</h1>
       <p className="mt-2 text-gray-600">
         {format(t.copyDesc, {
-          from: formatDayRange(addDays(monday, -7), addDays(monday, -1), locale),
-          to: formatDayRange(monday, addDays(monday, 6), locale),
+          from: formatDayRange(addDays(weekFirst, -7), addDays(weekFirst, -1), locale),
+          to: formatDayRange(weekFirst, addDays(weekFirst, 6), locale),
         })}
       </p>
 
@@ -55,9 +55,9 @@ export default async function CopyWeekPage({ searchParams }: PageProps<"/calenda
       <p className="mt-4 text-sm text-gray-500">{t.copySkipNote}</p>
 
       <form action={copyLastWeek} className="mt-6 flex gap-3">
-        <input type="hidden" name="monday" value={monday} />
+        <input type="hidden" name="weekFirst" value={weekFirst} />
         <Link
-          href={`/calendar?date=${monday}`}
+          href={`/calendar?date=${weekFirst}`}
           className="flex min-h-12 flex-1 items-center justify-center rounded-xl border border-gray-300 bg-white font-medium"
         >
           {t.cancel}

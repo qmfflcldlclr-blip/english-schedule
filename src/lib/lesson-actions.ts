@@ -17,6 +17,40 @@ export type LessonFormState = {
   overlaps?: { time: string; name: string; minutes: number }[];
 };
 
+type Supabase = Awaited<ReturnType<typeof createClient>>;
+type Overlap = NonNullable<LessonFormState["overlaps"]>[number];
+
+// 겹치는 수업 확인: 같은 날 앞뒤 수업 중 시간이 겹치는 것 (무료 취소된 수업, 자기 자신은 제외)
+async function findOverlaps(
+  supabase: Supabase,
+  start: Date,
+  end: Date,
+  lessonId: string,
+  timeZone: string,
+): Promise<Overlap[]> {
+  const { data: nearby } = await supabase
+    .from("lessons")
+    .select("id, starts_at, duration_minutes, student:students(name)")
+    .neq("status", "free_cancel")
+    .gte("starts_at", new Date(start.getTime() - LESSON_MINUTES_MAX * 60_000).toISOString())
+    .lt("starts_at", end.toISOString());
+  return (nearby ?? [])
+    .filter((l) => l.id !== lessonId)
+    .filter(
+      (l) =>
+        new Date(l.starts_at).getTime() + l.duration_minutes * 60_000 >
+        start.getTime(),
+    )
+    .map((l) => {
+      const s = Array.isArray(l.student) ? l.student[0] : l.student;
+      return {
+        time: toZoned(l.starts_at, timeZone).time,
+        name: (s as { name: string } | null)?.name ?? "",
+        minutes: l.duration_minutes,
+      };
+    });
+}
+
 // 수업 추가(lesson_id 없음) / 수정(있음). 시간은 입력한 사람의 시간대 기준
 export async function saveLesson(
   _prev: LessonFormState,
@@ -51,29 +85,8 @@ export async function saveLesson(
 
   const supabase = await createClient();
 
-  // 겹치는 수업 확인: 같은 날 앞뒤 수업 중 시간이 겹치는 것 (무료 취소된 수업은 제외)
   if (!ignoreOverlap) {
-    const { data: nearby } = await supabase
-      .from("lessons")
-      .select("id, starts_at, duration_minutes, student:students(name)")
-      .neq("status", "free_cancel")
-      .gte("starts_at", new Date(start.getTime() - LESSON_MINUTES_MAX * 60_000).toISOString())
-      .lt("starts_at", end.toISOString());
-    const overlaps = (nearby ?? [])
-      .filter((l) => l.id !== lessonId)
-      .filter(
-        (l) =>
-          new Date(l.starts_at).getTime() + l.duration_minutes * 60_000 >
-          start.getTime(),
-      )
-      .map((l) => {
-        const s = Array.isArray(l.student) ? l.student[0] : l.student;
-        return {
-          time: toZoned(l.starts_at, timeZone).time,
-          name: (s as { name: string } | null)?.name ?? "",
-          minutes: l.duration_minutes,
-        };
-      });
+    const overlaps = await findOverlaps(supabase, start, end, lessonId, timeZone);
     if (overlaps.length) return { overlaps };
   }
 
@@ -100,4 +113,42 @@ export async function deleteLesson(lessonId: string, date: string) {
     .eq("id", lessonId);
   if (!count) return { error: true };
   redirect(`/calendar?date=${isDate(date) ? date : ""}`);
+}
+
+export type MoveResult = { ok: true } | { overlaps: Overlap[] } | { error: "move_failed" };
+
+// 달력에서 끌어서 옮기기: 시작 시각만 바꿈 (길이·학생·메모 그대로). 날짜·시각은 옮긴 사람의 시간대 기준
+// "예정" 수업만 옮길 수 있음 (처리된 수업은 데이터베이스가 거부)
+export async function moveLesson(
+  lessonId: string,
+  date: string,
+  time: string,
+  ignoreOverlap = false,
+): Promise<MoveResult> {
+  if (!isDate(date) || !isTime(time)) return { error: "move_failed" };
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/login");
+  const timeZone = profile.timezone as string;
+  const supabase = await createClient();
+
+  const { data: lesson } = await supabase
+    .from("lessons")
+    .select("duration_minutes, status")
+    .eq("id", lessonId)
+    .maybeSingle();
+  if (!lesson || lesson.status !== "scheduled") return { error: "move_failed" };
+
+  const start = fromZoned(date, time, timeZone);
+  const end = new Date(start.getTime() + lesson.duration_minutes * 60_000);
+  if (!ignoreOverlap) {
+    const overlaps = await findOverlaps(supabase, start, end, lessonId, timeZone);
+    if (overlaps.length) return { overlaps };
+  }
+
+  const { count } = await supabase
+    .from("lessons")
+    .update({ starts_at: start.toISOString() }, { count: "exact" })
+    .eq("id", lessonId);
+  if (!count) return { error: "move_failed" };
+  return { ok: true };
 }

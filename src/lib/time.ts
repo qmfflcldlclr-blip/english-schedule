@@ -1,7 +1,7 @@
 // 시간대 변환 도우미 (서버·브라우저 공용, 외부 라이브러리 없음)
 // 날짜는 "YYYY-MM-DD", 시각은 "HH:mm" 문자열로 다룸
 
-import { DAY_CUTOFF_HOUR } from "@/config/schedule";
+import { DAY_CUTOFF_HOUR, WEEK_STARTS_ON } from "@/config/schedule";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -47,11 +47,11 @@ export function addDays(date: string, days: number) {
   return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`;
 }
 
-// 그 날짜가 속한 주의 월요일
+// 그 날짜가 속한 주의 첫날 (WEEK_STARTS_ON 요일)
 export function weekStart(date: string) {
   const [y, m, d] = date.split("-").map(Number);
   const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); // 0=일 … 6=토
-  return addDays(date, -((weekday + 6) % 7));
+  return addDays(date, -((weekday - WEEK_STARTS_ON + 7) % 7));
 }
 
 export function isDate(value: unknown): value is string {

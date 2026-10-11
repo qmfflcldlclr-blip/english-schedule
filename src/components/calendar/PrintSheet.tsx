@@ -89,7 +89,7 @@ export default function PrintSheet({ month, heading, meta, days, holidays = {}, 
             <thead>
               <tr style={{ height: "5mm" }}>
                 {weekdayNames.map((w, i) => (
-                  <th key={w} className={`${cell} bg-gray-100 text-[8pt] font-bold ${i === 5 ? "text-blue-600" : i === 6 ? "text-red-600" : ""}`}>
+                  <th key={w} className={`${cell} bg-gray-100 text-[8pt] font-bold ${toneText[dayTone(weeks[0][i], false)]}`}>
                     {w}
                   </th>
                 ))}

@@ -240,13 +240,13 @@
     "deleteSeries": "Delete this and later repeats",
     "deleteSeriesConfirm": "Delete this class and all later scheduled classes in the same repeat?",
     "weekdayNames": [
+      "Sun",
       "Mon",
       "Tue",
       "Wed",
       "Thu",
       "Fri",
-      "Sat",
-      "Sun"
+      "Sat"
     ],
     "repeatErrors": {
       "weekdays": "Choose at least one day.",
@@ -287,7 +287,10 @@
       "unknown": "Could not process. Please try again."
     },
     "print": "Print",
-    "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length.",
+    "slotHint": "Double-click an empty time to add a class there, or drag to set the time and length. Drag a scheduled class to move it to another day or time.",
+    "confirmMove": "Move {name}'s class?\n{from} → {to}",
+    "moveOverlap": "This overlaps another class: {list}\nMove anyway?",
+    "moveFailed": "Could not move. Only scheduled classes can be moved. Please refresh the page.",
     "pickWeek": "Choose a week",
     "searchStudent": "Search by name",
     "noMatch": "No matching student.",
