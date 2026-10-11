@@ -92,21 +92,26 @@ export default function WeekGrid({ days, today, byDay, holidays, timeZone, other
                   studentId={l.student_id}
                   scheduled={l.status === "scheduled"}
                   move={{ date: d, minutes: start, duration: l.duration_minutes, fromHour, hourPx: HOUR_PX, studentName: l.studentName, locale, labels: moveLabels }}
-                  title={`${time} ${l.studentName} · ${minutes}`}
+                  title={`${time} ${l.studentName} · ${minutes}${l.memo ? ` · ${l.memo}` : ""}`}
                   className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]}`}
                   style={{ top: ((start - fromHour * 60) / 60) * HOUR_PX, height }}
                 >
                   {oneLine ? (
                     <>
                       <span className="shrink-0 font-semibold tabular-nums">{time}</span>
-                      <span className="min-w-0 truncate font-medium">{l.studentName}</span>
+                      <span className="shrink-0 font-medium">{l.studentName}</span>
+                      {/* 수업 메모는 이름 옆에 (누르면 옆 칸에 전체) */}
+                      {l.memo && <span className="min-w-0 truncate opacity-70">{l.memo}</span>}
                       <span className="ml-auto shrink-0 pl-1 text-[11px] opacity-70">{minutes}</span>
                     </>
                   ) : (
                     <>
                       <span className="absolute top-1 right-1.5 text-[11px] opacity-70">{minutes}</span>
                       <LessonTime startsAt={l.starts_at} {...timeProps} compact />
-                      <span className="block truncate font-medium">{l.studentName}</span>
+                      <span className="block truncate font-medium">
+                        {l.studentName}
+                        {l.memo && <span className="ml-1 font-normal opacity-70">· {l.memo}</span>}
+                      </span>
                     </>
                   )}
                 </LessonQuick>

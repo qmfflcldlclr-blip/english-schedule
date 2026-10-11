@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useActionForm } from "@/lib/use-action-form";
 import { saveLesson, type LessonFormState } from "@/lib/lesson-actions";
 import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
@@ -50,10 +50,14 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDur
     setValues((v) => ({ ...v, date: slot.date, time: slot.time, duration: slot.duration ?? v.duration }));
   }
 
-  // 옆 칸에서 저장이 끝나면 알려 줌 (저장할 때마다 새 결과가 와서 한 번씩만 실행)
+  // 옆 칸에서 저장이 끝나면 알려 줌. 같은 저장 결과로는 한 번만
+  // (onSaved 는 화면을 그릴 때마다 새로 만들어져서, 이걸 기억하지 않으면 저장 → 새로고침 → 또 저장 알림이 끝없이 반복됨)
   const onSaved = panel?.onSaved;
+  const handled = useRef(state.saved);
   useEffect(() => {
-    if (state.saved) onSaved?.(state.saved);
+    if (!state.saved || handled.current === state.saved) return;
+    handled.current = state.saved;
+    onSaved?.(state.saved);
   }, [state.saved, onSaved]);
 
   // 학생을 고르면 그 학생의 수업 길이로 자동 변경 (달력에서 드래그로 길이를 정해 왔으면 유지)

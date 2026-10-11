@@ -29,3 +29,18 @@ export async function getStudentNotes(studentId: string) {
   };
   return { private: pick("private"), shared: pick("shared") };
 }
+
+// 학생 목록용: 학생마다 내 개별용·공유용 노트 내용 (표가 없으면 빈 목록)
+export async function listNotesByStudent() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("student_notes").select("student_id, visibility, content");
+  const map = new Map<string, { privateNote: string; sharedNote: string }>();
+  if (error) return map; // 0014 실행 전
+  for (const r of data) {
+    const entry = map.get(r.student_id as string) ?? { privateNote: "", sharedNote: "" };
+    if (r.visibility === "private") entry.privateNote = r.content as string;
+    else entry.sharedNote = r.content as string;
+    map.set(r.student_id as string, entry);
+  }
+  return map;
+}

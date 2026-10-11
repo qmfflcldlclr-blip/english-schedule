@@ -75,7 +75,7 @@
       "save": "저장하지 못했습니다. 다시 시도해 주세요."
     },
     "remaining": "남은 횟수",
-    "search": "이름·메모 검색 (초성도 가능)",
+    "search": "이름·노트 검색 (초성도 가능)",
     "noMatch": "검색 결과가 없습니다.",
     "selectAll": "전체 선택",
     "selectStudent": "{name} 선택",
@@ -97,7 +97,9 @@
       "setup": "완전 삭제를 쓰려면 Supabase SQL Editor 에서 0011 파일을 먼저 실행해 주세요."
     },
     "nameEn": "영어 이름",
-    "nameEnHint": "비워 두면 영어 화면에서 자동으로 바꿔 보여 줘요: {auto}"
+    "nameEnHint": "비워 두면 영어 화면에서 자동으로 바꿔 보여 줘요: {auto}",
+    "privateNote": "개별 노트",
+    "sharedNote": "공유 노트"
   },
   "credits": {
     "title": "수강 횟수",

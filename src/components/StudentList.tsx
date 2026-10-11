@@ -12,7 +12,8 @@ export type StudentRow = {
   id: string;
   name: string;
   label: string; // 동명이인은 "김민준 #2"
-  memo: string | null;
+  privateNote: string; // 내 개별용 노트
+  sharedNote: string; // 공유용 노트
   lesson_minutes: number;
   remaining: number;
   expired: boolean;
@@ -25,7 +26,7 @@ type Props = {
   t: Messages["students"] & { timesUnit: string; expired: string };
 };
 
-// 학생 목록: 검색(이름·메모, 초성) + 체크박스로 여러 명 보관·완전 삭제
+// 학생 목록: 검색(이름·노트, 초성) + 체크박스로 여러 명 보관·완전 삭제
 // 현재 학생 목록에서는 남은 횟수 0회 학생을 맨 아래 묶음으로 따로 보여 줌
 export default function StudentList({ students, archivedView, autoArchiveDays, t }: Props) {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const shown = students.filter((s) => matchesSearch(`${s.label} ${s.name} ${s.memo ?? ""}`, query));
+  const shown = students.filter((s) => matchesSearch(`${s.label} ${s.name} ${s.privateNote} ${s.sharedNote}`, query));
   const zero = archivedView ? [] : shown.filter((s) => s.remaining === 0);
   const main = archivedView ? shown : shown.filter((s) => s.remaining !== 0);
 
@@ -113,7 +114,8 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
                 {/* 영어 화면: 한글 이름도 작게 */}
                 {!s.label.startsWith(s.name) && <span className="ml-1.5 text-sm font-normal text-gray-400">{s.name}</span>}
               </p>
-              {s.memo && <p className="truncate text-sm text-gray-500">{s.memo}</p>}
+              {s.privateNote && <p className="truncate text-sm text-gray-500">🔒 {s.privateNote}</p>}
+              {s.sharedNote && <p className="truncate text-sm text-gray-500">👥 {s.sharedNote}</p>}
             </div>
             <div className="shrink-0 text-right">
               {remaining(s)}
@@ -131,7 +133,7 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
       {withHeader && (
         <thead className="border-b border-gray-200 text-sm text-gray-500">
           <tr>
-            <th className="w-12 py-2 pl-4">
+            <th className="w-14 min-w-14 py-2 pr-3 pl-4">
               <input
                 type="checkbox"
                 checked={allShownSelected}
@@ -143,7 +145,8 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
             <th className="py-2 pr-4 font-medium">{t.name}</th>
             <th className="py-2 pr-4 font-medium">{t.remaining}</th>
             <th className="py-2 pr-4 font-medium">{t.lessonMinutes}</th>
-            <th className="py-2 pr-4 font-medium">{t.memo}</th>
+            <th className="py-2 pr-4 font-medium">🔒 {t.privateNote}</th>
+            <th className="py-2 pr-4 font-medium">👥 {t.sharedNote}</th>
           </tr>
         </thead>
       )}
@@ -153,7 +156,7 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
             key={s.id}
             className={`border-b border-gray-100 last:border-0 hover:bg-gray-50 ${selected.has(s.id) ? "bg-brand-50/60" : ""}`}
           >
-            <td className="w-12 py-3 pl-4">
+            <td className="w-14 min-w-14 py-3 pr-3 pl-4">
               {check(s)}
             </td>
             {/* 이름은 항상 한 줄 (영어 이름이 길어도). 메모가 길면 메모 쪽을 "…"으로 줄임 */}
@@ -167,7 +170,9 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
               {remaining(s)}
             </td>
             <td className="w-28 py-3 pr-4 whitespace-nowrap text-gray-600">{format(t.minutesUnit, { n: s.lesson_minutes })}</td>
-            <td className="w-full max-w-0 truncate py-3 pr-4 text-gray-500" title={s.memo ?? undefined}>{s.memo}</td>
+            {/* 노트가 길면 "…"으로 줄임 (마우스를 올리면 전체) */}
+            <td className="w-1/2 max-w-0 truncate py-3 pr-4 text-gray-500" title={s.privateNote || undefined}>{s.privateNote}</td>
+            <td className="w-1/2 max-w-0 truncate py-3 pr-4 text-gray-500" title={s.sharedNote || undefined}>{s.sharedNote}</td>
           </tr>
         ))}
       </tbody>

@@ -82,8 +82,6 @@ export default async function StudentDetailPage({
         <dd>
           {formatDate(student.created_at, locale, timeZone)}
         </dd>
-        <dt className="text-gray-500">{t.memo}</dt>
-        <dd className="whitespace-pre-wrap break-words">{student.memo || "—"}</dd>
       </dl>
 
       {/* 학생 노트: 개별용(나만) · 공유용(함께) */}

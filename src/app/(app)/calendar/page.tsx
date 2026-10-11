@@ -155,7 +155,10 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                       >
                         <div className="min-w-0">
                           <LessonTime startsAt={l.starts_at} {...timeProps} />
-                          <p className="truncate font-medium">{l.studentName}</p>
+                          <p className="truncate font-medium">
+                            {l.studentName}
+                            {l.memo && <span className="ml-1.5 font-normal text-gray-500">· {l.memo}</span>}
+                          </p>
                         </div>
                         <div className="flex shrink-0 flex-col items-end gap-1 text-sm">
                           <span className="text-gray-500">{format(t.minutesUnit, { n: l.duration_minutes })}</span>

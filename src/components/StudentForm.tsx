@@ -91,17 +91,6 @@ export default function StudentForm({ t, student, cancelHref }: Props) {
         )}
       </label>
 
-      <label className="block text-sm font-medium">
-        {t.memo}
-        <textarea
-          name="memo"
-          rows={4}
-          defaultValue={student?.memo ?? ""}
-          placeholder={t.memoPlaceholder}
-          className={`${inputClass} py-2.5`}
-        />
-      </label>
-
       {errors.save && (
         <p role="alert" className="text-sm text-red-600">
           {t.errors.save}

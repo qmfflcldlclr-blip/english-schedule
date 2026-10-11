@@ -128,6 +128,8 @@
 
 ## 학생 노트 (2026-10-11, SQL 0014)
 - 학생 상세에 **개별용(쓴 사람만 봄)** · **공유용(매니저·선생님 함께, 마지막 수정자 표시)** 2칸. 저장은 DB 함수 `save_student_note` 로만. 학생 완전 삭제 시 함께 삭제(cascade).
+- **학생 "메모" 칸은 없앰** (2026-10-11): 기존 메모는 0015 로 lee 의 개별용 노트로 옮김. 학생 목록은 메모 대신 **개별 노트 · 공유 노트** 두 열(폰은 두 줄), 검색도 노트 포함. `students.memo` 열은 남아 있지만 쓰지 않음.
+- **수업 메모**는 달력 수업 칸의 이름 옆에 표시 (누르면 옆 칸에 전체).
 
 ## 학생 피드백 (2026-10-10 결정)
 - 메뉴 **"피드백"** (폰 하단 탭 5칸) + **학생 상세 화면**에 최근 3개와 쓰기 버튼.
@@ -146,7 +148,7 @@
 - 사이트 주소: **https://english-schedule-5mgw.vercel.app** (Vercel 프로젝트 `english-schedule-5mgw`)
 - 코드: GitHub `qmfflcldlclr-blip/english-schedule` (비공개). **main 에 push 하면 Vercel 이 자동 배포.**
 - Vercel 환경 변수: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (값은 `.env.local` 과 동일), `DEEPL_API_KEY` (자동 번역, 선택)
-- 데이터베이스 변경은 `supabase/migrations/` 에 번호 순서대로 SQL 파일을 만들고, 사용자가 Supabase SQL Editor 에서 **한 번씩** 실행. **0012 까지 실행 완료.** 0013 = 학생 영어 이름 칸 (실행 완료). 0014 = 학생 노트. 0012 = 실제 데이터 가져오기 (9월 달력 + 10월 미쉘 스케쥴, 테스트 데이터 전부 삭제 후 입력. 한 번만 실행). **학생 실명이 들어 있어 git 에 올리지 않음** (`.gitignore`), 내 컴퓨터에만 있음
+- 데이터베이스 변경은 `supabase/migrations/` 에 번호 순서대로 SQL 파일을 만들고, 사용자가 Supabase SQL Editor 에서 **한 번씩** 실행. **0012 까지 실행 완료.** 0013 = 학생 영어 이름 칸 (실행 완료). 0014 = 학생 노트 (실행 완료). 0015 = 학생 메모 → 개별용 노트로 옮기기. 0012 = 실제 데이터 가져오기 (9월 달력 + 10월 미쉘 스케쥴, 테스트 데이터 전부 삭제 후 입력. 한 번만 실행). **학생 실명이 들어 있어 git 에 올리지 않음** (`.gitignore`), 내 컴퓨터에만 있음
 - 취소 규칙 테스트: `supabase/tests/lesson_status_test.sql` ("TEST OK" 오류 메시지가 성공)
 - 로그인 계정: `lee`(매니저, 한국어, Asia/Seoul), `michelle`(선생님, 영어, Asia/Manila). 아이디는 내부적으로 `아이디@example.com` 이메일로 변환됨.
 - 폰에서 개발 서버 확인: `npm run dev:phone` → 같은 Wi-Fi 에서 `http://PC의IP:3000`

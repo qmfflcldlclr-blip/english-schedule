@@ -4,6 +4,7 @@ import { format } from "@/i18n/format";
 import { listStudents } from "@/lib/students";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getCreditOverview } from "@/lib/credits";
+import { listNotesByStudent } from "@/lib/student-notes";
 import { todayIn } from "@/lib/credit-math";
 import { EmptyStudentsArt } from "@/components/Illustrations";
 import StudentList from "@/components/StudentList";
@@ -22,10 +23,11 @@ export default async function StudentsPage({
 }: PageProps<"/students">) {
   const showArchived = (await searchParams).show === "archived";
   const archivedNow = showArchived ? 0 : await autoArchive(); // 목록을 읽기 전에 먼저 정리
-  const [{ t: all }, profile, students] = await Promise.all([
+  const [{ t: all }, profile, students, notes] = await Promise.all([
     getDictionary(),
     getCurrentProfile(),
     listStudents(showArchived),
+    listNotesByStudent(),
   ]);
   const t = all.students;
   const overview = await getCreditOverview(
@@ -74,7 +76,12 @@ export default async function StudentsPage({
         </div>
       ) : (
         <StudentList
-          students={students.map((st) => ({ ...st, ...creditsOf(st.id) }))}
+          students={students.map((st) => ({
+            ...st,
+            ...creditsOf(st.id),
+            privateNote: notes.get(st.id)?.privateNote ?? "",
+            sharedNote: notes.get(st.id)?.sharedNote ?? "",
+          }))}
           archivedView={showArchived}
           autoArchiveDays={AUTO_ARCHIVE_DAYS}
           t={{ ...t, timesUnit: all.credits.timesUnit, expired: all.credits.expired }}

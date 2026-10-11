@@ -18,7 +18,6 @@ export async function saveStudent(
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const minutes = Number(formData.get("lesson_minutes"));
-  const memo = String(formData.get("memo") ?? "").trim() || null;
   const nameEn = String(formData.get("name_en") ?? "").trim() || null;
 
   const errors: NonNullable<StudentFormState["errors"]> = {};
@@ -33,7 +32,8 @@ export async function saveStudent(
   if (Object.keys(errors).length) return { errors };
 
   const supabase = await createClient();
-  const values = { name, name_en: nameEn, lesson_minutes: minutes, memo };
+  // 메모는 학생 노트로 옮김 (0015) → 여기서는 저장하지 않음
+  const values = { name, name_en: nameEn, lesson_minutes: minutes };
 
   let savedId = id;
   if (id) {

@@ -75,7 +75,7 @@
       "save": "Could not save. Please try again."
     },
     "remaining": "Remaining",
-    "search": "Search name or memo",
+    "search": "Search name or notes",
     "noMatch": "No results.",
     "selectAll": "Select all",
     "selectStudent": "Select {name}",
@@ -97,7 +97,9 @@
       "setup": "To delete permanently, first run migration 0011 in the Supabase SQL Editor."
     },
     "nameEn": "English name",
-    "nameEnHint": "Leave empty to show it automatically: {auto}"
+    "nameEnHint": "Leave empty to show it automatically: {auto}",
+    "privateNote": "Private notes",
+    "sharedNote": "Shared notes"
   },
   "credits": {
     "title": "Class credits",
