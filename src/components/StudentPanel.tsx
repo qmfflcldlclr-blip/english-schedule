@@ -310,19 +310,16 @@ function QuickAdjust({ t, studentId, onSaved }: { t: Messages["credits"]; studen
           {t.minus}
         </label>
       </div>
-      <div className="mt-2 flex gap-2">
-        <input
-          name="amount"
-          type="number"
-          inputMode="numeric"
-          required
-          min={1}
-          max={ADJUST_MAX}
-          defaultValue={1}
-          aria-label={t.amount}
-          className={`${field} mt-0 min-h-11 w-20 shrink-0`}
-        />
-        <input name="reason" required aria-label={t.reason} placeholder={t.reasonPlaceholder} className={`${field} mt-0 min-h-11 min-w-0 flex-1`} />
+      {/* 횟수(좁게) 위, 사유(넓게) 아래 — field 의 w-full 이 좁은 폭을 덮어쓰지 않도록 폭은 감싸는 칸에서 정함 */}
+      <div className="mt-2 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2">
+        <label className="block text-xs font-medium text-gray-600">
+          {t.amount}
+          <input name="amount" type="number" inputMode="numeric" required min={1} max={ADJUST_MAX} defaultValue={1} className={`${field} min-h-11`} />
+        </label>
+        <label className="block text-xs font-medium text-gray-600">
+          {t.reason}
+          <input name="reason" required placeholder={t.reasonPlaceholder} className={`${field} min-h-11`} />
+        </label>
       </div>
       <button type="submit" disabled={pending} className="mt-2 min-h-11 w-full rounded-lg border border-brand-300 bg-brand-50 text-sm font-semibold text-brand-700 disabled:opacity-60">
         {pending ? t.saving : t.save}
