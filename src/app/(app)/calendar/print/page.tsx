@@ -10,6 +10,7 @@ import { scheduleDayStart, toScheduleDay, toZoned } from "@/lib/time";
 import { zoneName } from "@/config/timezones";
 import { addMonths, isMonth, monthWeeks, PAGE } from "@/lib/print-layout";
 import { getHolidays } from "@/lib/holidays";
+import { getPlanTimelines, spanDay } from "@/lib/plan-timelines";
 import { PrintButton, StudentPicker } from "@/components/calendar/PrintControls";
 import PrintSheet, { type PrintEntry, type PrintRow } from "@/components/calendar/PrintSheet";
 import { Jua } from "next/font/google";
@@ -51,7 +52,7 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
   for (const l of lessons) (days[toScheduleDay(l.starts_at, timeZone).date] ??= []).push(entry(l));
 
   // 학생별 이번 달 횟수 (학생을 골랐으면 그 학생만, 아니면 이번 달 수업이 있는 학생)
-  const rows = new Map<string, Omit<PrintRow, "id" | "remaining">>();
+  const rows = new Map<string, Omit<PrintRow, "id" | "remaining" | "start" | "end">>();
   const empty = (name: string) => ({ name, completed: 0, scheduled: 0, free: 0, absent: 0 });
   if (student) rows.set(student.id, empty(student.label));
   for (const l of lessons) {
@@ -59,9 +60,17 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
     r[l.status === "free_cancel" ? "free" : l.status]++;
     rows.set(l.student_id, r);
   }
-  const overview = await getCreditOverview([...rows.keys()], today);
+  const [overview, timelines] = await Promise.all([getCreditOverview([...rows.keys()], today), getPlanTimelines([...rows.keys()])]);
+  // 시작일·종료일: 가장 최근 플랜 기준 (학생 목록·홈과 같은 규칙)
+  const span = (id: string) => timelines.get(id)?.spans.at(-1);
   const summary: PrintRow[] = [...rows.entries()]
-    .map(([id, r]) => ({ id, ...r, remaining: overview.get(id)?.remaining ?? 0 }))
+    .map(([id, r]) => ({
+      id,
+      ...r,
+      remaining: overview.get(id)?.remaining ?? 0,
+      start: spanDay(span(id)?.start, span(id)?.startProjected, timeZone, all.students),
+      end: spanDay(span(id)?.end, span(id)?.endProjected, timeZone, all.students),
+    }))
     .sort((a, b) => a.name.localeCompare(b.name, locale));
 
   const monthTitle = new Intl.DateTimeFormat(locale, { year: "numeric", month: "long", timeZone: "UTC" }).format(

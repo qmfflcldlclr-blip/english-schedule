@@ -11,6 +11,9 @@ export const getStudentLabels = cache(async () => {
   const supabase = await createClient();
   // "*" 로 가져와서, 영어 이름 칸(0013)을 아직 안 만들었어도 화면이 깨지지 않게
   const [{ data }, locale] = await Promise.all([supabase.from("students").select("*"), getLocale()]);
-  const rows = (data ?? []) as { id: string; name: string; name_en?: string | null; created_at: string }[];
+  // 삭제된 학생(0020)은 동명이인 번호에서 뺌 (지난 수업에는 원래 이름으로 보임)
+  const rows = ((data ?? []) as { id: string; name: string; name_en?: string | null; created_at: string; deleted_at?: string | null }[]).filter(
+    (r) => !r.deleted_at,
+  );
   return computeNameLabels(rows, locale === "en" ? (r) => r.name_en?.trim() || romanizeName(r.name) : undefined);
 });

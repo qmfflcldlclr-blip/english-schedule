@@ -96,9 +96,9 @@ export function scheduleDayStart(date: string, timeZone: string) {
   return fromZoned(date, `${pad(DAY_CUTOFF_HOUR)}:00`, timeZone);
 }
 
-// 지금이 속한 수업일 (새벽 1시라면 어제)
+// "오늘" 날짜: 자정(0시)에 바로 바뀜 (새벽 수업을 전날 칸에 그리는 것과는 별개)
 export function scheduleToday(timeZone: string) {
-  return toScheduleDay(new Date(), timeZone).date;
+  return toZoned(new Date(), timeZone).date;
 }
 
 // 수업일 + 그 날 0시부터 센 분 → 실제 날짜·시각 (1470분 → 다음 날 "00:30")

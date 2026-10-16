@@ -1,7 +1,7 @@
 "use client";
 
 // 달력 옆 칸 (넓은 PC: 오른쪽에 고정 / 폰·좁은 화면: 아래에서 올라오는 창)
-// 처음: 이름 검색 + 이번 주 학생 → 학생: 한 달 수업 목록 → 수업: 완료·결석·수정·삭제 → 새 수업: 추가 폼
+// 처음: 이름 검색 + 이번 주 학생 → 학생: 한 달 수업 목록 → 수업: 완료·결석·연기·삭제 (수정은 "자세히") → 새 수업: 추가 폼
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -270,9 +270,9 @@ function StudentMonth({
   );
 }
 
-// ───── 수업: 완료·결석 + 수정 + 삭제, 아래에 그 학생의 한 달 수업 ─────
+// ───── 수업: 완료·결석·연기·삭제 (Delete 키로도 삭제), 아래에 그 학생의 한 달 수업 ─────
 function LessonView(props: Props & { lessonId: string }) {
-  const { t, students, timeZone, otherTimeZone, locale, zoneLabel, lessonId } = props;
+  const { t, timeZone, otherTimeZone, locale, lessonId } = props;
   const panel = usePanel();
   const [data, setData] = useState<{ key: string; value: PanelLesson | null } | null>(null);
   const key = `${lessonId}|${panel.version}`;
@@ -287,6 +287,33 @@ function LessonView(props: Props & { lessonId: string }) {
       alive = false;
     };
   }, [lessonId, key]);
+
+  // 예정 수업 삭제 (처리된 수업은 데이터베이스가 거부). 지우면 그 학생의 한 달 수업으로
+  const removeNow = (l: PanelLesson) => {
+    if (!window.confirm(t.deleteConfirm)) return;
+    startTransition(async () => {
+      const result = await removeLesson(l.id);
+      if (result.error) {
+        setError(t.errors.delete);
+        return;
+      }
+      panel.refresh();
+      panel.open({ mode: "student", studentId: l.student_id });
+    });
+  };
+
+  // 달력에서 수업을 누른 뒤 Delete 키 → 삭제 (글 쓰는 칸에서 누른 Delete 는 무시)
+  const current = data?.value;
+  useEffect(() => {
+    if (current?.status !== "scheduled" || pending) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Delete" || (e.target as HTMLElement).closest("input, textarea, select, [contenteditable]")) return;
+      e.preventDefault();
+      removeNow(current);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   if (!data) return <p className="py-6 text-center text-sm text-gray-400">{t.panel.loading}</p>;
   const lesson = data.value;
@@ -316,23 +343,7 @@ function LessonView(props: Props & { lessonId: string }) {
     });
   };
 
-  const remove = () => {
-    if (!window.confirm(t.deleteConfirm)) return;
-    startTransition(async () => {
-      const result = await removeLesson(lesson.id);
-      if (result.error) {
-        setError(t.errors.delete);
-        return;
-      }
-      panel.refresh();
-      showStudent();
-    });
-  };
-
-  // 보관된 학생의 수업이어도 선택 목록에 그 학생이 보이도록
-  const options = students.some((s) => s.id === lesson.student_id)
-    ? students
-    : [...students, { id: lesson.student_id, name: lesson.studentName, lesson_minutes: lesson.duration_minutes }];
+  const remove = () => removeNow(lesson);
 
   return (
     <div>
@@ -368,7 +379,7 @@ function LessonView(props: Props & { lessonId: string }) {
       />
 
       {scheduled && (
-        <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="mt-4 grid grid-cols-4 gap-2">
           <button type="button" disabled={pending} onClick={() => run("complete")} className="min-h-12 rounded-xl bg-brand-600 font-semibold text-white disabled:opacity-60">
             ✓ {labels.complete}
           </button>
@@ -377,6 +388,9 @@ function LessonView(props: Props & { lessonId: string }) {
           </button>
           <button type="button" disabled={pending} onClick={() => run("cancel")} className="min-h-12 rounded-xl border border-gray-300 bg-white font-semibold text-gray-700 disabled:opacity-60">
             ⏸ {labels.postpone}
+          </button>
+          <button type="button" disabled={pending} onClick={remove} title={t.panel.deleteKeyHint} className="min-h-12 rounded-xl border border-red-200 bg-white font-semibold text-red-600 disabled:opacity-60">
+            🗑 {t.delete}
           </button>
         </div>
       )}
@@ -389,36 +403,6 @@ function LessonView(props: Props & { lessonId: string }) {
           {labels.details} ›
         </Link>
       </div>
-
-      {scheduled && (
-        <details className="mt-2 rounded-xl border border-gray-200 p-3 open:pb-4">
-          <summary className="min-h-8 cursor-pointer font-medium">{t.editTitle}</summary>
-          <div className="mt-3">
-            <LessonForm
-              key={`${lesson.id}|${data.key}`}
-              t={t}
-              students={options}
-              zoneLabel={zoneLabel}
-              cancelHref={`/calendar?date=${day}`}
-              hideMemo
-              panel={{ onCancel: showStudent, onSaved: () => panel.refresh() }}
-              initial={{
-                lessonId: lesson.id,
-                studentId: lesson.student_id,
-                date: local.date,
-                time: local.time,
-                duration: lesson.duration_minutes,
-                memo: lesson.memo ?? "",
-              }}
-            />
-            <div className="mt-3 flex justify-end">
-              <button type="button" disabled={pending} onClick={remove} className="min-h-11 rounded-xl px-4 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60">
-                {t.delete}
-              </button>
-            </div>
-          </div>
-        </details>
-      )}
 
       <StudentMonth {...props} studentId={lesson.student_id} month={day.slice(0, 7)} activeLessonId={lesson.id} compact />
     </div>

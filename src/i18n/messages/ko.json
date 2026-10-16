@@ -84,11 +84,8 @@
     "selectedCount": "{n}명 선택",
     "archiveSelected": "보관",
     "unarchiveSelected": "보관 해제",
-    "deleteSelected": "완전 삭제",
+    "deleteSelected": "삭제",
     "clearSelection": "선택 해제",
-    "deleteWord": "삭제",
-    "deletePrompt": "{n}명과 그 학생의 모든 기록(수업·횟수 기록·피드백)을 영구 삭제합니다. 되돌릴 수 없어요.\n\n{names}\n\n계속하려면 \"{word}\" 를 입력하세요.",
-    "deleteMismatch": "입력이 달라서 삭제하지 않았어요.",
     "zeroTitle": "남은 횟수 0회",
     "zeroHint": "0회인 채로 {days}일이 지나고 예정 수업이 없으면 자동으로 보관돼요.",
     "autoArchived": "남은 횟수 0회로 {days}일이 지난 학생 {n}명을 자동으로 보관했어요.",
@@ -115,7 +112,8 @@
     "undecided": "미정",
     "paidOn": "결제일",
     "startsOn": "시작일",
-    "endsOn": "종료일"
+    "endsOn": "종료일",
+    "deleteConfirm": "{n}명을 삭제할까요?\n\n{names}\n\n학생 목록·검색에서 사라지고, 앞으로 잡힌 예정 수업은 지워져요. 지난 수업·횟수 기록·피드백은 기록으로 남아요."
   },
   "credits": {
     "title": "수강 횟수",
@@ -372,7 +370,8 @@
         "save": "저장하지 못했습니다. 다시 시도해 주세요.",
         "setup": "데이터베이스 준비가 필요해요. Supabase SQL Editor 에서 0017(수업 피드백) 파일을 실행해 주세요."
       },
-      "monthCredits": "횟수 환산 {n}회 (30분 = 1회)"
+      "monthCredits": "횟수 환산 {n}회 (30분 = 1회)",
+      "deleteKeyHint": "수업을 고른 뒤 Delete 키로도 삭제할 수 있어요"
     },
     "copyFrom": "가져올 주",
     "copyPick": "다른 날짜로 고르기",
@@ -383,7 +382,13 @@
     "confirmPostpone": "연기로 처리할까요? 횟수는 차감되지 않습니다.",
     "postponeHint": "연기는 선생님·매니저가 허락한 경우에만 — 횟수 차감 없음. 그 외 빠진 수업은 결석(차감).",
     "planStart": "시작",
-    "planEnd": "종료"
+    "planEnd": "종료",
+    "dayAttend": {
+      "button": "출석",
+      "confirm": "{day} 예정 수업 {n}개를 모두 완료(출석) 처리할까요?",
+      "done": "{n}개 완료 처리했어요.",
+      "failed": "{n}개 완료, {failed}개는 처리하지 못했어요. 새로고침 후 확인해 주세요."
+    }
   },
   "settings": {
     "title": "설정",
@@ -433,7 +438,9 @@
     "freeShort": "연기",
     "lateShort": "차감",
     "absentShort": "결석",
-    "timeZoneNote": "{zone} 시간 기준"
+    "timeZoneNote": "{zone} 시간 기준",
+    "colStart": "시작일",
+    "colEnd": "종료일"
   },
   "notes": {
     "title": "메모",
@@ -497,7 +504,13 @@
     "general": "일반",
     "copy": "카톡용 복사",
     "copied": "복사했어요",
-    "original": "원문 보기"
+    "original": "원문 보기",
+    "exportTitle": "{name} 피드백 내보내기",
+    "exportCopy": "전체 복사",
+    "exportDownload": "파일 저장",
+    "exportFile": "피드백",
+    "exportHeading": "[{name}] 피드백 모음 ({n}개)",
+    "exportWritten": "{date} 작성"
   },
   "studentNotes": {
     "title": "학생 노트",

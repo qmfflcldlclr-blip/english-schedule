@@ -62,23 +62,26 @@ export default function StudentForm({ t, student, cancelHref }: Props) {
         )}
       </label>
 
-      <label className="block text-sm font-medium">
-        {t.lessonMinutes}
-        <select
-          name="lesson_minutes"
-          required
-          defaultValue={student?.lesson_minutes ?? DEFAULT_LESSON_MINUTES}
-          aria-invalid={errors.minutes || undefined}
-          className={`${inputClass} mt-1 min-h-12 w-40`}
-        >
-          {LESSON_LENGTHS.map((m) => (
-            <option key={m} value={m}>
-              {m} {t.minutes}
-            </option>
-          ))}
-        </select>
-        {errors.minutes && <span className="mt-1 block text-sm text-red-600">{t.errors.minutes}</span>}
-      </label>
+      {/* 수업 길이: 새 학생은 무조건 30분이라 수정할 때만 보임 */}
+      {student && (
+        <label className="block text-sm font-medium">
+          {t.lessonMinutes}
+          <select
+            name="lesson_minutes"
+            required
+            defaultValue={student?.lesson_minutes ?? DEFAULT_LESSON_MINUTES}
+            aria-invalid={errors.minutes || undefined}
+            className={`${inputClass} mt-1 min-h-12 w-40`}
+          >
+            {LESSON_LENGTHS.map((m) => (
+              <option key={m} value={m}>
+                {m} {t.minutes}
+              </option>
+            ))}
+          </select>
+          {errors.minutes && <span className="mt-1 block text-sm text-red-600">{t.errors.minutes}</span>}
+        </label>
+      )}
 
       {errors.save && (
         <p role="alert" className="text-sm text-red-600">

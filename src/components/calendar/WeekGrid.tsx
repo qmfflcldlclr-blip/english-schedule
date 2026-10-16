@@ -9,6 +9,7 @@ import { CALENDAR_END_HOUR, CALENDAR_RANGE_TIME_ZONE, CALENDAR_START_HOUR, DAY_C
 import LessonTime, { MarkBadge, markRing, statusStyle } from "@/components/calendar/LessonTime";
 import type { LessonMark } from "@/lib/plan-timeline";
 import DaySlots from "@/components/calendar/DaySlots";
+import DayAttendButton from "@/components/calendar/DayAttendButton";
 import LessonQuick from "@/components/calendar/LessonQuick";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
 
@@ -62,19 +63,24 @@ export default function WeekGrid({ days, today, byDay, feedbackIds = [], marks =
         {/* 요일 머리글 (공휴일·일요일 빨강, 토요일 파랑) */}
         <div className="border-b border-gray-200" />
         {days.map((d) => (
-          <Link
-            key={d}
-            href={`/calendar/new?date=${d}`}
-            title={t.add}
-            className={`flex min-w-0 flex-col items-center justify-center border-b border-l border-gray-200 px-1 py-1.5 text-center text-sm hover:bg-gray-50 ${d === today ? "bg-brand-50 font-bold" : ""} ${tone(d) || "text-gray-700"}`}
-          >
-            {formatDay(d, locale, { weekday: "short", day: "numeric" })}
+          <div key={d} className={`flex min-w-0 flex-col items-center justify-center border-b border-l border-gray-200 px-1 py-1.5 text-center text-sm ${d === today ? "bg-brand-50 font-bold" : ""} ${tone(d) || "text-gray-700"}`}>
+            <span className="flex items-center gap-1">
+              <Link href={`/calendar/new?date=${d}`} title={t.add} className="rounded px-1 hover:bg-gray-100">
+                {formatDay(d, locale, { weekday: "short", day: "numeric" })}
+              </Link>
+              {/* 그날 예정 수업 한 번에 출석 */}
+              <DayAttendButton
+                ids={(byDay[d] ?? []).filter((l) => l.status === "scheduled").map((l) => l.id)}
+                dayLabel={formatDay(d, locale, { month: "long", day: "numeric", weekday: "short" })}
+                labels={t.dayAttend}
+              />
+            </span>
             {holidays[d] && (
               <span title={holidayText(d)} className="block w-full truncate text-[11px] font-medium">
                 {holidayText(d)}
               </span>
             )}
-          </Link>
+          </div>
         ))}
 
         {/* 시간 눈금 (24시 넘으면 01:00 처럼) */}

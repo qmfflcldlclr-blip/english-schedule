@@ -16,13 +16,14 @@ export type Student = {
 // "*": 영어 이름 칸(0013)을 아직 안 만들었어도 깨지지 않게
 const COLUMNS = "*";
 
-// 학생 목록 (이름순). archived=true 면 보관된 학생만
+// 학생 목록 (이름순). archived=true 면 보관된 학생만. 삭제된 학생(0020)은 어디에도 안 보임
 export async function listStudents(archived: boolean): Promise<Student[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("students")
     .select(COLUMNS)
     .eq("archived", archived)
+    .is("deleted_at", null)
     .order("name");
   if (error) throw error;
   const labels = await getStudentLabels();

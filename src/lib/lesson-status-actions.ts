@@ -46,3 +46,20 @@ export async function quickLessonStatus(
   revalidatePath("/");
   return { ok: true };
 }
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// 하루 일괄 출석: 그날 "예정" 수업을 모두 완료 (이미 처리된 수업은 건너뜀). 남은 횟수가 모자라도 처리 (마이너스로 표시됨)
+export async function completeLessons(ids: string[]): Promise<{ done: number; failed: number }> {
+  const valid = Array.isArray(ids) ? ids.filter((id) => typeof id === "string" && UUID.test(id)).slice(0, 100) : [];
+  const supabase = await createClient();
+  let done = 0;
+  // 같은 학생 수업은 데이터베이스가 한 줄로 세움 → 하나씩 차례로
+  for (const id of valid) {
+    const { error } = await supabase.rpc("set_lesson_status", { p_lesson_id: id, p_action: "complete" });
+    if (!error) done++;
+  }
+  revalidatePath("/calendar");
+  revalidatePath("/");
+  return { done, failed: valid.length - done };
+}

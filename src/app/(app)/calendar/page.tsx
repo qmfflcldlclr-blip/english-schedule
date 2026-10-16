@@ -21,6 +21,7 @@ import LessonQuick from "@/components/calendar/LessonQuick";
 import { statusText } from "@/components/calendar/quick-labels";
 import { CalendarPanelProvider } from "@/components/calendar/panel-context";
 import SidePanel from "@/components/calendar/SidePanel";
+import DayAttendButton from "@/components/calendar/DayAttendButton";
 import AddLessonButton, { OverviewButton } from "@/components/calendar/AddLessonButton";
 import type { MonthSummary } from "@/components/calendar/SidePanel";
 import { addMonths } from "@/lib/print-layout";
@@ -40,7 +41,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   ]);
   const t = all.calendar;
   const timeZone = (profile?.timezone as string) ?? "UTC";
-  const today = scheduleToday(timeZone); // 새벽 1시라면 아직 "어제"
+  const today = scheduleToday(timeZone); // 자정에 바뀜
   const selected = isDate(sp.date) ? sp.date : today;
   const weekFirst = weekStart(selected);
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekFirst, i));
@@ -81,14 +82,16 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
 
   // 옆 칸: 이번 달 현황 (취소(연기)는 횟수·시간에서 뺌)
   const counted = monthLessons.filter((l) => l.status !== "free_cancel");
+  // 길이는 30분 단위로 셈 (예전 15분 수업도 30분)
+  const len = (l: Lesson) => creditUnits(l.duration_minutes) * 30;
   const lengths = new Map<number, number>();
-  for (const l of counted) lengths.set(l.duration_minutes, (lengths.get(l.duration_minutes) ?? 0) + 1);
+  for (const l of counted) lengths.set(len(l), (lengths.get(len(l)) ?? 0) + 1);
   const summary: MonthSummary = {
     month,
     lessons: counted.length,
-    minutes: counted.reduce((sum, l) => sum + l.duration_minutes, 0),
+    minutes: counted.reduce((sum, l) => sum + len(l), 0),
     credits: counted.reduce((sum, l) => sum + creditUnits(l.duration_minutes), 0),
-    doneMinutes: counted.filter((l) => l.status === "completed").reduce((sum, l) => sum + l.duration_minutes, 0),
+    doneMinutes: counted.filter((l) => l.status === "completed").reduce((sum, l) => sum + len(l), 0),
     byMinutes: [...lengths].sort((a, b) => a[0] - b[0]),
     completed: monthLessons.filter((l) => l.status === "completed").length,
     scheduled: monthLessons.filter((l) => l.status === "scheduled").length,
@@ -153,10 +156,18 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                 className="mt-3 flex min-h-11 w-full items-center justify-center rounded-xl border border-brand-200 bg-brand-50 text-sm font-medium text-brand-700"
               />
 
-              <h2 className={`mt-5 text-sm font-medium ${tone(selected) || "text-gray-500"}`}>
-                {formatDay(selected, locale, { month: "long", day: "numeric", weekday: "long" })}
-                {holidays[selected] && <span className="ml-2">{holidayText(selected)}</span>}
-              </h2>
+              <div className="mt-5 flex items-center justify-between gap-2">
+                <h2 className={`text-sm font-medium ${tone(selected) || "text-gray-500"}`}>
+                  {formatDay(selected, locale, { month: "long", day: "numeric", weekday: "long" })}
+                  {holidays[selected] && <span className="ml-2">{holidayText(selected)}</span>}
+                </h2>
+                <DayAttendButton
+                  ids={dayLessons.filter((l) => l.status === "scheduled").map((l) => l.id)}
+                  dayLabel={formatDay(selected, locale, { month: "long", day: "numeric", weekday: "short" })}
+                  labels={t.dayAttend}
+                  className="min-h-10 px-3 text-sm"
+                />
+              </div>
               {dayLessons.length === 0 ? (
                 <div className="mt-4 flex flex-col items-center py-4 text-center">
                   <EmptyLessonsArt className="h-24" />

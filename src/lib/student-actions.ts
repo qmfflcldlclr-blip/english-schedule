@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isMissingFunction } from "@/lib/db-errors";
-import { isLessonLength } from "@/config/rules";
+import { DEFAULT_LESSON_MINUTES, isLessonLength } from "@/config/rules";
 
 export type StudentFormState = {
   errors?: { name?: boolean; minutes?: boolean; save?: boolean };
@@ -17,7 +17,9 @@ export async function saveStudent(
 ): Promise<StudentFormState> {
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
-  const minutes = Number(formData.get("lesson_minutes"));
+  // 새 학생 폼에는 길이 칸이 없음 → 기본 30분 (수정 폼에서는 바꿀 수 있음)
+  const rawMinutes = formData.get("lesson_minutes");
+  const minutes = rawMinutes === null ? DEFAULT_LESSON_MINUTES : Number(rawMinutes);
   const nameEn = String(formData.get("name_en") ?? "").trim() || null;
 
   const errors: NonNullable<StudentFormState["errors"]> = {};
@@ -69,11 +71,11 @@ export async function archiveStudents(ids: string[], archived: boolean): Promise
   return { count: count ?? 0 };
 }
 
-// 여러 학생과 그 학생들의 모든 기록을 영구 삭제 (데이터베이스 함수가 한 번에 처리 — SQL 0011)
-export async function deleteStudentsPermanently(ids: string[]): Promise<BulkResult> {
+// 여러 학생 삭제: 화면에서만 숨기고 지난 수업·횟수 기록·피드백은 남김. 앞으로 잡힌 예정 수업만 지움 (SQL 0020)
+export async function deleteStudents(ids: string[]): Promise<BulkResult> {
   if (!validIds(ids)) return { error: "invalid" };
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("delete_students_permanently", { p_ids: ids });
+  const { data, error } = await supabase.rpc("remove_students", { p_ids: ids });
   if (isMissingFunction(error)) return { error: "setup" };
   if (error) return { error: "save" };
   revalidatePath("/students");

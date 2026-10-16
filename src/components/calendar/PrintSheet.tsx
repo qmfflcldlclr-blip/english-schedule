@@ -14,6 +14,8 @@ export type PrintRow = {
   free: number;
   absent: number;
   remaining: number;
+  start: string; // 가장 최근 플랜 시작일 "10/5"
+  end: string; // 종료일 "11/2 (예상)"
 };
 
 type Props = {
@@ -161,13 +163,15 @@ export default function PrintSheet({ month, heading, meta, days, holidays = {}, 
                 >
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className={`${cell} w-[28%] px-[1.5mm] text-left`}>{t.colStudent}</th>
+                      <th className={`${cell} w-[18%] px-[1.5mm] text-left`}>{t.colStudent}</th>
                       <th className={cell}>{t.colMonth}</th>
                       <th className={cell}>{t.colCompleted}</th>
                       <th className={cell}>{t.colScheduled}</th>
                       <th className={cell}>{t.colFree}</th>
                       <th className={cell}>{t.colAbsent}</th>
                       <th className={cell}>{t.colRemaining}</th>
+                      <th className={`${cell} w-[16%]`}>{t.colStart}</th>
+                      <th className={`${cell} w-[16%]`}>{t.colEnd}</th>
                     </tr>
                   </thead>
                   <tbody className="text-center tabular-nums">
@@ -180,6 +184,8 @@ export default function PrintSheet({ month, heading, meta, days, holidays = {}, 
                         <td className={cell}>{r.free}</td>
                         <td className={cell}>{r.absent}</td>
                         <td className={`${cell} font-bold`}>{format(timesUnit, { n: r.remaining })}</td>
+                        <td className={`${cell} truncate`}>{r.start}</td>
+                        <td className={`${cell} truncate`}>{r.end}</td>
                       </tr>
                     ))}
                   </tbody>

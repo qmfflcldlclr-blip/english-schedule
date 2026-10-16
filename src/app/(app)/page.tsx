@@ -21,7 +21,7 @@ function dayPart(minutes: number): DayPart {
 export default async function Home() {
   const [{ locale, t }, profile] = await Promise.all([getDictionary(), getCurrentProfile()]);
   const timeZone = (profile?.timezone as string) ?? "UTC";
-  const today = scheduleToday(timeZone); // 새벽 수업은 전날에 포함
+  const today = scheduleToday(timeZone); // 자정에 바뀜 (그날 수업일 = 그날 5시 ~ 다음 날 5시)
   const now = new Date();
 
   const [todayLessons, otherTimeZone, notes, lowCredit] = await Promise.all([
@@ -55,8 +55,33 @@ export default async function Home() {
   const name = profile?.display_name ?? "";
   const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.calendar.otherTime };
 
+  // 공지: 남은 횟수가 얼마 안 남은 학생 (세로 한 줄씩). 폰은 설명서 아래, 넓은 화면은 오른쪽 칸
+  const lowCreditBox = lowCredit.length > 0 && (
+    <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
+      <h2 className="font-bold text-amber-900">📢 {t.home.lowCreditTitle}</h2>
+      <p className="text-sm text-amber-700">{format(t.home.lowCreditHint, { n: LOW_CREDIT_THRESHOLD })}</p>
+      <ul className="mt-2 flex flex-col gap-1.5">
+        {lowCredit.map((s) => (
+          <li key={s.id}>
+            <Link
+              href={`/students/${s.id}`}
+              className="flex min-h-11 items-center gap-2 rounded-xl border border-amber-200 bg-white px-3 text-sm hover:bg-amber-100"
+            >
+              <span className="min-w-0 flex-1 truncate font-medium">{s.name}</span>
+              <span className={`shrink-0 tabular-nums ${s.remaining <= 0 ? "font-semibold text-red-600" : "text-amber-700"}`}>
+                {format(t.home.lowCreditItem, { n: s.remaining })}
+              </span>
+              {endOf(s.id) && <span className="shrink-0 text-xs text-red-700">{t.students.endsOn} {endOf(s.id)}</span>}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-5 md:py-8">
+    <main className={`mx-auto w-full max-w-3xl flex-1 px-4 py-5 md:py-8 lg:max-w-6xl ${lowCreditBox ? "lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-6" : ""}`}>
+      <div className="min-w-0">
       {/* 인사 카드 */}
       <section
         className={`relative overflow-hidden rounded-3xl p-5 shadow-sm md:p-7 ${
@@ -113,31 +138,7 @@ export default async function Home() {
         <span aria-hidden className="text-xl text-brand-500">›</span>
       </Link>
 
-      {/* 공지: 남은 횟수가 얼마 안 남은 학생 */}
-      {lowCredit.length > 0 && (
-        <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
-          <h2 className="font-bold text-amber-900">
-            📢 {t.home.lowCreditTitle}
-            <span className="ml-2 text-sm font-normal text-amber-700">{format(t.home.lowCreditHint, { n: LOW_CREDIT_THRESHOLD })}</span>
-          </h2>
-          <ul className="mt-2 flex flex-wrap gap-1.5">
-            {lowCredit.map((s) => (
-              <li key={s.id}>
-                <Link
-                  href={`/students/${s.id}`}
-                  className="flex min-h-10 items-center gap-1.5 rounded-full border border-amber-200 bg-white px-3 text-sm hover:bg-amber-100"
-                >
-                  <span className="font-medium">{s.name}</span>
-                  <span className={`tabular-nums ${s.remaining <= 0 ? "font-semibold text-red-600" : "text-amber-700"}`}>
-                    {format(t.home.lowCreditItem, { n: s.remaining })}
-                  </span>
-                  {endOf(s.id) && <span className="text-xs text-red-700">· {t.students.endsOn} {endOf(s.id)}</span>}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      {lowCreditBox && <div className="mt-4 lg:hidden">{lowCreditBox}</div>}
 
       {/* 서로 남기는 메모 (매니저 · 선생님 각자 한 칸) */}
       <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -200,6 +201,10 @@ export default async function Home() {
           ))}
         </ul>
       )}
+      </div>
+
+      {/* 넓은 화면: 오른쪽 칸 */}
+      {lowCreditBox && <aside className="hidden lg:sticky lg:top-20 lg:block">{lowCreditBox}</aside>}
     </main>
   );
 }

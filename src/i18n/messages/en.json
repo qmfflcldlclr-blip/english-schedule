@@ -84,11 +84,8 @@
     "selectedCount": "{n} selected",
     "archiveSelected": "Archive",
     "unarchiveSelected": "Unarchive",
-    "deleteSelected": "Delete permanently",
+    "deleteSelected": "Delete",
     "clearSelection": "Clear",
-    "deleteWord": "DELETE",
-    "deletePrompt": "This permanently deletes {n} student(s) and all their records (classes, credit history, feedback). This cannot be undone.\n\n{names}\n\nType \"{word}\" to continue.",
-    "deleteMismatch": "Text did not match, nothing was deleted.",
     "zeroTitle": "0 classes left",
     "zeroHint": "Students left at 0 for {days} days with no upcoming classes are archived automatically.",
     "autoArchived": "Archived {n} student(s) who stayed at 0 classes for {days} days.",
@@ -115,7 +112,8 @@
     "undecided": "TBD",
     "paidOn": "Paid",
     "startsOn": "Start",
-    "endsOn": "End"
+    "endsOn": "End",
+    "deleteConfirm": "Delete {n} student(s)?\n\n{names}\n\nThey disappear from the student list and search, and their upcoming scheduled classes are removed. Past classes, credit history and feedback are kept as records."
   },
   "credits": {
     "title": "Class credits",
@@ -372,7 +370,8 @@
         "save": "Could not save. Please try again.",
         "setup": "Database setup needed. Run the 0017 (class feedback) file in the Supabase SQL Editor."
       },
-      "monthCredits": "= {n} credits (30 min = 1)"
+      "monthCredits": "= {n} credits (30 min = 1)",
+      "deleteKeyHint": "You can also press the Delete key after selecting a class"
     },
     "copyFrom": "Copy from",
     "copyPick": "Pick another date",
@@ -383,7 +382,13 @@
     "confirmPostpone": "Mark as postponed? No credit will be used.",
     "postponeHint": "Postpone only when the teacher/manager allows it — no credit used. Other missed classes are Absent (charged).",
     "planStart": "Start",
-    "planEnd": "End"
+    "planEnd": "End",
+    "dayAttend": {
+      "button": "Attend",
+      "confirm": "Mark all {n} scheduled class(es) on {day} as completed (attended)?",
+      "done": "Completed {n} class(es).",
+      "failed": "Completed {n}, could not process {failed}. Please refresh and check."
+    }
   },
   "settings": {
     "title": "Settings",
@@ -433,7 +438,9 @@
     "freeShort": "Postp.",
     "lateShort": "charged",
     "absentShort": "absent",
-    "timeZoneNote": "{zone} time"
+    "timeZoneNote": "{zone} time",
+    "colStart": "Start",
+    "colEnd": "End"
   },
   "notes": {
     "title": "Notes",
@@ -497,7 +504,13 @@
     "general": "General",
     "copy": "Copy",
     "copied": "Copied",
-    "original": "Show original"
+    "original": "Show original",
+    "exportTitle": "Export feedback for {name}",
+    "exportCopy": "Copy all",
+    "exportDownload": "Save file",
+    "exportFile": "feedback",
+    "exportHeading": "[{name}] Feedback ({n})",
+    "exportWritten": "written {date}"
   },
   "studentNotes": {
     "title": "Student notes",

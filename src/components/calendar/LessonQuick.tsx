@@ -24,6 +24,8 @@ export default function LessonQuick({ lessonId, studentId, scheduled, className,
   // 옆 칸에서 보고 있는 수업은 진하게, 같은 학생의 다른 수업은 옅게 테두리
   const selected = view.mode === "lesson" && view.lessonId === lessonId;
   const sameStudent = !selected && (view.mode === "lesson" || view.mode === "student") && view.studentId === studentId;
+  // 옆 칸에서 학생을 고르면 달력에는 그 학생 수업만
+  if (view.mode === "student" && view.studentId !== studentId) return null;
 
   return (
     <button

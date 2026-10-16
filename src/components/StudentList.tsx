@@ -8,7 +8,7 @@ import type { Messages } from "@/i18n/server";
 import { matchesSearch } from "@/lib/search";
 import { LOW_CREDIT_THRESHOLD } from "@/config/rules";
 import StudentPanel, { type PanelT } from "@/components/StudentPanel";
-import { archiveStudents, deleteStudentsPermanently, type BulkResult } from "@/lib/student-actions";
+import { archiveStudents, deleteStudents, type BulkResult } from "@/lib/student-actions";
 
 export type StudentRow = {
   id: string;
@@ -86,13 +86,8 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
   const remove = () => {
     const names = students.filter((s) => selected.has(s.id)).map((s) => s.label);
     const shownNames = names.slice(0, 8).join(", ") + (names.length > 8 ? ` …(+${names.length - 8})` : "");
-    const typed = window.prompt(format(t.deletePrompt, { n: names.length, names: shownNames, word: t.deleteWord }));
-    if (typed === null) return;
-    if (typed.trim() !== t.deleteWord) {
-      setMessage({ ok: false, text: t.deleteMismatch });
-      return;
-    }
-    startTransition(async () => finish(await deleteStudentsPermanently(ids)));
+    if (!window.confirm(format(t.deleteConfirm, { n: names.length, names: shownNames }))) return;
+    startTransition(async () => finish(await deleteStudents(ids)));
   };
 
   // 남은 횟수 배지 + "기간 지남" 표시 (0회 이하 빨강, 얼마 안 남으면 주황, 넉넉하면 초록)
