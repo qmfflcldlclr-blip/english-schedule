@@ -1,6 +1,7 @@
 // 플랜별 시작·종료 수업 계산 (데이터베이스 없이 순수 계산만)
 // 횟수는 "먼저 시작한 플랜부터" 쓰고, 수동 조정(이월·보너스·정정)은 맨 앞에서 먼저 씀 (computePlanProgress 와 같은 순서)
 // 잡혀 있는 수업이 모자라면 마지막 한 주의 수업 요일·시각이 계속 반복된다고 보고 예상 날짜를 냄
+// 예상할 때는 주말·공휴일(skipDay)은 수업 없다고 봄 → 실제로 그날 수업을 잡으면 그 수업이 세어져서 종료가 당겨짐
 import { creditUnits } from "@/config/rules";
 
 export type TimelinePlan = { id: string; credits: number; starts_on: string; created_at: string };
@@ -23,7 +24,12 @@ export type LessonMark = "start" | "end" | "both";
 const WEEK_MS = 7 * 86_400_000;
 const MAX_PROJECT_WEEKS = 52;
 
-export function planTimeline(plans: TimelinePlan[], lessons: TimelineLesson[], carry: number) {
+export function planTimeline(
+  plans: TimelinePlan[],
+  lessons: TimelineLesson[],
+  carry: number,
+  skipDay: (at: number) => boolean = () => false,
+) {
   const ordered = [...plans].sort((a, b) => a.starts_on.localeCompare(b.starts_on) || a.created_at.localeCompare(b.created_at));
   // 수업마다 쓰는 횟수: 처리된 수업은 실제 기록, 예정 수업은 길이만큼, 연기는 0
   const real = lessons
@@ -44,7 +50,9 @@ export function planTimeline(plans: TimelinePlan[], lessons: TimelineLesson[], c
     let sum = used;
     for (let k = 1; k <= MAX_PROJECT_WEEKS && sum < total; k++) {
       for (const l of week) {
-        timeline.push({ id: null, at: l.at + k * WEEK_MS, units: l.units });
+        const at = l.at + k * WEEK_MS;
+        if (skipDay(at)) continue;
+        timeline.push({ id: null, at, units: l.units });
         sum += l.units;
       }
     }

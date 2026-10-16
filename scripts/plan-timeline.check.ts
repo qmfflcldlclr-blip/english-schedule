@@ -38,4 +38,13 @@ const plan = (id: string, credits: number, starts_on: string) => ({ id, credits,
   assert.equal(marks.get("w1"), "start");
   assert.equal(marks.get("w22"), "end");
 }
+// 예상 날짜는 공휴일을 건너뜀: 20일이 공휴일이면 종료가 22 → 27일로 밀림. 실제로 20일 수업을 잡으면 다시 당겨짐
+{
+  const holiday = Date.parse(at(20));
+  const { spans } = planTimeline([plan("p1", 4, "2026-10-01")], [lesson("a", 13), lesson("b", 15)], 0, (t) => t === holiday);
+  assert.equal(spans[0].end, at(27));
+  const booked = planTimeline([plan("p1", 4, "2026-10-01")], [lesson("a", 13), lesson("b", 15), lesson("c", 20)], 0, (t) => t === holiday);
+  assert.equal(booked.spans[0].end, at(22));
+  assert.equal(booked.spans[0].endProjected, true);
+}
 console.log("OK");

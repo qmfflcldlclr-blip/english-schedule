@@ -1,6 +1,11 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { planTimeline, type TimelineLesson, type TimelinePlan } from "@/lib/plan-timeline";
+import { getHolidays } from "@/lib/holidays";
+import { addDays, toScheduleDay } from "@/lib/time";
+
+const KR_TIME_ZONE = "Asia/Seoul";
+const PROJECT_DAYS = 400; // 예상 날짜를 계산하는 최대 범위 (plan-timeline 의 52주보다 넉넉히)
 
 const PAGE = 1000; // Supabase 가 한 번에 돌려주는 최대 줄 수
 
@@ -22,7 +27,8 @@ export async function getPlanTimelines(studentIds: string[]) {
   const result = new Map<string, ReturnType<typeof planTimeline>>();
   if (studentIds.length === 0) return result;
   const supabase = await createClient();
-  const [plans, entries, lessons] = await Promise.all([
+  const today = toScheduleDay(new Date(), KR_TIME_ZONE).date;
+  const [plans, entries, lessons, holidays] = await Promise.all([
     fetchAll<TimelinePlan & { student_id: string }>(() =>
       supabase.from("plans").select("id, student_id, credits, starts_on, created_at").in("student_id", studentIds).order("id"),
     ),
@@ -32,7 +38,15 @@ export async function getPlanTimelines(studentIds: string[]) {
     fetchAll<Omit<TimelineLesson, "charged"> & { student_id: string }>(() =>
       supabase.from("lessons").select("id, student_id, starts_at, duration_minutes, status").in("student_id", studentIds).order("id"),
     ),
+    getHolidays(addDays(today, -7), addDays(today, PROJECT_DAYS)),
   ]);
+
+  // 예상에서 빼는 날: 토·일 + 한국 공휴일 (한국 날짜 기준, 새벽 수업은 전날)
+  const skipDay = (at: number) => {
+    const day = toScheduleDay(new Date(at), KR_TIME_ZONE).date;
+    const weekday = new Date(`${day}T00:00:00Z`).getUTCDay();
+    return weekday === 0 || weekday === 6 || Boolean(holidays[day]?.some((h) => h.country === "KR"));
+  };
 
   // 수업별 실제로 쓴 횟수, 학생별 수업과 무관한 조정 합계(이월·보너스·정정)
   const charged = new Map<string, number>();
@@ -50,6 +64,7 @@ export async function getPlanTimelines(studentIds: string[]) {
         plans.filter((p) => p.student_id === id).map((p) => ({ ...p, credits: Number(p.credits) })),
         lessons.filter((l) => l.student_id === id).map((l) => ({ ...l, charged: charged.get(l.id) ?? 0 })),
         carry.get(id) ?? 0,
+        skipDay,
       ),
     );
   }

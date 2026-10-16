@@ -91,7 +91,7 @@ const ko: Guide = {
       title: "학생",
       bullets: [
         "목록에서 남은 횟수는 색으로 보여요: 🟢 넉넉함 · 🟠 3회 이하 · 🔴 0회 이하.",
-        "**플랜** 칸: 지금 플랜 종류 · 결제일 · 시작일 ~ 종료일. 아직 안 잡힌 수업은 같은 요일로 계속한다고 보고 **(예상)** 날짜를 보여 줘요.",
+        "**플랜** 칸: 지금 플랜 종류 · 결제일 · 시작일 ~ 종료일. 아직 안 잡힌 수업은 같은 요일로 계속한다고 보고 **(예상)** 날짜를 보여 줘요. 예상할 때 **토·일·공휴일은 수업 없음**으로 봐요 — 공휴일에 수업을 잡으면 그만큼 종료일이 자동으로 당겨져요.",
         "학생 줄을 누르면 오른쪽 칸(폰은 아래 창)에서 바로 **플랜 등록 · 횟수 조정 · 노트 · 횟수 기록**을 볼 수 있어요. 전체 정보는 **자세히 ›**.",
         "**+ 학생 추가**: 이름, 영어 이름(비우면 자동 변환, 예: 나상현 → Na Sanghyeon), 기본 수업 길이.",
         "체크칸으로 여러 명을 골라 **보관**(목록에서 숨김, 되돌릴 수 있음) 또는 **완전 삭제**(모든 기록까지 영구 삭제)할 수 있어요.",
@@ -270,7 +270,7 @@ const en: Guide = {
       },
       bullets: [
         "**Add plan**: each payment, pick the type (4 weeks: **1×/wk 4 · 2×/wk 8 · 3×/wk 12 · 4×/wk 16 · 5×/wk 20**, or 1-class trial) and payment date. Leftover credits are used first, then older plans.",
-        "**Start / end dates** are automatic: the plan's first class is the start, its last class is the end. Start = green border, End = red border on the calendar.",
+        "**Start / end dates** are automatic: the plan's first class is the start, its last class is the end. Start = green border, End = red border on the calendar. Estimates skip weekends and Korean holidays — book a class on a holiday and the end date moves earlier automatically.",
         "**Edit plan** lets you change the type (e.g. 4 → 12). The difference is added to or removed from the remaining credits.",
         "**Adjust**: for bonuses or corrections; a reason is required. Records can't be deleted — if you made a mistake, adjust once more in the opposite direction.",
         "**Revert**: setting a processed class back to \"scheduled\" returns its credits exactly.",
