@@ -5,7 +5,7 @@ import { listStudents } from "@/lib/students";
 import { getCurrentProfile } from "@/lib/supabase/server";
 import { getCreditOverview, type CurrentPlan } from "@/lib/credits";
 import { planLabel } from "@/components/PlanSelect";
-import { toScheduleDay } from "@/lib/time";
+import { spanDay } from "@/lib/plan-timelines";
 import { listNotesByStudent } from "@/lib/student-notes";
 import { translateMany } from "@/lib/translate";
 import { todayIn } from "@/lib/credit-math";
@@ -46,15 +46,13 @@ export default async function StudentsPage({
     locale,
   );
   const timeZone = profile?.timezone ?? "UTC";
-  // 플랜 칸 글자: "주 2회 · 8회", "결제 10/25", "10/27 ~ 11/20 (예상)"
-  const md = (date: string) => `${Number(date.slice(5, 7))}/${Number(date.slice(8))}`;
-  const when = (iso: string | null | undefined, projected?: boolean) =>
-    iso ? `${md(toScheduleDay(iso, timeZone).date)}${projected ? ` ${t.projected}` : ""}` : t.undecided;
+  // 플랜 칸 글자: "주 2회 · 8회" / 결제일 "10/25" / 시작일 "10/27" / 종료일 "11/20 (예상)"
   const planText = (p: CurrentPlan | null) =>
     p && {
       label: planLabel(p.credits, all.credits),
-      paid: format(t.paidShort, { date: md(p.paidOn) }),
-      range: `${when(p.span?.start, p.span?.startProjected)} ~ ${when(p.span?.end, p.span?.endProjected)}`,
+      paid: `${Number(p.paidOn.slice(5, 7))}/${Number(p.paidOn.slice(8))}`,
+      start: spanDay(p.span?.start, p.span?.startProjected, timeZone, t),
+      end: spanDay(p.span?.end, p.span?.endProjected, timeZone, t),
     };
   const creditsOf = (id: string) => {
     const o = overview.get(id);

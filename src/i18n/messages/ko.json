@@ -111,9 +111,11 @@
     "details": "자세히",
     "moreHistory": "더 보기 ({n}개 더)",
     "plan": "플랜",
-    "paidShort": "결제 {date}",
     "projected": "(예상)",
-    "undecided": "미정"
+    "undecided": "미정",
+    "paidOn": "결제일",
+    "startsOn": "시작일",
+    "endsOn": "종료일"
   },
   "credits": {
     "title": "수강 횟수",

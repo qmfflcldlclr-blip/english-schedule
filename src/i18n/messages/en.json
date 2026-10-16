@@ -111,9 +111,11 @@
     "details": "Details",
     "moreHistory": "Show more ({n} more)",
     "plan": "Plan",
-    "paidShort": "Paid {date}",
     "projected": "(est.)",
-    "undecided": "TBD"
+    "undecided": "TBD",
+    "paidOn": "Paid",
+    "startsOn": "Start",
+    "endsOn": "End"
   },
   "credits": {
     "title": "Class credits",

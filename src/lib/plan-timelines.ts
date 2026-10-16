@@ -22,6 +22,13 @@ async function fetchAll<T>(query: () => Query): Promise<T[]> {
   }
 }
 
+// 시작·종료 날짜 글자 "10/27", 예상이면 "10/27 (예상)", 없으면 "미정" (보는 사람 시간대, 새벽 수업은 전날)
+export function spanDay(iso: string | null | undefined, projected: boolean | undefined, timeZone: string, t: { projected: string; undecided: string }) {
+  if (!iso) return t.undecided;
+  const d = toScheduleDay(iso, timeZone).date;
+  return `${Number(d.slice(5, 7))}/${Number(d.slice(8))}${projected ? ` ${t.projected}` : ""}`;
+}
+
 // 학생별 플랜 시작·종료 (수업 칸 표시 + 플랜별 날짜)
 export async function getPlanTimelines(studentIds: string[]) {
   const result = new Map<string, ReturnType<typeof planTimeline>>();

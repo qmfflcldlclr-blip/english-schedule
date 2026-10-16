@@ -10,6 +10,7 @@ import NoteCard from "@/components/NoteCard";
 import { getStaffNotes } from "@/lib/notes";
 import { translateNote } from "@/lib/translate";
 import { listLowCreditStudents } from "@/lib/students";
+import { getPlanTimelines, spanDay } from "@/lib/plan-timelines";
 import { LOW_CREDIT_THRESHOLD } from "@/config/rules";
 
 // 내 시간대 기준: 12시 전 아침, 18시 전 오후, 그 뒤 저녁
@@ -29,7 +30,14 @@ export default async function Home() {
     getStaffNotes(),
     listLowCreditStudents(LOW_CREDIT_THRESHOLD),
   ]);
-  const lessons = await withMemoTranslations(todayLessons, locale); // 수업 노트 번역
+  const [lessons, timelines] = await Promise.all([
+    withMemoTranslations(todayLessons, locale), // 수업 노트 번역
+    getPlanTimelines(lowCredit.map((s) => s.id)), // 공지: 횟수가 끝나는 날 (마지막 플랜의 종료)
+  ]);
+  const endOf = (id: string) => {
+    const last = timelines.get(id)?.spans.at(-1);
+    return last?.end ? spanDay(last.end, last.endProjected, timeZone, t.students) : null;
+  };
   // 메모 자동 번역 (화면 언어와 다른 글만)
   const translations = await Promise.all(notes.map((n) => translateNote(n.content, locale)));
   // 메모 수정 시각 "10/10 16:20" (내 시간대)
@@ -123,6 +131,7 @@ export default async function Home() {
                   <span className={`tabular-nums ${s.remaining <= 0 ? "font-semibold text-red-600" : "text-amber-700"}`}>
                     {format(t.home.lowCreditItem, { n: s.remaining })}
                   </span>
+                  {endOf(s.id) && <span className="text-xs text-red-700">· {t.students.endsOn} {endOf(s.id)}</span>}
                 </Link>
               </li>
             ))}
