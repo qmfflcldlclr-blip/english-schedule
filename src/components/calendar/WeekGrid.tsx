@@ -6,7 +6,8 @@ import type { Lesson } from "@/lib/lessons";
 import { flag, type Holiday } from "@/lib/holidays";
 import { formatDay, toScheduleDay, toZoned } from "@/lib/time";
 import { CALENDAR_END_HOUR, CALENDAR_RANGE_TIME_ZONE, CALENDAR_START_HOUR, DAY_CUTOFF_HOUR, HOUR_PX } from "@/config/schedule";
-import LessonTime, { statusStyle } from "@/components/calendar/LessonTime";
+import LessonTime, { MarkBadge, markRing, statusStyle } from "@/components/calendar/LessonTime";
+import type { LessonMark } from "@/lib/plan-timeline";
 import DaySlots from "@/components/calendar/DaySlots";
 import LessonQuick from "@/components/calendar/LessonQuick";
 import { dayTone, toneText } from "@/components/calendar/day-tone";
@@ -28,6 +29,7 @@ type Props = {
   today: string;
   byDay: Record<string, Lesson[]>; // 수업일별 수업
   feedbackIds?: string[]; // 피드백이 있는 수업 (💬 표시)
+  marks?: Record<string, LessonMark>; // 플랜 시작·종료 수업
   holidays: Record<string, Holiday[]>;
   timeZone: string;
   otherTimeZone: string | null;
@@ -35,7 +37,7 @@ type Props = {
   t: Messages["calendar"];
 };
 
-export default function WeekGrid({ days, today, byDay, feedbackIds = [], holidays, timeZone, otherTimeZone, locale, t }: Props) {
+export default function WeekGrid({ days, today, byDay, feedbackIds = [], marks = {}, holidays, timeZone, otherTimeZone, locale, t }: Props) {
   const hasFeedback = new Set(feedbackIds);
   const lessons = days.flatMap((d) => byDay[d] ?? []);
   const timeProps = { timeZone, otherTimeZone, locale, otherLabel: t.otherTime };
@@ -106,12 +108,13 @@ export default function WeekGrid({ days, today, byDay, feedbackIds = [], holiday
                   move={{ date: d, minutes: start, duration: l.duration_minutes, fromHour, hourPx: HOUR_PX, studentName: l.studentName, locale, labels: moveLabels }}
                   title={`${time} ${l.studentName} · ${minutes}${l.memo ? `
 📝 ${l.memoT || l.memo}` : ""}`}
-                  className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]} ${l.memo ? "border-l-4 border-l-amber-400" : ""}`}
+                  className={`absolute inset-x-1 overflow-hidden rounded-md border px-1.5 text-xs shadow-sm hover:z-10 hover:shadow-md ${oneLine ? "flex items-center gap-1 leading-none" : "py-1"} ${statusStyle[l.status]} ${l.memo ? "border-l-4 border-l-amber-400" : ""} ${marks[l.id] ? markRing[marks[l.id]] : ""}`}
                   style={{ top: ((start - fromHour * 60) / 60) * HOUR_PX, height }}
                 >
                   {oneLine ? (
                     <>
                       <span className="shrink-0 font-semibold tabular-nums">{time}</span>
+                      <MarkBadge mark={marks[l.id]} t={t} />
                       <span className="shrink-0 font-medium">{l.studentName}</span>
                       {/* 수업 노트는 이름 옆에 (누르면 옆 칸에 전체) */}
                       {l.memo && <span className="min-w-0 truncate text-amber-800">📝 {l.memoT || l.memo}</span>}
@@ -127,9 +130,10 @@ export default function WeekGrid({ days, today, byDay, feedbackIds = [], holiday
                         {minutes}
                       </span>
                       <LessonTime startsAt={l.starts_at} {...timeProps} compact />
-                      <span className="block truncate font-medium">
-                        {l.studentName}
-                        {l.memo && <span className="ml-1 font-normal text-amber-800">📝 {l.memoT || l.memo}</span>}
+                      <span className="flex min-w-0 items-center gap-1 font-medium">
+                        <MarkBadge mark={marks[l.id]} t={t} />
+                        <span className="truncate">{l.studentName}</span>
+                        {l.memo && <span className="min-w-0 truncate font-normal text-amber-800">📝 {l.memoT || l.memo}</span>}
                       </span>
                     </>
                   )}

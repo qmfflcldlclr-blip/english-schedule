@@ -7,7 +7,7 @@ import { format } from "@/i18n/format";
 import { SLOT_MINUTES } from "@/config/schedule";
 import { scheduleToActual } from "@/lib/time";
 
-const SNAP = SLOT_MINUTES; // 더블클릭·드래그 모두 15분 단위
+const SNAP = SLOT_MINUTES; // 클릭·드래그 모두 30분 단위
 const pad = (n: number) => String(n).padStart(2, "0");
 // 시간표 위 표시용 (25:00 이 아니라 01:00 으로)
 const hhmm = (m: number) => `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`;

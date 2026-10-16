@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useActionForm } from "@/lib/use-action-form";
 import { saveLesson, type LessonFormState } from "@/lib/lesson-actions";
-import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
+import { LESSON_LENGTHS } from "@/config/rules";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import { ErrorText, FormButtons, fieldClass } from "@/components/PlanForm";
@@ -98,7 +98,7 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDur
         </label>
         <label className="block text-sm font-medium">
           {t.time}
-          <input name="time" type="time" required step={300} value={values.time} onChange={set("time")} aria-invalid={errors.time || undefined} className={fieldClass} />
+          <input name="time" type="time" required step={600} value={values.time} onChange={set("time")} aria-invalid={errors.time || undefined} className={fieldClass} />
           {errors.time && <ErrorText>{t.errors.time}</ErrorText>}
         </label>
       </div>
@@ -106,24 +106,17 @@ export default function LessonForm({ t, students, zoneLabel, cancelHref, keepDur
 
       <label className="block text-sm font-medium">
         {t.duration}
-        <div className="mt-1 flex items-center gap-2">
-          <input
-            name="duration_minutes"
-            type="number"
-            inputMode="numeric"
-            required
-            min={LESSON_MINUTES_MIN}
-            max={LESSON_MINUTES_MAX}
-            value={values.duration}
-            onChange={set("duration")}
-            aria-invalid={errors.duration || undefined}
-            className={`${fieldClass} mt-0 w-28`}
-          />
-          <span className="text-gray-600">{format(t.minutesUnit, { n: "" }).trim()}</span>
-        </div>
-        {errors.duration && (
-          <ErrorText>{format(t.errors.duration, { min: LESSON_MINUTES_MIN, max: LESSON_MINUTES_MAX })}</ErrorText>
-        )}
+        <select
+          name="duration_minutes"
+          required
+          value={values.duration}
+          onChange={set("duration")}
+          aria-invalid={errors.duration || undefined}
+          className={`${fieldClass} w-40`}
+        >
+          {LESSON_LENGTHS.map((m) => <option key={m} value={m}>{format(t.minutesUnit, { n: m })}</option>)}
+        </select>
+        {errors.duration && <ErrorText>{t.errors.duration}</ErrorText>}
       </label>
 
       {!hideMemo && (

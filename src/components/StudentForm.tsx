@@ -7,8 +7,7 @@ import { useActionForm } from "@/lib/use-action-form";
 import { saveStudent, type StudentFormState } from "@/lib/student-actions";
 import {
   DEFAULT_LESSON_MINUTES,
-  LESSON_MINUTES_MAX,
-  LESSON_MINUTES_MIN,
+  LESSON_LENGTHS,
 } from "@/config/rules";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
@@ -65,30 +64,20 @@ export default function StudentForm({ t, student, cancelHref }: Props) {
 
       <label className="block text-sm font-medium">
         {t.lessonMinutes}
-        <div className="mt-1 flex items-center gap-2">
-          <input
-            name="lesson_minutes"
-            type="number"
-            inputMode="numeric"
-            required
-            min={LESSON_MINUTES_MIN}
-            max={LESSON_MINUTES_MAX}
-            defaultValue={student?.lesson_minutes ?? DEFAULT_LESSON_MINUTES}
-            aria-invalid={errors.minutes || undefined}
-            className={`${inputClass} mt-0 min-h-12 w-28`}
-          />
-          <span className="text-gray-600">
-            {t.minutes}
-          </span>
-        </div>
-        {errors.minutes && (
-          <span className="mt-1 block text-sm text-red-600">
-            {format(t.errors.minutes, {
-              min: LESSON_MINUTES_MIN,
-              max: LESSON_MINUTES_MAX,
-            })}
-          </span>
-        )}
+        <select
+          name="lesson_minutes"
+          required
+          defaultValue={student?.lesson_minutes ?? DEFAULT_LESSON_MINUTES}
+          aria-invalid={errors.minutes || undefined}
+          className={`${inputClass} mt-1 min-h-12 w-40`}
+        >
+          {LESSON_LENGTHS.map((m) => (
+            <option key={m} value={m}>
+              {m} {t.minutes}
+            </option>
+          ))}
+        </select>
+        {errors.minutes && <span className="mt-1 block text-sm text-red-600">{t.errors.minutes}</span>}
       </label>
 
       {errors.save && (

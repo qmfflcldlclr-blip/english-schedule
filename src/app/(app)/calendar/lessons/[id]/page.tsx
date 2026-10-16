@@ -35,8 +35,7 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
     getSettings(),
     getOtherTimeZone(profile?.id ?? "", timeZone),
   ]);
-  const now = toZoned(new Date(), timeZone);
-  // 결석 중 취소 시각이 있으면 "차감 취소", 없으면 "노쇼"
+  // 결석 중 취소 시각이 있으면 예전 규칙의 "차감 취소", 없으면 "결석"
   const absentLabel = lesson.cancelled_at ? t.lateCancel : t.noShow;
 
   // 고르는 칸에는 동명이인 번호가 붙은 이름으로
@@ -83,8 +82,6 @@ export default async function LessonPage({ params }: PageProps<"/calendar/lesson
         status={lesson.status}
         remaining={remaining}
         units={creditUnits(lesson.duration_minutes)}
-        hoursBefore={settings.freeCancelHoursBefore}
-        now={{ date: now.date, time: now.time }}
       />
 
       {editable ? (

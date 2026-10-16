@@ -2,6 +2,8 @@ import Link from "next/link";
 import { format, formatDate } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import type { getStudentCredits } from "@/lib/credits";
+import { planLabel } from "@/components/PlanSelect";
+import { toScheduleDay } from "@/lib/time";
 
 type Props = {
   t: Messages["credits"];
@@ -54,6 +56,9 @@ export default function CreditSection({
     return parts.join(" · ");
   };
   const { remaining, used, purchased, firstStart, plans, entries } = credits;
+  // 플랜 첫 수업·마지막 회차 수업 날짜 (아직 안 잡힌 수업이면 "예상")
+  const lessonDay = (iso: string | null | undefined, projected?: boolean) =>
+    iso ? `${day(toScheduleDay(iso, timeZone).date, locale)}${projected ? ` ${t.projected}` : ""}` : t.undecided;
 
   return (
     <>
@@ -105,7 +110,7 @@ export default function CreditSection({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-semibold">
-                      {format(t.planNumber, { n: p.number })}
+                      {format(t.planNumber, { n: p.number })} · {planLabel(p.credits, t)}
                       <span className="ml-2 text-sm font-normal text-gray-600">
                         {format(t.planUsed, { used: p.used, credits: p.credits })}
                       </span>
@@ -149,7 +154,9 @@ export default function CreditSection({
                   <dt className="text-gray-500">{t.paidOn}</dt>
                   <dd>{day(p.paid_on, locale)}</dd>
                   <dt className="text-gray-500">{t.startsOn}</dt>
-                  <dd>{day(p.starts_on, locale)}</dd>
+                  <dd className="text-emerald-700">{lessonDay(p.span?.start, p.span?.startProjected)}</dd>
+                  <dt className="text-gray-500">{t.endsOn}</dt>
+                  <dd className="text-red-700">{lessonDay(p.span?.end, p.span?.endProjected)}</dd>
                   <dt className="text-gray-500">{t.expiresOn}</dt>
                   <dd className={p.expired ? "font-medium text-red-700" : ""}>
                     {p.expires_on ? day(p.expires_on, locale) : t.noExpiry}

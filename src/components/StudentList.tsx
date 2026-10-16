@@ -21,6 +21,7 @@ export type StudentRow = {
   lesson_minutes: number;
   remaining: number;
   expired: boolean;
+  plan?: { label: string; paid: string; range: string } | null; // 지금 플랜: 종류·결제일·시작~종료
 };
 
 type Props = {
@@ -148,6 +149,11 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
               </p>
               {s.privateNote && <p className="truncate text-sm text-gray-500">🔒 {note(s.privateNote, s.privateNoteT)}</p>}
               {s.sharedNote && <p className="truncate text-sm text-gray-500">👥 {note(s.sharedNote, s.sharedNoteT)}</p>}
+              {s.plan && (
+                <p className="truncate text-xs text-gray-500">
+                  📅 {s.plan.label} · {s.plan.paid} · {s.plan.range}
+                </p>
+              )}
             </div>
             <div className="shrink-0 text-right">
               {remaining(s)}
@@ -186,6 +192,7 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
               </th>
               <th className="py-3 pr-4 whitespace-nowrap">{t.name}</th>
               <th className="py-3 pr-4 whitespace-nowrap">{t.remaining}</th>
+              <th className="py-3 pr-4 whitespace-nowrap">{t.plan}</th>
               <th className="py-3 pr-4 whitespace-nowrap">{t.lessonMinutes}</th>
               <th className="px-3 py-3 whitespace-nowrap">🔒 {t.privateNote}</th>
               <th className="px-3 py-3 whitespace-nowrap">👥 {t.sharedNote}</th>
@@ -218,6 +225,17 @@ export default function StudentList({ students, archivedView, autoArchiveDays, t
                 {!s.label.startsWith(s.name) && <span className="block text-xs text-gray-400">{s.name}</span>}
               </td>
               <td className="py-3 pr-4 align-top whitespace-nowrap">{remaining(s)}</td>
+              <td className="py-3 pr-4 align-top text-sm whitespace-nowrap">
+                {s.plan ? (
+                  <>
+                    <span className="font-medium text-gray-800">{s.plan.label}</span>
+                    <span className="block text-xs text-gray-500">{s.plan.paid}</span>
+                    <span className="block text-xs text-gray-700 tabular-nums">{s.plan.range}</span>
+                  </>
+                ) : (
+                  <span className="text-gray-300">—</span>
+                )}
+              </td>
               <td className="py-3 pr-4 align-top whitespace-nowrap">
                 <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-sm text-gray-700">
                   {format(t.minutesUnit, { n: s.lesson_minutes })}

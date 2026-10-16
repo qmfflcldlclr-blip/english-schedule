@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isMissingFunction } from "@/lib/db-errors";
-import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
+import { isLessonLength } from "@/config/rules";
 
 export type StudentFormState = {
   errors?: { name?: boolean; minutes?: boolean; save?: boolean };
@@ -22,13 +22,7 @@ export async function saveStudent(
 
   const errors: NonNullable<StudentFormState["errors"]> = {};
   if (!name) errors.name = true;
-  if (
-    !Number.isInteger(minutes) ||
-    minutes < LESSON_MINUTES_MIN ||
-    minutes > LESSON_MINUTES_MAX
-  ) {
-    errors.minutes = true;
-  }
+  if (!isLessonLength(minutes)) errors.minutes = true;
   if (Object.keys(errors).length) return { errors };
 
   const supabase = await createClient();

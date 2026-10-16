@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
-import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN, NOTE_MAX } from "@/config/rules";
+import { LESSON_MINUTES_MAX, NOTE_MAX, isLessonLength } from "@/config/rules";
 import { isMissingFunction } from "@/lib/db-errors";
 import { fromZoned, isDate, isTime, toZoned } from "@/lib/time";
 
@@ -74,13 +74,7 @@ export async function saveLesson(
   if (!studentId) errors.student = true;
   if (!isDate(date)) errors.date = true;
   if (!isTime(time)) errors.time = true;
-  if (
-    !Number.isInteger(duration) ||
-    duration < LESSON_MINUTES_MIN ||
-    duration > LESSON_MINUTES_MAX
-  ) {
-    errors.duration = true;
-  }
+  if (!isLessonLength(duration)) errors.duration = true;
   if (Object.keys(errors).length) return { errors };
 
   const profile = await getCurrentProfile();

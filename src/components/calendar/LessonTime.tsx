@@ -2,6 +2,7 @@ import { format } from "@/i18n/format";
 import { zoneName } from "@/config/timezones";
 import { toZoned } from "@/lib/time";
 import type { LessonStatus } from "@/lib/lessons";
+import type { LessonMark } from "@/lib/plan-timeline";
 
 // 수업 상태별 색 (목록·시간표 공용)
 export const statusStyle: Record<LessonStatus, string> = {
@@ -17,6 +18,24 @@ export const statusBadge: Record<LessonStatus, string> = {
   free_cancel: "bg-gray-100 text-gray-500",
   absent: "bg-red-50 text-red-700",
 };
+
+// 플랜 첫 수업(초록)·마지막 회차 수업(빨강) 칸 테두리 + 작은 글자
+export const markRing: Record<LessonMark, string> = {
+  start: "ring-2 ring-emerald-500",
+  end: "ring-2 ring-red-500",
+  both: "ring-2 ring-red-500",
+};
+
+export function MarkBadge({ mark, t }: { mark?: LessonMark; t: { planStart: string; planEnd: string } }) {
+  if (!mark) return null;
+  const pill = "shrink-0 rounded px-1 text-[10px] leading-4 font-bold text-white";
+  return (
+    <>
+      {mark !== "end" && <span className={`${pill} bg-emerald-600`}>{t.planStart}</span>}
+      {mark !== "start" && <span className={`${pill} bg-red-600`}>{t.planEnd}</span>}
+    </>
+  );
+}
 
 type Props = {
   startsAt: string;

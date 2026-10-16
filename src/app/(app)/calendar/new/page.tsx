@@ -5,7 +5,7 @@ import { listStudents } from "@/lib/students";
 import { todayIn } from "@/lib/credit-math";
 import { isDate, isTime } from "@/lib/time";
 import { zoneName } from "@/config/timezones";
-import { DEFAULT_LESSON_MINUTES, LESSON_MINUTES_MAX, LESSON_MINUTES_MIN } from "@/config/rules";
+import { DEFAULT_LESSON_MINUTES, isLessonLength } from "@/config/rules";
 import LessonForm from "@/components/calendar/LessonForm";
 import { DEFAULT_LESSON_TIME } from "@/config/schedule";
 
@@ -22,7 +22,7 @@ export default async function NewLessonPage({ searchParams }: PageProps<"/calend
   // 달력에서 더블클릭·드래그로 넘어오면 시간(·길이)이 주소에 들어 있음
   const time = isTime(sp.time) ? sp.time : DEFAULT_LESSON_TIME;
   const dragged = Number(sp.duration);
-  const draggedOk = Number.isInteger(dragged) && dragged >= LESSON_MINUTES_MIN && dragged <= LESSON_MINUTES_MAX;
+  const draggedOk = isLessonLength(dragged);
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 px-4 py-6">

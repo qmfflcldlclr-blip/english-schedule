@@ -2,10 +2,12 @@
 import type { Messages } from "@/i18n/server";
 import type { Lesson } from "@/lib/lessons";
 
-// 옆 칸의 완료·결석 버튼 문구
+// 옆 칸의 완료·결석·연기 버튼 문구
 export type QuickLabels = {
   complete: string;
   absent: string;
+  postpone: string;
+  confirmPostpone: string;
   details: string;
   close: string;
   processing: string;
@@ -19,6 +21,8 @@ export function quickLabels(t: Messages["calendar"]): QuickLabels {
   return {
     complete: t.actions.complete,
     absent: t.actions.absent,
+    postpone: t.actions.cancel,
+    confirmPostpone: t.confirmPostpone,
     details: t.details,
     close: t.close,
     processing: t.processing,
@@ -29,7 +33,7 @@ export function quickLabels(t: Messages["calendar"]): QuickLabels {
   };
 }
 
-// "예정" / "완료" / "무료 취소" / "차감 취소" / "결석 (노쇼)"
+// "예정" / "완료" / "연기" / "차감 취소"(예전 기록) / "결석"
 export function statusText(l: Pick<Lesson, "status" | "cancelled_at">, t: Messages["calendar"]) {
   if (l.status === "absent") return l.cancelled_at ? t.lateCancel : t.noShow;
   return t.status[l.status];

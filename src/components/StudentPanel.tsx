@@ -9,7 +9,8 @@ import type { Messages } from "@/i18n/server";
 import { useActionForm } from "@/lib/use-action-form";
 import { adjustCredits, savePlan, type AdjustFormState, type PlanFormState } from "@/lib/credit-actions";
 import { loadStudentPanel, type StudentPanelData } from "@/lib/student-panel-actions";
-import { ADJUST_MAX, LOW_CREDIT_THRESHOLD, PLAN_CREDITS_MAX } from "@/config/rules";
+import { ADJUST_MAX, LOW_CREDIT_THRESHOLD } from "@/config/rules";
+import PlanSelect from "@/components/PlanSelect";
 import { toZoned } from "@/lib/time";
 import NoteCard from "@/components/NoteCard";
 
@@ -238,7 +239,7 @@ function useSavedOnce(saved: number | undefined, onSaved: () => void) {
   }, [saved, onSaved]);
 }
 
-// ───── 플랜 추가: 횟수만 (결제일·시작일은 오늘), "더 보기"로 날짜·만료일·메모 ─────
+// ───── 플랜 추가: 종류 + 결제일, "더 보기"로 만료일·메모 ─────
 function QuickPlan({ t, studentId, today, onSaved }: { t: Messages["credits"]; studentId: string; today: string; onSaved: () => void }) {
   const [state, onSubmit, pending] = useActionForm<PlanFormState>(savePlan, {});
   useSavedOnce(state.saved, onSaved);
@@ -249,26 +250,22 @@ function QuickPlan({ t, studentId, today, onSaved }: { t: Messages["credits"]; s
       <input type="hidden" name="student_id" value={studentId} />
       <input type="hidden" name="stay" value="1" />
       <h3 className="text-sm font-semibold">➕ {t.addPlan}</h3>
-      <div className="mt-2 flex items-end gap-2">
-        <label className="block flex-1 text-xs font-medium text-gray-600">
-          {t.credits}
-          <input name="credits" type="number" inputMode="decimal" required min={0.5} step={0.5} max={PLAN_CREDITS_MAX} placeholder="10" className={`${field} min-h-11`} />
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <label className="block text-xs font-medium text-gray-600">
+          {t.planKind}
+          <PlanSelect t={t} className={`${field} min-h-11`} />
         </label>
-        <button type="submit" disabled={pending} className="min-h-11 shrink-0 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-60">
-          {pending ? t.saving : t.save}
-        </button>
+        <label className="block text-xs font-medium text-gray-600">
+          {t.paidOn}
+          <input name="paid_on" type="date" required defaultValue={today} className={`${field} min-h-11`} />
+        </label>
       </div>
+      <button type="submit" disabled={pending} className="mt-2 min-h-11 w-full rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-60">
+        {pending ? t.saving : t.save}
+      </button>
       <details className="mt-2">
         <summary className="min-h-8 cursor-pointer text-xs text-gray-500">{t.moreOptions}</summary>
         <div className="mt-2 grid grid-cols-2 gap-2">
-          <label className="block text-xs font-medium text-gray-600">
-            {t.paidOn}
-            <input name="paid_on" type="date" required defaultValue={today} className={`${field} min-h-11`} />
-          </label>
-          <label className="block text-xs font-medium text-gray-600">
-            {t.startsOn}
-            <input name="starts_on" type="date" required defaultValue={today} className={`${field} min-h-11`} />
-          </label>
           <label className="col-span-2 block text-xs font-medium text-gray-600">
             {t.expiresOn} <span className="font-normal text-gray-400">({t.expiresOnHint})</span>
             <input name="expires_on" type="date" className={`${field} min-h-11`} />
@@ -279,7 +276,7 @@ function QuickPlan({ t, studentId, today, onSaved }: { t: Messages["credits"]; s
           </label>
         </div>
       </details>
-      {errors.credits && <p className="mt-1 text-xs text-red-600">{format(t.errors.credits, { max: PLAN_CREDITS_MAX })}</p>}
+      {errors.credits && <p className="mt-1 text-xs text-red-600">{t.errors.credits}</p>}
       {errors.dates && <p className="mt-1 text-xs text-red-600">{t.errors.dates}</p>}
       {errors.expires && <p className="mt-1 text-xs text-red-600">{t.errors.expires}</p>}
       {errors.save && <p className="mt-1 text-xs text-red-600">{t.errors.save}</p>}
@@ -314,7 +311,7 @@ function QuickAdjust({ t, studentId, onSaved }: { t: Messages["credits"]; studen
       <div className="mt-2 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2">
         <label className="block text-xs font-medium text-gray-600">
           {t.amount}
-          <input name="amount" type="number" inputMode="decimal" required min={0.5} step={0.5} max={ADJUST_MAX} defaultValue={1} className={`${field} min-h-11`} />
+          <input name="amount" type="number" inputMode="numeric" required min={1} step={1} max={ADJUST_MAX} defaultValue={1} className={`${field} min-h-11`} />
         </label>
         <label className="block text-xs font-medium text-gray-600">
           {t.reason}

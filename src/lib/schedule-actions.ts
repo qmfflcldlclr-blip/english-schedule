@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
-import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN, REPEAT_MAX_WEEKS } from "@/config/rules";
+import { REPEAT_MAX_WEEKS, isLessonLength } from "@/config/rules";
 import { isDate, isTime, toZoned, weekStart } from "@/lib/time";
 import { planCopyWeek, planRepeat, type RepeatItem } from "@/lib/schedule";
 
@@ -67,9 +67,7 @@ export async function repeatLessons(
   if (!isDate(startDate)) errors.date = true;
   if (!isTime(time)) errors.time = true;
   if (!Number.isInteger(weeks) || weeks < 1 || weeks > REPEAT_MAX_WEEKS) errors.weeks = true;
-  if (!Number.isInteger(duration) || duration < LESSON_MINUTES_MIN || duration > LESSON_MINUTES_MAX) {
-    errors.duration = true;
-  }
+  if (!isLessonLength(duration)) errors.duration = true;
   if (Object.keys(errors).length) return { errors };
 
   const me = await requireProfile();

@@ -12,6 +12,10 @@ import { addMonths, isMonth, monthWeeks, PAGE } from "@/lib/print-layout";
 import { getHolidays } from "@/lib/holidays";
 import { PrintButton, StudentPicker } from "@/components/calendar/PrintControls";
 import PrintSheet, { type PrintEntry, type PrintRow } from "@/components/calendar/PrintSheet";
+import { Jua } from "next/font/google";
+
+// 인쇄 글꼴: 한컴 백제 M 과 비슷한 둥글고 굵은 무료 글꼴 (배민 주아). 한글은 글자 범위별로 필요할 때 받음
+const printFont = Jua({ weight: "400", subsets: ["latin"], preload: false });
 
 // 월간 일정 인쇄: /calendar/print?month=2026-10&student=학생ID(없으면 전체)
 export default async function PrintPage({ searchParams }: PageProps<"/calendar/print">) {
@@ -66,7 +70,7 @@ export default async function PrintPage({ searchParams }: PageProps<"/calendar/p
   const link = (m: string) => `/calendar/print?month=${m}${student ? `&student=${student.id}` : ""}`;
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4 print:m-0 print:max-w-none print:p-0">
+    <main className={`mx-auto w-full max-w-6xl flex-1 px-4 py-4 print:m-0 print:max-w-none print:p-0 ${printFont.className}`}>
       {/* 종이 크기·여백 (인쇄할 때 적용) */}
       <style>{`@page { size: A4 landscape; margin: ${PAGE.margin}mm; }`}</style>
 

@@ -39,10 +39,10 @@ export default function AdjustForm({ t, studentId }: Props) {
         <input
           name="amount"
           type="number"
-          inputMode="decimal"
+          inputMode="numeric"
           required
-          min={0.5}
-          step={0.5}
+          min={1}
+          step={1}
           max={ADJUST_MAX}
           defaultValue={1}
           aria-invalid={errors.amount || undefined}

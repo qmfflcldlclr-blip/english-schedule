@@ -12,7 +12,8 @@ import {
   toScheduleDay,
   weekStart,
 } from "@/lib/time";
-import LessonTime, { statusBadge, statusStyle } from "@/components/calendar/LessonTime";
+import LessonTime, { MarkBadge, markRing, statusBadge, statusStyle } from "@/components/calendar/LessonTime";
+import { getPlanTimelines } from "@/lib/plan-timelines";
 import WeekGrid from "@/components/calendar/WeekGrid";
 import { EmptyLessonsArt } from "@/components/Illustrations";
 import CalendarHeader from "@/components/calendar/CalendarHeader";
@@ -57,10 +58,12 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
   ]);
 
   // 수업 노트 번역 (화면 언어와 다른 노트만)
-  const [lessons, feedbackIds] = await Promise.all([
+  const [lessons, feedbackIds, timelines] = await Promise.all([
     withMemoTranslations(weekLessons, locale),
     lessonIdsWithFeedback(weekLessons.map((l) => l.id)), // 💬 표시용
+    getPlanTimelines([...new Set(weekLessons.map((l) => l.student_id))]), // 플랜 시작·종료 표시용
   ]);
+  const marks = Object.fromEntries([...timelines.values()].flatMap((tl) => [...tl.marks]));
   const hasFeedback = new Set(feedbackIds);
   // 피드백 페이지의 "수업 보기"로 오면 그 수업을 옆 칸에 바로 엶
   const openLesson = typeof sp.lesson === "string" ? lessons.find((l) => l.id === sp.lesson) : undefined;
@@ -93,9 +96,11 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
     cancelled: monthLessons.length - counted.length,
   };
 
-  // 옆 칸: 학생 고르기 목록(동명이인 번호 포함), 이번 주 수업 학생(이름순)
+  // 옆 칸: 학생 고르기 목록(동명이인 번호 포함), 이번 주 수업 학생(이름순, 보관된 학생 빼고)
   const studentOptions = students.map((s) => ({ id: s.id, name: s.label, lesson_minutes: s.lesson_minutes }));
-  const weekStudents = [...new Map(lessons.map((l) => [l.student_id, { id: l.student_id, name: l.studentName }])).values()].sort((a, b) =>
+  const activeIds = new Set(students.map((s) => s.id));
+  const weekLessonsActive = lessons.filter((l) => activeIds.has(l.student_id));
+  const weekStudents = [...new Map(weekLessonsActive.map((l) => [l.student_id, { id: l.student_id, name: l.studentName }])).values()].sort((a, b) =>
     a.name.localeCompare(b.name, locale),
   );
 
@@ -165,12 +170,13 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                         lessonId={l.id}
                         studentId={l.student_id}
                         scheduled={l.status === "scheduled"}
-                        className={`flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 ${statusStyle[l.status]} ${l.memo ? "border-l-4 border-l-amber-400" : ""}`}
+                        className={`flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 ${statusStyle[l.status]} ${l.memo ? "border-l-4 border-l-amber-400" : ""} ${marks[l.id] ? markRing[marks[l.id]] : ""}`}
                       >
                         <div className="min-w-0">
                           <LessonTime startsAt={l.starts_at} {...timeProps} />
-                          <p className="truncate font-medium">
-                            {l.studentName}
+                          <p className="flex min-w-0 items-center gap-1.5 font-medium">
+                            <MarkBadge mark={marks[l.id]} t={t} />
+                            <span className="truncate">{l.studentName}</span>
                           </p>
                           {hasFeedback.has(l.id) && <p className="mt-0.5 text-xs font-medium text-brand-700">💬 {t.panel.lessonFeedback}</p>}
                           {/* 수업 노트 (번역된 것이 있으면 번역) */}
@@ -205,6 +211,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                 today={today}
                 byDay={Object.fromEntries(byDay)}
                 feedbackIds={feedbackIds}
+                marks={marks}
                 holidays={holidays}
                 timeZone={timeZone}
                 otherTimeZone={otherTimeZone}

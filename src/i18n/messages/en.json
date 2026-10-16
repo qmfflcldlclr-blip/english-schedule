@@ -73,7 +73,7 @@
     "notFound": "Student not found.",
     "errors": {
       "name": "Please enter a name.",
-      "minutes": "Class length must be between {min} and {max} minutes.",
+      "minutes": "Choose a class length.",
       "save": "Could not save. Please try again."
     },
     "remaining": "Remaining",
@@ -109,7 +109,11 @@
     "panelGone": "Student not found.",
     "panelClose": "Close",
     "details": "Details",
-    "moreHistory": "Show more ({n} more)"
+    "moreHistory": "Show more ({n} more)",
+    "plan": "Plan",
+    "paidShort": "Paid {date}",
+    "projected": "(est.)",
+    "undecided": "TBD"
   },
   "credits": {
     "title": "Class credits",
@@ -151,14 +155,13 @@
       "lesson_completed": "Class completed",
       "absent": "Absent",
       "late_cancel": "Late cancel",
-      "free_cancel": "Free cancel",
+      "free_cancel": "Postponed",
       "adjust": "Manual adjustment",
       "revert": "Reverted"
     },
     "newPlanTitle": "Add plan",
     "editPlanTitle": "Edit plan",
     "editPlan": "Edit",
-    "creditsLocked": "Credits cannot be changed. Use Adjust instead.",
     "adjustTitle": "Adjust credits",
     "direction": "Direction",
     "plus": "Add (+)",
@@ -171,9 +174,9 @@
     "saving": "Saving…",
     "cancel": "Cancel",
     "errors": {
-      "credits": "Credits must be between 1 and {max}.",
-      "dates": "Please enter the paid and start dates.",
-      "expires": "Expiry must be on or after the start date.",
+      "credits": "Choose a plan type.",
+      "dates": "Enter the payment date.",
+      "expires": "Expiry date must be after the payment date.",
       "amount": "Credits must be between 1 and {max}.",
       "reason": "Please enter a reason.",
       "save": "Could not save. Please try again."
@@ -183,9 +186,19 @@
     "reasons": {
       "early_first": "{hours}+ hours before, first cancel this month",
       "within_hour": "Cancelled within {hours} hour(s) of class",
-      "monthly_limit": "Already cancelled this month"
+      "monthly_limit": "Already cancelled this month",
+      "postponed": "no credit used"
     },
-    "moreOptions": "Dates, expiry, memo (optional)"
+    "moreOptions": "Expiry date & memo (optional)",
+    "planKind": "Plan type",
+    "planType": "{w}×/week · {n} classes",
+    "planTest": "1 class (trial)",
+    "planCustom": "{n} classes (old plan)",
+    "planChangeHint": "Changing the type adds or removes the difference from the remaining credits.",
+    "startsAuto": "Start and end dates are calculated from the schedule.",
+    "endsOn": "End date",
+    "projected": "(est.)",
+    "undecided": "TBD"
   },
   "calendar": {
     "title": "Calendar",
@@ -200,7 +213,7 @@
     "status": {
       "scheduled": "Scheduled",
       "completed": "Completed",
-      "free_cancel": "Free cancel",
+      "free_cancel": "Postponed",
       "absent": "Absent"
     },
     "newTitle": "Add class",
@@ -229,7 +242,7 @@
       "student": "Please choose a student.",
       "date": "Please enter a date.",
       "time": "Please enter a start time.",
-      "duration": "Length must be between {min} and {max} minutes.",
+      "duration": "Choose a class length.",
       "save": "Could not save. Please try again.",
       "delete": "Could not delete. The class may already be processed."
     },
@@ -272,32 +285,20 @@
     },
     "actions": {
       "complete": "Completed",
-      "cancel": "Cancel",
+      "cancel": "Postpone",
       "absent": "Absent",
       "revert": "Revert"
     },
     "processing": "Processing…",
     "confirmComplete": "Mark this class as completed? {units} credit(s) will be used.",
     "confirmCompleteNoCredits": "This student has {n} credits left. Complete anyway? The balance will go negative.",
-    "confirmAbsent": "Mark as absent (no-show)? {units} credit(s) will be used.",
+    "confirmAbsent": "Mark as absent? {units} credit(s) will be used.",
     "confirmRevert": "Revert to \"Scheduled\"? Any credit change from this class will be undone.",
-    "cancelTitle": "Cancel class",
-    "cancelledAt": "When the cancellation was received",
-    "cancelledAtHint": "Defaults to now. If you were told earlier, change it to that time.",
-    "cancelPreviewFree": "Free cancellation — no credit used.",
-    "cancelPreviewCharged": "{units} credit(s) will be used.",
-    "checking": "Checking…",
-    "confirmCancel": "Cancel class",
     "back": "Back",
     "remainingNow": "{n} credits left",
     "cancelledAtLabel": "Cancelled at",
-    "noShow": "Absent (no-show)",
+    "noShow": "Absent",
     "lateCancel": "Late cancel",
-    "reasons": {
-      "early_first": "{hours}+ hours before, first cancel this month",
-      "within_hour": "Cancelled within {hours} hour(s) of class",
-      "monthly_limit": "Already cancelled {n} time(s) this month"
-    },
     "statusErrors": {
       "already_processed": "This class was already processed. Please refresh.",
       "cancel_time_in_future": "Cancellation time cannot be in the future.",
@@ -320,7 +321,7 @@
       "weekStudents": "Students this week",
       "noWeekStudents": "No classes this week.",
       "monthLessons": "Classes in {month}",
-      "counts": "Done {done} · Scheduled {scheduled} · Absent {absent} · Cancelled {cancel}",
+      "counts": "Done {done} · Scheduled {scheduled} · Absent {absent} · Postponed {cancel}",
       "noMonthLessons": "No classes this month.",
       "prevMonth": "Previous month",
       "nextMonth": "Next month",
@@ -332,7 +333,7 @@
       "lessonGone": "Class not found. It may have been deleted.",
       "loading": "Loading…",
       "archived": "Archived",
-      "processedHint": "Cancel or revert from 'Details'.",
+      "processedHint": "Undo is on the 'Details' page.",
       "monthTitle": "{month} overview",
       "monthTotal": "{n} classes · {time}",
       "byLength": "{m} min × {n}",
@@ -376,7 +377,11 @@
     "copyWeekItem": "{range} · {n}",
     "copyThisWeek": "Copy to",
     "holidaySkip": "Holiday · {name}",
-    "creditUnits": "uses {units}"
+    "creditUnits": "uses {units}",
+    "confirmPostpone": "Mark as postponed? No credit will be used.",
+    "postponeHint": "Postpone only when the teacher/manager allows it — no credit used. Other missed classes are Absent (charged).",
+    "planStart": "Start",
+    "planEnd": "End"
   },
   "settings": {
     "title": "Settings",
@@ -389,17 +394,19 @@
     "openZoom": "Open Zoom",
     "noZoom": "No Zoom link yet.",
     "setZoom": "Add in Settings",
-    "rulesTitle": "Cancellation rules",
-    "rulesHint": "Rule values can be changed in the database settings.",
-    "ruleHours": "Free cancellation",
-    "ruleHoursValue": "Up to {n} hour(s) before class",
-    "rulePerMonth": "Free cancels per month",
-    "rulePerMonthValue": "{n} (all cancellations count)",
-    "ruleZone": "Month boundary time zone",
+    "rulesTitle": "Class & credit rules",
     "errors": {
       "url": "Please enter a valid address starting with https://",
       "save": "Could not save. Please try again."
-    }
+    },
+    "ruleUnits": "Credits",
+    "ruleUnitsValue": "30 min = 1 · 60 min = 2 · 90 min = 3",
+    "ruleAbsent": "Absent",
+    "ruleAbsentValue": "Charged by length",
+    "rulePostpone": "Postpone",
+    "rulePostponeValue": "Only when chosen by teacher/manager · no credit used",
+    "rulePlans": "Plans (4 weeks)",
+    "rulePlansValue": "1×/wk 4 · 2×/wk 8 · 3×/wk 12 · 4×/wk 16 · 5×/wk 20"
   },
   "print": {
     "title": "Print schedule",
@@ -415,13 +422,13 @@
     "colMonth": "Classes",
     "colCompleted": "Done",
     "colScheduled": "Scheduled",
-    "colFree": "Free cancel",
+    "colFree": "Postponed",
     "colAbsent": "Absent/charged",
     "colRemaining": "Remaining",
     "total": "Total",
     "noLessons": "No classes this month.",
     "printedAt": "Printed {date}",
-    "freeShort": "cancel",
+    "freeShort": "Postp.",
     "lateShort": "charged",
     "absentShort": "absent",
     "timeZoneNote": "{zone} time"

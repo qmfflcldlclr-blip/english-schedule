@@ -1,5 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { getPlanTimelines } from "@/lib/plan-timelines";
+import type { PlanSpan } from "@/lib/plan-timeline";
 import {
   computePlanProgress,
   withRunningBalance,
@@ -21,7 +23,7 @@ const PLAN_COLUMNS =
 // 학생 1명의 횟수 현황: 요약 + 플랜별 진행 + 기록(최신순)
 export async function getStudentCredits(studentId: string, today: string) {
   const supabase = await createClient();
-  const [plansRes, entriesRes] = await Promise.all([
+  const [plansRes, entriesRes, timelines] = await Promise.all([
     supabase.from("plans").select(PLAN_COLUMNS).eq("student_id", studentId),
     supabase
       .from("credit_entries")
@@ -30,6 +32,7 @@ export async function getStudentCredits(studentId: string, today: string) {
       )
       .eq("student_id", studentId)
       .order("created_at"),
+    getPlanTimelines([studentId]),
   ]);
   if (plansRes.error) throw plansRes.error;
   if (entriesRes.error) throw entriesRes.error;
@@ -50,7 +53,12 @@ export async function getStudentCredits(studentId: string, today: string) {
   const used = -entries
     .filter((e) => e.kind !== "plan")
     .reduce((sum, e) => sum + e.delta, 0);
-  const plans = computePlanProgress(plansRes.data as PlanRow[], used, today);
+  const spans = timelines.get(studentId)?.spans ?? [];
+  // 플랜마다 실제 시작·종료 수업 (예상 포함)
+  const plans = computePlanProgress(plansRes.data as PlanRow[], used, today).map((p) => ({
+    ...p,
+    span: spans.find((s) => s.planId === p.id),
+  }));
 
   return {
     remaining,
@@ -72,18 +80,21 @@ export async function getPlan(planId: string) {
   return data as (PlanRow & { student_id: string }) | null;
 }
 
-// 학생 목록용: 학생별 남은 횟수와 "기간 지난 플랜이 있는지"
+export type CurrentPlan = { credits: number; paidOn: string; span?: PlanSpan };
+
+// 학생 목록용: 학생별 남은 횟수, "기간 지난 플랜이 있는지", 지금 쓰는 플랜(없으면 마지막 플랜)의 결제일·시작·종료
 export async function getCreditOverview(studentIds: string[], today: string) {
-  const overview = new Map<string, { remaining: number; expired: boolean }>();
+  const overview = new Map<string, { remaining: number; expired: boolean; plan: CurrentPlan | null }>();
   if (studentIds.length === 0) return overview;
 
   const supabase = await createClient();
-  const [balancesRes, plansRes] = await Promise.all([
+  const [balancesRes, plansRes, timelines] = await Promise.all([
     supabase
       .from("student_balances")
       .select("student_id, remaining, used")
       .in("student_id", studentIds),
     supabase.from("plans").select(PLAN_COLUMNS).in("student_id", studentIds),
+    getPlanTimelines(studentIds),
   ]);
   if (balancesRes.error) throw balancesRes.error;
   if (plansRes.error) throw plansRes.error;
@@ -93,9 +104,17 @@ export async function getCreditOverview(studentIds: string[], today: string) {
       (p) => p.student_id === b.student_id,
     );
     const progress = computePlanProgress(plans, b.used, today);
+    const current = progress.find((p) => p.status === "active") ?? progress.at(-1);
     overview.set(b.student_id, {
       remaining: b.remaining,
       expired: progress.some((p) => p.expired),
+      plan: current
+        ? {
+            credits: current.credits,
+            paidOn: current.paid_on,
+            span: timelines.get(b.student_id)?.spans.find((s) => s.planId === current.id),
+          }
+        : null,
     });
   }
   return overview;

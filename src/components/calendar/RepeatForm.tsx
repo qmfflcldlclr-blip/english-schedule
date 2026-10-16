@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useActionForm } from "@/lib/use-action-form";
 import { repeatLessons, type RepeatFormState } from "@/lib/schedule-actions";
-import { LESSON_MINUTES_MAX, LESSON_MINUTES_MIN, REPEAT_MAX_WEEKS } from "@/config/rules";
+import { LESSON_LENGTHS, REPEAT_MAX_WEEKS } from "@/config/rules";
 import { format } from "@/i18n/format";
 import type { Messages } from "@/i18n/server";
 import { formatDay, toZoned } from "@/lib/time";
@@ -87,25 +87,21 @@ export default function RepeatForm({ t, students, zoneLabel, timeZone, locale, i
       <div className="grid grid-cols-2 gap-3">
         <label className="block text-sm font-medium">
           {t.time}
-          <input name="time" type="time" required step={300} value={time} onChange={(e) => changed(setTime)(e.target.value)} className={fieldClass} />
+          <input name="time" type="time" required step={600} value={time} onChange={(e) => changed(setTime)(e.target.value)} className={fieldClass} />
           {errors.time && <ErrorText>{t.errors.time}</ErrorText>}
         </label>
         <label className="block text-sm font-medium">
           {t.duration}
-          <input
+          <select
             name="duration_minutes"
-            type="number"
-            inputMode="numeric"
             required
-            min={LESSON_MINUTES_MIN}
-            max={LESSON_MINUTES_MAX}
             value={duration}
             onChange={(e) => changed(setDuration)(Number(e.target.value))}
             className={fieldClass}
-          />
-          {errors.duration && (
-            <ErrorText>{format(t.errors.duration, { min: LESSON_MINUTES_MIN, max: LESSON_MINUTES_MAX })}</ErrorText>
-          )}
+          >
+            {LESSON_LENGTHS.map((m) => <option key={m} value={m}>{format(t.minutesUnit, { n: m })}</option>)}
+          </select>
+          {errors.duration && <ErrorText>{t.errors.duration}</ErrorText>}
         </label>
       </div>
       <p className="-mt-3 text-sm text-gray-500">{format(t.timeZoneHint, { zone: zoneLabel })}</p>

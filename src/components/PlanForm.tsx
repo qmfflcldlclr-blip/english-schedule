@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useActionForm } from "@/lib/use-action-form";
 import { savePlan, type PlanFormState } from "@/lib/credit-actions";
-import { PLAN_CREDITS_MAX } from "@/config/rules";
-import { format } from "@/i18n/format";
+import PlanSelect from "@/components/PlanSelect";
 import type { Messages } from "@/i18n/server";
 import type { PlanRow } from "@/lib/credit-math";
 
@@ -12,7 +11,7 @@ type Props = {
   t: Messages["credits"];
   studentId: string;
   today: string;
-  plan?: PlanRow; // 있으면 수정 모드 (횟수는 고정)
+  plan?: PlanRow; // 있으면 수정 모드
 };
 
 export const fieldClass =
@@ -67,57 +66,28 @@ export default function PlanForm({ t, studentId, today, plan }: Props) {
     <form onSubmit={onSubmit} className="flex flex-col gap-5">
       <input type="hidden" name="student_id" value={studentId} />
       {plan && <input type="hidden" name="plan_id" value={plan.id} />}
+      {plan && <input type="hidden" name="old_credits" value={plan.credits} />}
 
       <label className="block text-sm font-medium">
-        {t.credits}
-        <input
-          name="credits"
-          type="number"
-          inputMode="decimal"
-          required={!plan}
-          disabled={Boolean(plan)}
-          min={0.5}
-          step={0.5}
-          max={PLAN_CREDITS_MAX}
-          defaultValue={plan?.credits}
-          aria-invalid={errors.credits || undefined}
-          className={`${fieldClass} w-32 disabled:bg-gray-100 disabled:text-gray-500`}
-        />
-        {plan && (
-          <span className="mt-1 block text-sm font-normal text-gray-500">
-            {t.creditsLocked}
-          </span>
-        )}
-        {errors.credits && (
-          <ErrorText>{format(t.errors.credits, { max: PLAN_CREDITS_MAX })}</ErrorText>
-        )}
+        {t.planKind}
+        <PlanSelect t={t} current={plan?.credits} invalid={errors.credits} className={`${fieldClass} sm:w-64`} />
+        {plan && <span className="mt-1 block text-sm font-normal text-gray-500">{t.planChangeHint}</span>}
+        {errors.credits && <ErrorText>{t.errors.credits}</ErrorText>}
       </label>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <label className="block text-sm font-medium">
-          {t.paidOn}
-          <input
-            name="paid_on"
-            type="date"
-            required
-            defaultValue={plan?.paid_on ?? today}
-            aria-invalid={errors.dates || undefined}
-            className={fieldClass}
-          />
-        </label>
-        <label className="block text-sm font-medium">
-          {t.startsOn}
-          <input
-            name="starts_on"
-            type="date"
-            required
-            defaultValue={plan?.starts_on ?? today}
-            aria-invalid={errors.dates || undefined}
-            className={fieldClass}
-          />
-        </label>
-      </div>
-      {errors.dates && <ErrorText>{t.errors.dates}</ErrorText>}
+      <label className="block text-sm font-medium">
+        {t.paidOn}
+        <input
+          name="paid_on"
+          type="date"
+          required
+          defaultValue={plan?.paid_on ?? today}
+          aria-invalid={errors.dates || undefined}
+          className={`${fieldClass} sm:w-64`}
+        />
+        <span className="mt-1 block text-sm font-normal text-gray-500">{t.startsAuto}</span>
+        {errors.dates && <ErrorText>{t.errors.dates}</ErrorText>}
+      </label>
 
       <label className="block text-sm font-medium">
         {t.expiresOn}

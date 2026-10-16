@@ -9,10 +9,10 @@ export const CALENDAR_RANGE_TIME_ZONE = "Asia/Seoul";
 // 이 시각 전에 시작하는 새벽 수업은 화면에서 "전날" 칸에 이어서 보여 줌 (횟수·취소 규칙과는 무관)
 export const DAY_CUTOFF_HOUR = 5;
 
-// 시간표에서 더블클릭·드래그로 고르는 최소 단위(분)
-export const SLOT_MINUTES = 15;
+// 시간표에서 클릭·드래그·옮기기로 고르는 최소 단위(분). 10분 단위 시작(예: 8:20)은 수정 폼에서
+export const SLOT_MINUTES = 30;
 
-// PC 시간표 1시간 높이(px). 15분 수업도 한 줄이 보이도록 넉넉하게
+// PC 시간표 1시간 높이(px)
 export const HOUR_PX = 112;
 
 // 한 주의 첫 요일 (0 = 일요일, 1 = 월요일). 달력·인쇄·지난주 복사·반복 요일 순서가 모두 따름

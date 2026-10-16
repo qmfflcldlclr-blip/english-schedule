@@ -297,9 +297,10 @@ function LessonView(props: Props & { lessonId: string }) {
   const scheduled = lesson.status === "scheduled";
   const showStudent = () => panel.open({ mode: "student", studentId: lesson.student_id });
 
-  const run = (action: "complete" | "absent") => {
+  const run = (action: "complete" | "absent" | "cancel") => {
     const units = { units: creditUnits(lesson.duration_minutes) };
-    if (!window.confirm(format(action === "complete" ? labels.confirmComplete : labels.confirmAbsent, units))) return;
+    const ask = { complete: labels.confirmComplete, absent: labels.confirmAbsent, cancel: labels.confirmPostpone }[action];
+    if (!window.confirm(format(ask, units))) return;
     setError(null);
     startTransition(async () => {
       let result = await quickLessonStatus(lesson.id, action);
@@ -367,12 +368,15 @@ function LessonView(props: Props & { lessonId: string }) {
       />
 
       {scheduled && (
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-4 grid grid-cols-3 gap-2">
           <button type="button" disabled={pending} onClick={() => run("complete")} className="min-h-12 rounded-xl bg-brand-600 font-semibold text-white disabled:opacity-60">
             ✓ {labels.complete}
           </button>
           <button type="button" disabled={pending} onClick={() => run("absent")} className="min-h-12 rounded-xl border border-red-200 bg-red-50 font-semibold text-red-700 disabled:opacity-60">
             ✕ {labels.absent}
+          </button>
+          <button type="button" disabled={pending} onClick={() => run("cancel")} className="min-h-12 rounded-xl border border-gray-300 bg-white font-semibold text-gray-700 disabled:opacity-60">
+            ⏸ {labels.postpone}
           </button>
         </div>
       )}

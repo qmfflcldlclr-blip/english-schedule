@@ -3,7 +3,9 @@ import { getDictionary } from "@/i18n/server";
 import { format } from "@/i18n/format";
 import { listStudents } from "@/lib/students";
 import { getCurrentProfile } from "@/lib/supabase/server";
-import { getCreditOverview } from "@/lib/credits";
+import { getCreditOverview, type CurrentPlan } from "@/lib/credits";
+import { planLabel } from "@/components/PlanSelect";
+import { toScheduleDay } from "@/lib/time";
 import { listNotesByStudent } from "@/lib/student-notes";
 import { translateMany } from "@/lib/translate";
 import { todayIn } from "@/lib/credit-math";
@@ -43,8 +45,21 @@ export default async function StudentsPage({
     students.flatMap((st) => [noteOf(st.id).privateNote, noteOf(st.id).sharedNote]),
     locale,
   );
-  const creditsOf = (id: string) =>
-    overview.get(id) ?? { remaining: 0, expired: false };
+  const timeZone = profile?.timezone ?? "UTC";
+  // 플랜 칸 글자: "주 2회 · 8회", "결제 10/25", "10/27 ~ 11/20 (예상)"
+  const md = (date: string) => `${Number(date.slice(5, 7))}/${Number(date.slice(8))}`;
+  const when = (iso: string | null | undefined, projected?: boolean) =>
+    iso ? `${md(toScheduleDay(iso, timeZone).date)}${projected ? ` ${t.projected}` : ""}` : t.undecided;
+  const planText = (p: CurrentPlan | null) =>
+    p && {
+      label: planLabel(p.credits, all.credits),
+      paid: format(t.paidShort, { date: md(p.paidOn) }),
+      range: `${when(p.span?.start, p.span?.startProjected)} ~ ${when(p.span?.end, p.span?.endProjected)}`,
+    };
+  const creditsOf = (id: string) => {
+    const o = overview.get(id);
+    return { remaining: o?.remaining ?? 0, expired: o?.expired ?? false, plan: planText(o?.plan ?? null) };
+  };
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 lg:max-w-[88rem]">
@@ -98,7 +113,7 @@ export default async function StudentsPage({
           panel={{
             t: { students: t, credits: all.credits, notes: all.notes, studentNotes: all.studentNotes },
             locale,
-            timeZone: profile?.timezone ?? "UTC",
+            timeZone,
             hoursBefore: settings.freeCancelHoursBefore,
           }}
         />

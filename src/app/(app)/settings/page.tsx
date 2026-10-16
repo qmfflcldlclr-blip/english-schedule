@@ -1,5 +1,4 @@
 import { getDictionary } from "@/i18n/server";
-import { format } from "@/i18n/format";
 import { getSettings } from "@/lib/settings";
 import ZoomForm from "@/components/ZoomForm";
 
@@ -20,14 +19,15 @@ export default async function SettingsPage() {
       <section className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
         <h2 className="font-semibold">{t.rulesTitle}</h2>
         <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-          <dt className="text-gray-500">{t.ruleHours}</dt>
-          <dd>{format(t.ruleHoursValue, { n: settings.freeCancelHoursBefore })}</dd>
-          <dt className="text-gray-500">{t.rulePerMonth}</dt>
-          <dd>{format(t.rulePerMonthValue, { n: settings.freeCancelsPerMonth })}</dd>
-          <dt className="text-gray-500">{t.ruleZone}</dt>
-          <dd>{settings.businessTimeZone}</dd>
+          <dt className="text-gray-500">{t.ruleUnits}</dt>
+          <dd>{t.ruleUnitsValue}</dd>
+          <dt className="text-gray-500">{t.ruleAbsent}</dt>
+          <dd>{t.ruleAbsentValue}</dd>
+          <dt className="text-gray-500">{t.rulePostpone}</dt>
+          <dd>{t.rulePostponeValue}</dd>
+          <dt className="text-gray-500">{t.rulePlans}</dt>
+          <dd>{t.rulePlansValue}</dd>
         </dl>
-        <p className="mt-3 text-xs text-gray-400">{t.rulesHint}</p>
       </section>
     </main>
   );
